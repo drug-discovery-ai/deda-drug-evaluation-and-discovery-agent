@@ -3,7 +3,6 @@ import random
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# === CONFIGURABLE PROMPT FORMAT ===
 USE_CHATML_FORMAT = True  # Set to False for plain instruction-input-output format
 
 
@@ -15,9 +14,9 @@ def generate_calendar_events(start_date, days=60):
         events.append({
             "date": date.strftime("%Y-%m-%d"),
             "events": [
-                f"{date.strftime('%Y-%m-%d')} 09:00 AM - Daily Standup",
-                f"{date.strftime('%Y-%m-%d')} 02:00 PM - Project Update with Team",
-                f"{date.strftime('%Y-%m-%d')} 05:00 PM - Review Emails and Plan Next Day"
+                f"{date.strftime('%Y-%m-%d')} 09:00 AM - Daily checkin with the team",
+                f"{date.strftime('%Y-%m-%d')} 02:00 PM - Project Update",
+                f"{date.strftime('%Y-%m-%d')} 05:00 PM - Review messages and Plan Next Day"
             ]
         })
     return events
