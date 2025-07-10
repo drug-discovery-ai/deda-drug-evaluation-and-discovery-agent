@@ -11,7 +11,7 @@ from starlette.responses import JSONResponse
 
 import uvicorn
 
-# Initialize FastMCP server for Weather tools (SSE)
+# Initialize FastMCP server for FASTA tools (SSE)
 mcp = FastMCP("FASTA")
 
 # Constants
