@@ -15,26 +15,9 @@ import uvicorn
 mcp = FastMCP("FASTA")
 
 # Constants
-NWS_API_BASE = "https://api.weather.gov"
-USER_AGENT = "weather-app/1.0"
+USER_AGENT = "FASTA-app/1.0"
 
 VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
-
-
-async def handle_invoke(request: Request) -> JSONResponse:
-    body = await request.json()
-    method = body.get("method")
-    params = body.get("params", {})
-
-    tool = mcp._mcp_server._tool_registry.get(method)
-    if not tool:
-        return JSONResponse({"error": f"Method '{method}' not found."}, status_code=400)
-
-    try:
-        result = await tool(**params)
-        return JSONResponse({"result": result})
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 async def make_fasta_request(url: str) -> dict[str, Any] | None:
@@ -69,7 +52,6 @@ async def get_fasta_protein(uniprot_code: str) -> str:
         A string containing the protein sequence in FASTA format.
     """
     url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.fasta"
-    print(url)
     data = await make_fasta_request(url)
     return data
 
@@ -118,7 +100,6 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         debug=debug,
         routes=[
             Route("/sse", endpoint=handle_sse),
-            Route("/invoke", endpoint=handle_invoke, methods=["POST"]),
             Route("/rest/get_fasta", endpoint=rest_get_fasta_protein, methods=["GET"]),
             Mount("/messages/", app=sse.handle_post_message),
         ],
