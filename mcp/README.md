@@ -11,7 +11,7 @@ Generate 5 small molecules that bind to the spike protein of SARS-CoV-2.
 ```
 Behind the scenes, the AI (i.e. LLM) connects to real tools like Boltz, Pocket2Mol, or ESMFold to get the job done—accurately and reproducibly.
 
-Currently we are focusing only integrating LLM to explore the vast capability of the `boltz` tool. **Contributions** are welcome to help expand integration with popular tools like `Pocket2Mol`, `DeepChem`, and `RDKit—with` the goal of supporting a broader range of bioinformatics workflows.
+Currently we are focusing only integrating LLM to explore the vast capability of the `boltz` tool. **Contributions** are welcome to help expand integration with popular tools like `Pocket2Mol`, `DeepChem`, and `RDKit` —with the goal of supporting a broader range of bioinformatics workflows.
 
 We leverage Model Control Protocl (mcp) to develop the bio-informatics AI agent. 
 
