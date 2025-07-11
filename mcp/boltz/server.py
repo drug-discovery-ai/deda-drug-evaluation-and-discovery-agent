@@ -34,7 +34,7 @@ async def make_fasta_request(url: str) -> dict[str, Any] | None:
         except Exception:
             return None
 
-@mcp.tool()
+@mcp.tool(description="Retrieves the amino acid sequence in FASTA format for a given viral protein using its UniProt accession code.")
 async def get_fasta_protein(uniprot_code: str) -> str:
     """
     Given a UniProt accession code for a virus protein, return its sequence in FASTA format.
@@ -54,6 +54,7 @@ async def get_fasta_protein(uniprot_code: str) -> str:
     url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.fasta"
     data = await make_fasta_request(url)
     return data
+
 
 
 # REST-style endpoint that wraps MCP tool: get_fasta_protein
