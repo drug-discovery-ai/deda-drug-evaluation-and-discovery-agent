@@ -24,6 +24,11 @@ USER_AGENT = "FASTA-app/1.0"
 VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
 
 
+
+
+
+############################ UNIPROT Database ############################################
+
 async def make_fasta_request(url: str) -> dict[str, Any] | None:
     """Make a request to the uniprot API with proper error handling."""
     headers = {
@@ -182,6 +187,144 @@ async def analyze_sequence_properties(uniprot_code: str) -> dict:
     }
 
 
+############################ RCSB Protein Data Bank ############################################
+
+@mcp.tool(
+    name="get_top_pdb_ids_for_uniprot",
+    description="Returns up to 10 representative PDB IDs for a given UniProt protein. Useful for fetching 3D structures without flooding the client."
+)
+async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> list[str]:
+    """
+    Fetches top 10 representative PDB entries from UniProt cross-references.
+    Returned PDB entries help in identifying structural details of the protein from the RCSB Database.
+
+    Args:
+        uniprot_id (str): A valid UniProt accession (e.g., 'P0DTC2').
+
+    Returns:
+        list[str]: Up to 10 unique PDB IDs linked to the protein.
+    """
+    url = f"https://rest.uniprot.org/uniprotkb/{uniprot_id}.json"
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+    except Exception:
+        return []
+
+    pdb_ids = [
+        xref["id"]
+        for xref in data.get("uniProtKBCrossReferences", [])
+        if xref.get("database") == "PDB"
+    ]
+
+    return sorted(set(pdb_ids))[:10]
+
+
+
+@mcp.tool(
+    name="get_experimental_structure_details",
+    description="Fetches experimental structure metadata from RCSB PDB using a valid PDB ID (e.g., '4HHB'). Useful for grounding structure-related queries with resolution, method, and official description."
+)
+async def get_experimental_structure_details(pdb_id: str) -> dict:
+    """
+    Given a PDB ID, returns curated structure metadata from RCSB PDB.
+
+    Args:
+        pdb_id (str): The 4-character PDB ID (e.g., '4HHB').
+
+    Returns:
+        dict: Metadata including structure title, method, resolution, and download link.
+    """
+    url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id.upper()}"
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, timeout=10)
+            response.raise_for_status()
+            entry = response.json()
+    except httpx.HTTPStatusError:
+        return {"error": f"No entry found for PDB ID: {pdb_id}"}
+    except Exception as e:
+        return {"error": f"Request failed: {str(e)}"}
+
+    return {
+        "pdb_id": pdb_id.upper(),
+        "title": entry.get("struct", {}).get("title"),
+        "method": entry.get("exptl", [{}])[0].get("method"),
+        "resolution": next(iter(entry.get("rcsb_entry_info", {}).get("resolution_combined", [])), None),
+        "deposited_atoms": entry.get("rcsb_entry_info", {}).get("deposited_atom_count"),
+        "release_date": entry.get("rcsb_accession_info", {}).get("initial_release_date"),
+        "keywords": entry.get("struct_keywords", {}).get("pdbx_keywords"),
+        "structure_url": f"https://files.rcsb.org/download/{pdb_id.upper()}.pdb"
+    }
+
+
+@mcp.tool(
+    name="get_ligand_smiles_from_uniprot",
+    description="Chains UniProt to PDB to retrieve known ligand SMILES structures. Helpful for identifying real molecules that bind to a protein."
+)
+async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict]:
+    """
+    Given a UniProt ID, returns ligand details (SMILES, formula) from top related PDB structures.
+
+    Args:
+        uniprot_id (str): A valid UniProt accession (e.g., 'P0DTC2').
+
+    Returns:
+        list[dict]: Ligand metadata including ID, name, formula, and SMILES.
+    """
+    pdb_lookup_url = f"https://rest.uniprot.org/uniprotkb/{uniprot_id}.json"
+    ligands = []
+
+    try:
+        async with httpx.AsyncClient() as client:
+            # Step 1: Get PDB cross-references from UniProt
+            response = await client.get(pdb_lookup_url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            pdb_ids = [
+                xref["id"]
+                for xref in data.get("uniProtKBCrossReferences", [])
+                if xref.get("database") == "PDB"
+            ]
+            pdb_ids = sorted(set(pdb_ids))[:10]
+
+            # Step 2: For each PDB ID, extract ligand info from RCSB
+            for pdb_id in pdb_ids:
+                entry_url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
+                entry_resp = await client.get(entry_url, timeout=10)
+                if entry_resp.status_code != 200:
+                    continue
+                entry = entry_resp.json()
+                entity_ids = entry.get("rcsb_entry_container_identifiers", {}).get("nonpolymer_entity_ids", [])
+
+                for eid in entity_ids:
+                    ligand_url = f"https://data.rcsb.org/rest/v1/core/nonpolymer_entity/{pdb_id}/{eid}"
+                    ligand_resp = await client.get(ligand_url, timeout=10)
+                    if ligand_resp.status_code != 200:
+                        continue
+                    ligand_data = ligand_resp.json()
+                    chem = ligand_data.get("chem_comp", {})
+
+                    ligands.append({
+                        "pdb_id": pdb_id,
+                        "ligand_id": chem.get("id"),
+                        "name": chem.get("name"),
+                        "formula": chem.get("formula"),
+                        "smiles": chem.get("smiles")
+                    })
+
+        return ligands[:10]  # return top 10 ligands total
+
+    except Exception as e:
+        return [{"error": str(e)}]
+
+
+
+
 # REST-style endpoint that wraps MCP tool: get_fasta_protein
 async def rest_get_fasta_protein(request: Request) -> JSONResponse:
     try:
@@ -208,6 +351,28 @@ async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+    
+# REST-style endpoint that wraps MCP tool: top_pdb_ids_for_uniprot
+async def rest_get_top_pdb_ids_for_uniprot(request: Request) -> JSONResponse:
+    try:
+        state = request.query_params["uniprot_code"]
+        result = await get_top_pdb_ids_for_uniprot(state)
+        return JSONResponse({"result": result})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    
+
+# REST-style endpoint that wraps MCP tool: top_pdb_ids_for_uniprot
+async def rest_get_experimental_structure_details(request: Request) -> JSONResponse:
+    try:
+        state = request.query_params["pdb_id"]
+        result = await get_experimental_structure_details(state)
+        return JSONResponse({"result": result})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+
 
 @mcp.prompt()
 def get_initial_prompts() -> list[base.Message]:
@@ -247,6 +412,8 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
             Route("/rest/get_fasta", endpoint=rest_get_fasta_protein, methods=["GET"]),
             Route("/rest/get_protein_details", endpoint=rest_get_details_protein, methods=["GET"]),
             Route("/rest/analyze_sequence_properties", endpoint=rest_analyze_sequence_properties, methods=["GET"]),
+            Route("/rest/top_pdb_ids", endpoint=rest_get_top_pdb_ids_for_uniprot, methods=["GET"]),
+            Route("/rest/get_experimental_structure_details", endpoint=rest_get_experimental_structure_details, methods=["GET"]),
             Mount("/messages/", app=sse.handle_post_message),
         ],
     )
