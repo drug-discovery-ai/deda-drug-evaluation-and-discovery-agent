@@ -7,7 +7,7 @@ USE_CHATML_FORMAT = True  # Set to False for plain instruction-input-output form
 
 
 # Generate synthetic calendar events
-def generate_calendar_events(start_date, days=60):
+def generate_calendar_events(start_date, days=10):
     events = []
     for i in range(days):
         date = start_date + timedelta(days=i)

@@ -9,7 +9,7 @@ OUTPUT_DIR = "./fine-tuned-model"
 MAX_SEQ_LENGTH = 512
 
 # Format selection - set this to choose your data format
-DATA_FORMAT = "instruction"  # Options: "chatml" or "instruction"
+DATA_FORMAT = "chatml"  # Options: "chatml" or "instruction"
 
 # Data files based on format
 DATA_FILES = {
@@ -94,8 +94,8 @@ data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 # Training config
 training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
-    per_device_train_batch_size=2,
-    num_train_epochs=3,
+    per_device_train_batch_size=1,
+    num_train_epochs=1,
     save_strategy="epoch",
     logging_steps=10,
     fp16=False,  # No CUDA, so disable fp16
