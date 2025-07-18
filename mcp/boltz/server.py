@@ -26,9 +26,6 @@ VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
 RCSB_DB_ENDPOINT = "https://data.rcsb.org/rest/v1/core/entry"
 
 
-
-
-
 ############################ UNIPROT Database ############################################
 
 async def make_fasta_request(url: str) -> dict[str, Any] | None:
@@ -71,11 +68,17 @@ async def get_fasta_protein(uniprot_code: str) -> str:
 
 @mcp.tool(
     name="get_virus_protein_details",
-    description="Fetch metadata about a viral protein given its UniProt accession code.",
+    description="Retrieve virus protein metadata (organism, species, lineage, function) from UniProt given an accession code like 'P0DTC2'."
 )
 async def get_virus_protein_details(uniprot_code: str) -> dict:
     """
-    Retrieve metadata (organism, species, lineage, function) for a viral protein by its UniProt accession code.
+    Returns structured metadata about a viral protein from UniProt.
+    
+    Args:
+        uniprot_code (str): UniProt accession code (e.g., P0DTC2).
+    
+    Returns:
+        dict: Contains organism, scientific name, lineage, function, reference URL, RCSB structural details url etc.
     """
     url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.json"
     
@@ -92,10 +95,10 @@ async def get_virus_protein_details(uniprot_code: str) -> dict:
 
     # Extract useful details
     result = {
-        "accession": entry.get("primaryAccession"),
+        "accession": entry.get("primaryAccession","UNKNOWN"),
         "organism": entry.get("organism", {}).get("scientificName"),
         "lineage": " → ".join(entry.get("organism", {}).get("lineage", [])),
-        "taxonomy_id": entry.get("organism", {}).get("taxonId"),
+        "taxonomy_id": entry.get("organism", {}).get("taxonId","NONE"),
     }
 
     # Affected hosts
@@ -140,7 +143,6 @@ async def get_virus_protein_details(uniprot_code: str) -> dict:
     # Reference url
     reference = VIRUS_UNIPROT_REST_API_BASE+"/"+uniprot_code
     result["Reference"] = reference
-
     return result
 
 @mcp.tool(

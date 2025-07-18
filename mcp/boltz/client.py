@@ -105,9 +105,9 @@ class MCPClient:
                     tool_name = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
 
-                    print(f"\n[Calling tool {tool_name} with args {tool_args}]...")
+                    #print(f"\n[Calling tool {tool_name} with args {tool_args}]...")
                     result = await self.session.call_tool(tool_name, tool_args)
-                    print(f"\nTool response: {result}")
+                    print(f"\nTool response: waiting..")
                     self.messages.append(
                         {
                             "role": "tool",
@@ -163,4 +163,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main()) 
