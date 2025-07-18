@@ -87,7 +87,7 @@ class MCPClient:
     async def call_openai(self) -> str:
         """Call OpenAI with the current messages and available tools"""
         response = self.openai.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4.1-nano", # Fix these configurations to tune your response. FYI the gpt-4.1-nano cheapest one.
             max_tokens=1000,
             messages=self.messages,
             tools=self.available_tools
@@ -107,7 +107,7 @@ class MCPClient:
 
                     #print(f"\n[Calling tool {tool_name} with args {tool_args}]...")
                     result = await self.session.call_tool(tool_name, tool_args)
-                    print(f"\nTool response: waiting..")
+                    #print(f"\nTool response: waiting..")
                     self.messages.append(
                         {
                             "role": "tool",
