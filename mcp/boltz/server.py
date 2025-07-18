@@ -14,6 +14,7 @@ from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IsoelectricPointCa
 from Bio.Seq import Seq
 
 import uvicorn
+import re
 
 # Initialize FastMCP server for FASTA tools (SSE)
 mcp = FastMCP("FASTA")
@@ -22,6 +23,7 @@ mcp = FastMCP("FASTA")
 USER_AGENT = "FASTA-app/1.0"
 
 VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
+RCSB_DB_ENDPOINT = "https://data.rcsb.org/rest/v1/core/entry"
 
 
 
@@ -136,7 +138,7 @@ async def get_virus_protein_details(uniprot_code: str) -> dict:
     result["virus_protein_sequence"] = sequence
 
     # Reference url
-    reference = "https://www.uniprot.org/uniprotkb/"+uniprot_code
+    reference = VIRUS_UNIPROT_REST_API_BASE+"/"+uniprot_code
     result["Reference"] = reference
 
     return result
@@ -160,11 +162,7 @@ async def analyze_sequence_properties(uniprot_code: str) -> dict:
             composition: dict
         }
     """
-    url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.fasta"
-    data = await make_fasta_request(url)
-
-    # Clean sequence
-    data = str(data)
+    data = await get_fasta_protein(uniprot_code)
 
     lines = data.strip().splitlines()
     if lines and lines[0].startswith(">"):
@@ -174,8 +172,6 @@ async def analyze_sequence_properties(uniprot_code: str) -> dict:
     # Validate amino acids
     if not all(res in "ACDEFGHIKLMNPQRSTVWY" for res in clean_seq):
         return {"error": "Invalid sequence. Only canonical amino acids are supported."}
-
-    print("reached here")
     seq_obj = Seq(clean_seq)
     pI_calc = IsoelectricPointCalculator(str(seq_obj))
 
@@ -185,6 +181,61 @@ async def analyze_sequence_properties(uniprot_code: str) -> dict:
         "isoelectric_point": round(pI_calc.pi(), 2),
         "composition": {aa: clean_seq.count(aa) for aa in sorted(set(clean_seq))}
     }
+
+
+@mcp.tool(
+    name="compare_protein_variant",
+    description=(
+        "Compares a mutated protein (e.g., D614G) against the reference from UniProt. "
+        "Returns changes in sequence, molecular weight, pI, and composition."
+    )
+)
+async def compare_protein_variant(uniprot_id: str, mutation: str) -> dict:
+    """
+    Applies a mutation like D614G to a protein sequence from UniProt and compares
+    basic properties between the wildtype and the variant.
+
+    Args:
+        uniprot_id (str): UniProt accession (e.g., "P0DTC2").
+        mutation (str): Mutation string in format D614G.
+
+    Returns:
+        dict: Differences in molecular weight, charge, and other properties.
+    """
+
+    try:
+        fasta = await get_fasta_protein(uniprot_id)
+        lines = fasta.strip().splitlines()
+        if lines[0].startswith(">"):
+            lines = lines[1:]
+        wild_seq = "".join(lines).upper()
+
+        match = re.match(r"([A-Z])(\d+)([A-Z])", mutation.strip().upper())
+        if not match:
+            return {"error": "Invalid mutation format. Use e.g., D614G."}
+        orig, pos, new = match.groups()
+        pos = int(pos) - 1
+
+        if wild_seq[pos] != orig:
+            return {"error": f"Reference mismatch: expected {orig} at position {pos+1}, found {wild_seq[pos]}"}
+
+        mutated_seq = wild_seq[:pos] + new + wild_seq[pos+1:]
+
+        # Analyze both sequences
+        wild_props = analyze_sequence_properties(wild_seq)
+        variant_props = analyze_sequence_properties(mutated_seq)
+
+        return {
+            "mutation": mutation,
+            "wildtype": wild_props,
+            "variant": variant_props,
+            "position": pos + 1,
+            "amino_acid_change": f"{orig} → {new}"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 
 
 ############################ RCSB Protein Data Bank ############################################
@@ -204,7 +255,7 @@ async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> list[str]:
     Returns:
         list[str]: Up to 10 unique PDB IDs linked to the protein.
     """
-    url = f"https://rest.uniprot.org/uniprotkb/{uniprot_id}.json"
+    url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_id}.json"
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(url, timeout=10)
@@ -237,8 +288,8 @@ async def get_experimental_structure_details(pdb_id: str) -> dict:
     Returns:
         dict: Metadata including structure title, method, resolution, and download link.
     """
-    url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id.upper()}"
-
+    url = f"{RCSB_DB_ENDPOINT}/{pdb_id}"
+    
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(url, timeout=10)
@@ -263,7 +314,10 @@ async def get_experimental_structure_details(pdb_id: str) -> dict:
 
 @mcp.tool(
     name="get_ligand_smiles_from_uniprot",
-    description="Chains UniProt to PDB to retrieve known ligand SMILES structures. Helpful for identifying real molecules that bind to a protein."
+    description=(
+        "Fetches up to 10 ligands (non-polymer entities) co-crystallized with PDB structures related to a UniProt ID. "
+        "Returns each ligand's SMILES, formula, and name. Useful for grounding small molecule binding partners of a protein."
+    )
 )
 async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict]:
     """
@@ -275,48 +329,35 @@ async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict]:
     Returns:
         list[dict]: Ligand metadata including ID, name, formula, and SMILES.
     """
-    pdb_lookup_url = f"https://rest.uniprot.org/uniprotkb/{uniprot_id}.json"
+
+    pdb_ids = await(get_top_pdb_ids_for_uniprot(uniprot_id))
+
     ligands = []
 
     try:
         async with httpx.AsyncClient() as client:
-            # Step 1: Get PDB cross-references from UniProt
-            response = await client.get(pdb_lookup_url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-
-            pdb_ids = [
-                xref["id"]
-                for xref in data.get("uniProtKBCrossReferences", [])
-                if xref.get("database") == "PDB"
-            ]
-            pdb_ids = sorted(set(pdb_ids))[:10]
-
-            # Step 2: For each PDB ID, extract ligand info from RCSB
+            # For each PDB ID, extract ligand info from RCSB
             for pdb_id in pdb_ids:
-                entry_url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
+                entry_url = f"{RCSB_DB_ENDPOINT}/{pdb_id}"
+
+                print(entry_url)
                 entry_resp = await client.get(entry_url, timeout=10)
                 if entry_resp.status_code != 200:
                     continue
                 entry = entry_resp.json()
-                entity_ids = entry.get("rcsb_entry_container_identifiers", {}).get("nonpolymer_entity_ids", [])
+                entity_ids = entry.get("rcsb_entry_container_identifiers", {}).get("non_polymer_entity_ids", [])
 
+                print(entity_ids)
                 for eid in entity_ids:
                     ligand_url = f"https://data.rcsb.org/rest/v1/core/nonpolymer_entity/{pdb_id}/{eid}"
                     ligand_resp = await client.get(ligand_url, timeout=10)
                     if ligand_resp.status_code != 200:
                         continue
                     ligand_data = ligand_resp.json()
-                    chem = ligand_data.get("chem_comp", {})
 
-                    ligands.append({
-                        "pdb_id": pdb_id,
-                        "ligand_id": chem.get("id"),
-                        "name": chem.get("name"),
-                        "formula": chem.get("formula"),
-                        "smiles": chem.get("smiles")
-                    })
+                    ligands.append(ligand_data)
 
+        print (ligands)
         return ligands[:10]  # return top 10 ligands total
 
     except Exception as e:
@@ -374,6 +415,17 @@ async def rest_get_experimental_structure_details(request: Request) -> JSONRespo
 
 
 
+# REST-style endpoint that wraps MCP tool: top_pdb_ids_for_uniprot
+async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
+    try:
+        state = request.query_params["uniprot_code"]
+        result = await get_ligand_smiles_from_uniprot(state)
+        return JSONResponse({"result": result})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+
 @mcp.prompt()
 def get_initial_prompts() -> list[base.Message]:
     return [
@@ -414,6 +466,7 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
             Route("/rest/analyze_sequence_properties", endpoint=rest_analyze_sequence_properties, methods=["GET"]),
             Route("/rest/top_pdb_ids", endpoint=rest_get_top_pdb_ids_for_uniprot, methods=["GET"]),
             Route("/rest/get_experimental_structure_details", endpoint=rest_get_experimental_structure_details, methods=["GET"]),
+            Route("/rest/get_ligand_smiles_from_uniprot", endpoint=rest_get_ligand_smiles_from_uniprot, methods=["GET"]),
             Mount("/messages/", app=sse.handle_post_message),
         ],
     )
