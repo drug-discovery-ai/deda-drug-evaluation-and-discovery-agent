@@ -39,7 +39,7 @@ pip install -r requirements.txt
 Run the server code:
 
 ```bash
-python run boltz/server.py --host localhost --port 8080
+python boltz/server.py --host localhost --port 8080
 ```
 
 In Order to run MCP client code, set environment variable first. 
