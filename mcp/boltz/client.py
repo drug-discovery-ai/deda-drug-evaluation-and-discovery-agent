@@ -41,8 +41,8 @@ class MCPClient:
         print("Initialized SSE client")
         
         # List available tools to verify connection
-        await self.get_available_tools();
-        await self.get_initial_prompts();
+        await self.get_available_tools()
+        await self.get_initial_prompts()
     
     async def cleanup(self):
         """Properly clean up the session and streams"""
