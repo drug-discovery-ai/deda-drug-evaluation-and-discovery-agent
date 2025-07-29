@@ -6,36 +6,28 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    git \
     gcc \
-    g++ \
     libffi-dev \
-    libssl-dev \
-    wget \
-    unzip \
-    bash \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
-# Clone the repository
-RUN git clone https://github.com/masudias/train-a-model.git
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 
-# Change to project directory
-WORKDIR /app/train-a-model/
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Create and activate virtual environment + install requirements
-RUN python -m venv venv && \
-    . venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Copy the application code
+COPY . .
+RUN chmod +x /app/entrypoint.sh
 
-
-# Set Environment Varible
+# Set Environment Variables
+ENV PYTHONPATH=/app
 ENV MCP_SSE_URL=http://localhost:8080/sse
-ENV OPENAI_API_KEY=sk-proj-xxx
-
-# Copy the entrypoint script, 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Provide a valid OpenAI API key
+ENV OPENAI_API_KEY="sk-proj-XXXX"
 
 # Set the entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
