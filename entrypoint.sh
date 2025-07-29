@@ -2,7 +2,7 @@
 set -e
 
 # Activate virtual environment
-source /app/train-a-model/mcp/mcp/bin/activate
+source /app/train-a-model/venv/bin/activate
 
 # Start the server in background
 echo "Starting MCP server..."
