@@ -31,7 +31,7 @@ RUN python -m venv venv && \
 
 # Set Environment Varible
 ENV MCP_SSE_URL=http://localhost:8080/sse
-ENV OPENAI_API_KEY=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
+ENV OPENAI_API_KEY=sk-proj-xxx
 
 # Copy the entrypoint script, 
 COPY entrypoint.sh /entrypoint.sh
