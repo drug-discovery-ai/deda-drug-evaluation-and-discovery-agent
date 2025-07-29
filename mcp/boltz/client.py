@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # load environment variables from .env
 
+
 class MCPClient:
     def __init__(self):
         # Initialize session and client objects
@@ -30,7 +31,7 @@ class MCPClient:
         # Store the context managers so they stay alive
         self._streams_context = sse_client(url=server_url)
         streams = await self._streams_context.__aenter__()
-        print("Streams:", streams)  
+        print("Streams:", streams)
 
         self._session_context = ClientSession(*streams)
         self.session: ClientSession = await self._session_context.__aenter__()
@@ -39,11 +40,11 @@ class MCPClient:
         print("Initializing SSE client...")
         await self.session.initialize()
         print("Initialized SSE client")
-        
+
         # List available tools to verify connection
-        await self.get_available_tools();
-        await self.get_initial_prompts();
-    
+        await self.get_available_tools()
+        await self.get_initial_prompts()
+
     async def cleanup(self):
         """Properly clean up the session and streams"""
         if self._session_context:
@@ -81,13 +82,13 @@ class MCPClient:
             }
             for tool in response.tools
         ]
-        self.available_tools = available_tools;
-
+        self.available_tools = available_tools
 
     async def call_openai(self) -> str:
         """Call OpenAI with the current messages and available tools"""
         response = self.openai.chat.completions.create(
-            model="gpt-4.1-nano", # Fix these configurations to tune your response. FYI the gpt-4.1-nano cheapest one.Check the available options :https://platform.openai.com/docs/pricing
+            model="gpt-4.1-nano",
+            # Fix these configurations to tune your response. FYI the gpt-4.1-nano cheapest one.Check the available options :https://platform.openai.com/docs/pricing
             max_tokens=1000,
             messages=self.messages,
             tools=self.available_tools
@@ -100,14 +101,14 @@ class MCPClient:
             if choice.finish_reason == "tool_calls":
                 # We need to include the original message and assistant response
                 self.messages.append(choice.message)
-                
+
                 for tool_call in choice.message.tool_calls:
                     tool_name = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
 
-                    #print(f"\n[Calling tool {tool_name} with args {tool_args}]...")
+                    # print(f"\n[Calling tool {tool_name} with args {tool_args}]...")
                     result = await self.session.call_tool(tool_name, tool_args)
-                    #print(f"\nTool response: waiting..")
+                    # print(f"\nTool response: waiting..")
                     self.messages.append(
                         {
                             "role": "tool",
@@ -115,7 +116,7 @@ class MCPClient:
                             "content": result.content,
                         }
                     )
-                
+
                 response = await self.call_openai()
                 return await self.process_openai_response(response)
 
@@ -137,18 +138,18 @@ class MCPClient:
         """Run an interactive chat loop"""
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
-        
+
         while True:
             try:
                 print("\n" + "-" * 100)
                 query = input("\nQuery: ").strip()
-                
+
                 if query.lower() == 'quit':
                     break
-                    
+
                 if query:
                     await self.process_query(query)
-                    
+
             except Exception as e:
                 print(f"\nError: {str(e)}")
 
@@ -163,4 +164,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
