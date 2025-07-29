@@ -88,7 +88,8 @@ curl "http://localhost:8080/rest/get_fasta?uniprot_code=P09261"
 The string *P09261* is the UniProt code for a `SARS-CoV-2` protein.
 The REST service will return the protein's amino acid sequence in `FASTA` format.
 
-The `@mcp.prompt()` and the `@mcp.tool` decorator are written in a way that allows an LLM client to clearly understand the tasks and invoke the appropriate tool.
+***The `@mcp.prompt()` and the `@mcp.tool` decorator are written in a way that allows an LLM client to clearly understand the tasks and invoke the appropriate tool.***
+
 ---
 # Run the AI assistant using Docker
 
