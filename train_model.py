@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments,
     DataCollatorForLanguageModeling
 
 # Config
-BASE_MODEL = "Qwen/Qwen1.5-0.5B"  # Small enough for CPU/M1
+BASE_MODEL = "instruction-pretrain/InstructLM-500M"  # Small enough for CPU/M1
 TEXT_FILE_PATH = "./train.txt"
 OUTPUT_DIR = "./fine-tuned-model"
 MAX_SEQ_LENGTH = 512
@@ -15,6 +15,7 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True)
+tokenizer.pad_token = tokenizer.eos_token
 model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, trust_remote_code=True)
 model.to(device)
 

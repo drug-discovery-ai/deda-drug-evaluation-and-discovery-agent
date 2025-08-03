@@ -1,5 +1,14 @@
+import os
+
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+MODEL_NAME = "instruction-pretrain/InstructLM-500M"
+MODEL_PATH = "./fine-tuned-model"
+
+if not os.path.isdir(MODEL_PATH) or not os.listdir(MODEL_PATH):
+    AutoModelForCausalLM.from_pretrained(MODEL_NAME).save_pretrained(MODEL_PATH)
+    AutoTokenizer.from_pretrained(MODEL_NAME).save_pretrained(MODEL_PATH)
 
 # Load your fine-tuned model
 MODEL_PATH = "./fine-tuned-model"
@@ -15,7 +24,7 @@ model.eval()
 
 def chat(user_question: str):
     prompt = f"""### Instruction:
-Answer the user's question concisely. 
+Answer the user's question in less than 100 tokens. 
 
 ### Input:
 {user_question}
