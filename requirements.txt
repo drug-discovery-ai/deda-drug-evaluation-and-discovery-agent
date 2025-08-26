@@ -36,3 +36,7 @@ typing_extensions==4.14.0
 uvicorn==0.35.0
 biopython==1.85
 numpy==2.3.1
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.1
+langchain-openai>=0.0.1
