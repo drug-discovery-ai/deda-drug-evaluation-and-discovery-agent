@@ -4,3 +4,4 @@ base-model
 .DS_Store
 __pycache__
 .env
+venv/

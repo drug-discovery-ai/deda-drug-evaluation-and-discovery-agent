@@ -39,39 +39,38 @@ Then activate the environment *mcp*.
 source venv/bin/activate
 ```
 
+Optional
+```bash
+pip install -e .
+```
+
 Then install the required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the server code:
-
-```bash
-python mcp/boltz/server.py --host localhost --port 8080
-```
-
-In Order to run MCP client code, set environment variable first.
+In Order to run Ai agent, set environment variable first.
 
 #### Setting Up Environment Variables
 
 Before running the MCP client code, make sure to configure the required environment variables.
-To make these variables available across terminal sessions, create a file named `.env` inside the `boltz` directory and
-add the following:
+Copy the example environment file:
 
 ```bash
-OPENAI_API_KEY=sk-proj-XXX
-MCP_SSE_URL=http://localhost:8080/sse
+cp .env.example .env
 ```
-
-### Basic Usage
-
-```bash
-python mcp/boltz/client.py
-```
-
 If you have credit in your `OPENAI_API_KEY`, chat in the terminal. You can start with a simply question like "Tell me
 details about `SARS-CoV-2` virus."
+
+
+Run the chat interface:
+
+```bash
+python -m src.interfaces.chat.chat_client
+```
+
+Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
 
 Although an LLM client (e.g., `mcp-client`) is typically needed to test our MCP server, relying on an external `API_KEY`
 from services like OpenAI or Anthropic can slow down local development. To reduce this dependency, we've added a simple
@@ -87,8 +86,6 @@ curl "http://localhost:8080/rest/get_fasta?uniprot_code=P09261"
 
 The string *P09261* is the UniProt code for a `SARS-CoV-2` protein.
 The REST service will return the protein's amino acid sequence in `FASTA` format.
-
-***The `@mcp.prompt()` and the `@mcp.tool` decorator are written in a way that allows an LLM client to clearly understand the tasks and invoke the appropriate tool.***
 
 ---
 # Run the AI assistant using Docker
