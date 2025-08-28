@@ -60,9 +60,7 @@ Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
-If you have credit in your `OPENAI_API_KEY`, chat in the terminal. You can start with a simply question like "Tell me
-details about `SARS-CoV-2` virus."
-
+If you have credit in your `OPENAI_API_KEY`, chat in the terminal.
 
 Run the chat interface:
 
@@ -72,22 +70,6 @@ python -m src.interfaces.chat.chat_client
 
 Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
 
-Although an LLM client (e.g., `mcp-client`) is typically needed to test our MCP server, relying on an external `API_KEY`
-from services like OpenAI or Anthropic can slow down local development. To reduce this dependency, we've added a simple
-REST interface that allows us to test and develop our tools **without requiring access to a live MCP client**. This
-makes it easier to create and validate test cases before exposing the service to real LLMs. The REST service is simply a
-wrapper around the `mcp` tool.
-
-Use the following `curl` request to test the REST endpoint:
-
-```bash
-curl "http://localhost:8080/rest/get_fasta?uniprot_code=P09261"
-```
-
-The string *P09261* is the UniProt code for a `SARS-CoV-2` protein.
-The REST service will return the protein's amino acid sequence in `FASTA` format.
-
----
 # Run the AI assistant using Docker
 
 **Pre-requisite** Make sure your `docker` runs in `rootless` mode. If you can run
