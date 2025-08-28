@@ -2,3 +2,5 @@
 fine-tuned-model
 base-model
 .DS_Store
+__pycache__
+.env
