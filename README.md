@@ -1,5 +1,7 @@
 # Bio-informatics AI agent for Drug discovery Research
 
+Follow our wiki pages for more insight: https://github.com/drug-discovery-ai/train-a-model/wiki
+
 ## Overview
 
 Agentic AI lets people control system components using plain language. It’s flexible enough that experts from different
