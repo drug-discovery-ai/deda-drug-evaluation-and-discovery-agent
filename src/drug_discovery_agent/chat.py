@@ -1,33 +1,37 @@
-"""Comprehensive LangChain-based chat interface for bioinformatics analysis."""
+"""Comprehensive LangChain-based langchain interface for bioinformatics analysis."""
 import asyncio
 import os
+from typing import Optional, List
 
 from dotenv import load_dotenv
 from langchain.agents import create_openai_tools_agent, AgentExecutor
-from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, trim_messages
 from langchain_openai import ChatOpenAI
 
 # Local imports
-from .tools import (
-    get_protein_fasta,
-    get_protein_details,
-    analyze_sequence_properties,
-    analyze_raw_sequence,
-    compare_protein_variant,
-    get_top_pdb_ids_for_uniprot,
-    get_structure_details,
-    get_ligand_smiles_from_uniprot,
-)
+from drug_discovery_agent.interfaces.langchain.tools import create_bioinformatics_tools
+from drug_discovery_agent.core.uniprot import UniProtClient
+from drug_discovery_agent.core.pdb import PDBClient
+from drug_discovery_agent.core.analysis import SequenceAnalyzer
 
 load_dotenv()  # Load environment variables from .env
 
 
 class BioinformaticsChatClient:
-    """Comprehensive LangChain-based bioinformatics chat client with conversation memory."""
+    """Comprehensive LangChain-based bioinformatics langchain client with conversation memory."""
     
-    def __init__(self):
-        """Initialize the chat client with LangChain components."""
+    def __init__(self, 
+                 uniprot_client: Optional[UniProtClient] = None,
+                 pdb_client: Optional[PDBClient] = None,
+                 sequence_analyzer: Optional[SequenceAnalyzer] = None):
+        """Initialize the langchain client with LangChain components.
+        
+        Args:
+            uniprot_client: UniProt client instance. Creates default if None.
+            pdb_client: PDB client instance. Creates default if None.
+            sequence_analyzer: Sequence analyzer instance. Creates default if None.
+        """
         # Initialize LangChain components
         self.llm = ChatOpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
@@ -35,24 +39,16 @@ class BioinformaticsChatClient:
             temperature=0.7,
         )
         
-        # Load all bioinformatics tools
-        self.tools = [
-            get_protein_fasta,
-            get_protein_details,
-            analyze_sequence_properties,
-            analyze_raw_sequence,
-            compare_protein_variant,
-            get_top_pdb_ids_for_uniprot,
-            get_structure_details,
-            get_ligand_smiles_from_uniprot,
-        ]
-        
-        # Setup conversation history (20 exchanges)
-        self.memory = ConversationBufferWindowMemory(
-            k=20,  # Keep last 20 exchanges for context
-            memory_key="chat_history",
-            return_messages=True
+        # Create bioinformatics tools with optional client injection
+        self.tools = create_bioinformatics_tools(
+            uniprot_client=uniprot_client,
+            pdb_client=pdb_client,
+            sequence_analyzer=sequence_analyzer
         )
+        
+        # Setup conversation history (keep last 20 messages)
+        self.chat_history: List[BaseMessage] = []
+        self.max_history = 20
         
         # Create agent with bioinformatics-focused prompt
         self.agent_executor = self._create_agent()
@@ -99,7 +95,6 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
         return AgentExecutor(
             agent=agent,
             tools=self.tools,
-            memory=self.memory,
             verbose=False,  # Clean output
             handle_parsing_errors=True,
             max_iterations=5  # Prevent infinite loops
@@ -108,23 +103,40 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
     async def chat(self, query: str) -> str:
         """Process a single query through the LangChain agent."""
         try:
+            # Trim chat history to keep only the last max_history messages
+            if len(self.chat_history) > self.max_history:
+                self.chat_history = trim_messages(
+                    self.chat_history,
+                    token_counter=len,
+                    max_tokens=self.max_history,
+                    strategy="last",
+                    start_on="human",
+                    include_system=True,
+                    allow_partial=False
+                )
+            
             response = await self.agent_executor.ainvoke(
-                {"input": query}
+                {"input": query, "chat_history": self.chat_history}
             )
-            return response["output"]
+            
+            # Add the current exchange to chat history
+            self.chat_history.append(HumanMessage(content=query))
+            self.chat_history.append(AIMessage(content=response["output"]))
+            
+            return str(response["output"])
             
         except Exception as e:
             error_msg = f"Error processing query: {str(e)}"
             print(f"⚠️  {error_msg}")
             return error_msg
     
-    def clear_conversation(self):
+    def clear_conversation(self) -> None:
         """Clear conversation history."""
-        self.memory.clear()
+        self.chat_history.clear()
         print("🗑️  Conversation history cleared")
     
     def _handle_commands(self, user_input: str) -> bool:
-        """Handle chat commands. Returns True if command was handled."""
+        """Handle langchain commands. Returns True if command was handled."""
         user_input = user_input.strip()
         
         if user_input == "/clear":
@@ -137,7 +149,7 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
             
         return False
     
-    def _show_help(self):
+    def _show_help(self) -> None:
         """Display comprehensive help information."""
         print("""
 🧬 Bioinformatics Assistant - Help
@@ -161,7 +173,7 @@ CHAT EXAMPLES:
 COMMANDS:
   /clear    - Clear conversation history
   /help     - Show this help
-  /quit     - Exit chat
+  /quit     - Exit langchain
 
 AVAILABLE TOOLS:
   • get_protein_fasta - Retrieve FASTA sequences from UniProt
@@ -180,8 +192,8 @@ TIPS:
   • All data is fetched from authoritative sources (UniProt, PDB, RCSB)
         """)
     
-    async def chat_loop(self):
-        """Run interactive chat loop with proper error handling."""
+    async def chat_loop(self) -> None:
+        """Run interactive langchain loop with proper error handling."""
         print("🧬 Bioinformatics Assistant")
         print("💡 Type '/help' for examples and commands, or '/quit' to exit")
         print("🔬 Ready to help with protein analysis and molecular data!\n")
@@ -204,7 +216,7 @@ TIPS:
                     print()  # Add spacing after commands
                     continue
                 
-                # Process chat query with loading indicator
+                # Process langchain query with loading indicator
                 print("🤔 Analyzing...", end="", flush=True)
                 response = await self.chat(user_input)
                 print(f"\r🧬 Assistant: {response}\n")
@@ -220,8 +232,8 @@ TIPS:
                 print("💡 Try '/help' for usage examples or '/quit' to exit\n")
 
 
-async def main():
-    """Main entry point for running the chat interface directly."""
+async def async_main() -> None:
+    """Async entry point for running the langchain interface."""
     try:
         # Check for required environment variables
         if not os.getenv("OPENAI_API_KEY"):
@@ -230,7 +242,7 @@ async def main():
             print("   See .env.example for the required format")
             return
         
-        # Initialize and run chat client
+        # Initialize and run langchain client
         client = BioinformaticsChatClient()
         await client.chat_loop()
         
@@ -238,9 +250,14 @@ async def main():
         print(f"❌ Missing required dependencies: {e}")
         print("💡 Please install required packages with: pip install -r requirements.txt")
     except Exception as e:
-        print(f"❌ Failed to start chat client: {e}")
+        print(f"❌ Failed to start langchain client: {e}")
         print("💡 Check your configuration and try again")
 
 
+def main() -> None:
+    """Synchronous entry point that runs the async main function."""
+    asyncio.run(async_main())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

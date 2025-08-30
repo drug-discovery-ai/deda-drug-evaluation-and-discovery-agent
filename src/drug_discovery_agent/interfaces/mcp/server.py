@@ -1,5 +1,3 @@
-"""Updated MCP server using the shared core package."""
-from typing import Any
 from mcp.server.fastmcp import FastMCP
 from starlette.applications import Starlette
 from mcp.server.sse import SseServerTransport
@@ -9,21 +7,15 @@ from mcp.server import Server
 from mcp.server.fastmcp.prompts import base
 from starlette.responses import JSONResponse
 import uvicorn
+from typing import List, Dict, Any
 
-# Import from core modules
-from ....core.uniprot import (
-    fetch_protein_fasta_sequence,
-    fetch_protein_details,
-    fetch_top_pdb_ids_for_uniprot,
-)
-from ....core.pdb import (
-    fetch_structure_details,
-    fetch_ligand_smiles_from_uniprot,
-)
-from ....core.analysis import (
-    analyze_sequence_properties,
-    compare_protein_variant,
-)
+from drug_discovery_agent.core.uniprot import UniProtClient
+from drug_discovery_agent.core.pdb import PDBClient
+from drug_discovery_agent.core.analysis import SequenceAnalyzer
+
+uniprot_client = UniProtClient()
+pdb_client = PDBClient(uniprot_client)
+sequence_analyzer = SequenceAnalyzer(uniprot_client)
 
 # Initialize FastMCP server for FASTA tools (SSE)
 mcp = FastMCP("FASTA")
@@ -50,14 +42,14 @@ async def get_fasta_protein(uniprot_code: str) -> str:
     Returns:
         A string containing the protein sequence in FASTA format.
     """
-    return await fetch_protein_fasta_sequence(uniprot_code)
+    return await uniprot_client.get_fasta_sequence(uniprot_code)
 
 
 @mcp.tool(
     name="get_virus_protein_details",
     description="Retrieve virus protein metadata (organism, species, lineage, function) from UniProt given an accession code like 'P0DTC2'."
 )
-async def get_virus_protein_details(uniprot_code: str) -> dict:
+async def get_virus_protein_details(uniprot_code: str) -> Dict[str, Any]:
     """MCP wrapper that delegates to core function.
     
     Returns structured metadata about a viral protein from UniProt.
@@ -68,14 +60,14 @@ async def get_virus_protein_details(uniprot_code: str) -> dict:
     Returns:
         dict: Contains organism, scientific name, lineage, function, reference URL, RCSB structural details url etc.
     """
-    return await fetch_protein_details(uniprot_code)
+    return await uniprot_client.get_details(uniprot_code)
 
 
 @mcp.tool(
     name="analyze_sequence_properties",
     description="Analyze length, molecular weight (kDa), isoelectric point (pI), and composition of a protein sequence. Use 'get_fasta_protein' to retrieve the sequence for a UniProt ID."
 )
-async def analyze_protein_sequence_properties(uniprot_code: str) -> dict:
+async def analyze_protein_sequence_properties(uniprot_code: str) -> Dict[str, Any]:
     """MCP wrapper that delegates to core function.
     
     Analyze properties of a protein sequence (raw or FASTA) for a viral protein by its UniProt accession code.
@@ -91,7 +83,7 @@ async def analyze_protein_sequence_properties(uniprot_code: str) -> dict:
             composition: dict
         }
     """
-    return await analyze_sequence_properties(uniprot_code)
+    return await sequence_analyzer.analyze_from_uniprot(uniprot_code)
 
 
 @mcp.tool(
@@ -101,7 +93,7 @@ async def analyze_protein_sequence_properties(uniprot_code: str) -> dict:
         "Returns changes in sequence, molecular weight, pI, and composition."
     )
 )
-async def compare_variant_protein(uniprot_id: str, mutation: str) -> dict:
+async def compare_variant_protein(uniprot_id: str, mutation: str) -> Dict[str, Any]:
     """MCP wrapper that delegates to core function.
     
     Applies a mutation like D614G to a protein sequence from UniProt and compares
@@ -114,14 +106,14 @@ async def compare_variant_protein(uniprot_id: str, mutation: str) -> dict:
     Returns:
         dict: Differences in molecular weight, charge, and other properties.
     """
-    return await compare_protein_variant(uniprot_id, mutation)
+    return await sequence_analyzer.compare_variant(uniprot_id, mutation)
 
 
 @mcp.tool(
     name="get_top_pdb_ids_for_uniprot",
     description="Returns up to 10 representative PDB IDs for a given UniProt protein. Useful for fetching 3D structures without flooding the client."
 )
-async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> list[str]:
+async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> List[str]:
     """MCP wrapper that delegates to core function.
     
     Fetches top 10 representative PDB entries from UniProt cross-references.
@@ -133,14 +125,14 @@ async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> list[str]:
     Returns:
         list[str]: Up to 10 unique PDB IDs linked to the protein.
     """
-    return await fetch_top_pdb_ids_for_uniprot(uniprot_id)
+    return await uniprot_client.get_pdb_ids(uniprot_id)
 
 
 @mcp.tool(
     name="get_experimental_structure_details",
     description="Fetches experimental structure metadata from RCSB PDB using a valid PDB ID (e.g., '4HHB'). Useful for grounding structure-related queries with resolution, method, and official description."
 )
-async def get_experimental_structure_details(pdb_id: str) -> dict:
+async def get_experimental_structure_details(pdb_id: str) -> Dict[str, Any]:
     """MCP wrapper that delegates to core function.
     
     Given a PDB ID, returns curated structure metadata from RCSB PDB.
@@ -151,7 +143,7 @@ async def get_experimental_structure_details(pdb_id: str) -> dict:
     Returns:
         dict: Metadata including structure title, method, resolution, and download link.
     """
-    return await fetch_structure_details(pdb_id)
+    return await pdb_client.get_structure_details(pdb_id)
 
 
 @mcp.tool(
@@ -161,7 +153,7 @@ async def get_experimental_structure_details(pdb_id: str) -> dict:
         "Returns each ligand's SMILES, formula, and name. Useful for grounding small molecule binding partners of a protein."
     )
 )
-async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict]:
+async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> List[Dict[str, Any]]:
     """MCP wrapper that delegates to core function.
     
     Given a UniProt ID, returns ligand details (SMILES, formula) from top related PDB structures.
@@ -172,7 +164,7 @@ async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict]:
     Returns:
         list[dict]: Ligand metadata including ID, name, formula, and SMILES.
     """
-    return await fetch_ligand_smiles_from_uniprot(uniprot_id)
+    return await pdb_client.get_ligands_for_uniprot(uniprot_id)
 
 
 # REST-style endpoints that wrap MCP tools
@@ -231,7 +223,7 @@ async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
 
 
 @mcp.prompt()
-def get_initial_prompts() -> list[base.Message]:
+def get_initial_prompts() -> List[base.Message]:
     return [
         base.UserMessage(
             "You are a knowledgeable bioinformatics assistant. "

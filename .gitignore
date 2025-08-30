@@ -5,3 +5,4 @@ base-model
 __pycache__
 .env
 venv/
+*.egg-info/

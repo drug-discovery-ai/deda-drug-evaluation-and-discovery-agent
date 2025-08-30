@@ -67,7 +67,9 @@ If you have credit in your `OPENAI_API_KEY`, chat in the terminal.
 Run the chat interface:
 
 ```bash
-python -m src.interfaces.chat.chat_client
+python -m drug_discovery_agent.chat
+# or simply
+chat
 ```
 
 Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
