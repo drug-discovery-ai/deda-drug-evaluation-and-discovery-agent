@@ -2,6 +2,7 @@ import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, \
     DataCollatorForLanguageModeling
+from typing import Dict, Any, List
 
 # Config
 BASE_MODEL = "Qwen/Qwen1.5-0.5B"  # Small enough for CPU/M1
@@ -16,10 +17,10 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, trust_remote_code=True)
-model.to(device)
+model.to(device)  # type: ignore[arg-type]
 
 
-def tokenize_fn(example_batch):
+def tokenize_fn(example_batch: Dict[str, Any]) -> Dict[str, Any]:
     prompts = []
     for messages in example_batch["messages"]:
         conv = ""
@@ -32,12 +33,13 @@ def tokenize_fn(example_batch):
                 conv += f"<|assistant|>\n{content}\n"
         prompts.append(conv.strip())
 
-    return tokenizer(
+    result = tokenizer(
         prompts,
         truncation=True,
         padding="max_length",
         max_length=512,
     )
+    return dict(result)
 
 
 tokenized_dataset = dataset.map(tokenize_fn, batched=True)

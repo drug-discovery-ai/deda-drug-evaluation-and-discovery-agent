@@ -1,7 +1,7 @@
 """HTTP client utilities for API requests."""
 from typing import Any, Optional
 import httpx
-from .constants import USER_AGENT
+from drug_discovery_agent.utils.constants import USER_AGENT
 
 
 async def make_api_request(
