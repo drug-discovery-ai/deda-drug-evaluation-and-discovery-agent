@@ -1,11 +1,12 @@
 """Shared mock client fixtures for testing."""
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
-from drug_discovery_agent.core.uniprot import UniProtClient
-from drug_discovery_agent.core.pdb import PDBClient
+import pytest
+
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
+from drug_discovery_agent.core.pdb import PDBClient
+from drug_discovery_agent.core.uniprot import UniProtClient
 
 
 @pytest.fixture

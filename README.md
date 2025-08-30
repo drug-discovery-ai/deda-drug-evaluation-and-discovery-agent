@@ -74,6 +74,29 @@ chat
 
 Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
 
+# Development
+
+## Code Quality
+
+This project uses `ruff` for linting and formatting, and `mypy` for type checking.
+
+Install development dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+Run linting:
+```bash
+ruff check .          # Check for linting issues
+ruff check . --fix    # Auto-fix linting issues
+ruff format .         # Auto-format code
+```
+
+## Run tests
+```bash
+pytest
+```
+
 # Run the AI assistant using Docker
 
 **Pre-requisite** Make sure your `docker` runs in `rootless` mode. If you can run

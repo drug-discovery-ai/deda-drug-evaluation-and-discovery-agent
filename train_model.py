@@ -1,15 +1,23 @@
+from typing import Any
+
 import torch
 from datasets import load_dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, \
-    DataCollatorForLanguageModeling
-from typing import Dict, Any, List
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
 
 # Config
 BASE_MODEL = "Qwen/Qwen1.5-0.5B"  # Small enough for CPU/M1
 TEXT_FILE_PATH = "./train.txt"
 OUTPUT_DIR = "./fine-tuned-model"
 MAX_SEQ_LENGTH = 512
-dataset = load_dataset("json", data_files="train_data_chatml_format.jsonl", split="train")
+dataset = load_dataset(
+    "json", data_files="train_data_chatml_format.jsonl", split="train"
+)
 
 # Use MPS (Apple GPU) if available
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -20,7 +28,7 @@ model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, trust_remote_code=True)
 model.to(device)  # type: ignore[arg-type]
 
 
-def tokenize_fn(example_batch: Dict[str, Any]) -> Dict[str, Any]:
+def tokenize_fn(example_batch: dict[str, Any]) -> dict[str, Any]:
     prompts = []
     for messages in example_batch["messages"]:
         conv = ""
@@ -53,7 +61,7 @@ training_args = TrainingArguments(
     save_strategy="epoch",
     logging_steps=10,
     fp16=False,  # No CUDA, so disable fp16
-    push_to_hub=False
+    push_to_hub=False,
 )
 
 # Trainer setup
