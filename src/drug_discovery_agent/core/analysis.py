@@ -38,6 +38,15 @@ class SequenceAnalyzer:
             lines = lines[1:]
         clean_seq = "".join(lines).upper()
 
+        # Handle empty sequence
+        if not clean_seq:
+            return {
+                "length": 0,
+                "molecular_weight_kda": 0,
+                "isoelectric_point": 0,
+                "composition": {}
+            }
+
         # Validate amino acids
         if not all(res in "ACDEFGHIKLMNPQRSTVWY" for res in clean_seq):
             return {"error": "Invalid sequence. Only canonical amino acids are supported."}
@@ -62,6 +71,15 @@ class SequenceAnalyzer:
             dict: Analysis results including length, MW, pI, and composition.
         """
         clean_seq = sequence.strip().upper()
+        
+        # Handle empty sequence
+        if not clean_seq:
+            return {
+                "length": 0,
+                "molecular_weight_kda": 0,
+                "isoelectric_point": 0,
+                "composition": {}
+            }
         
         # Validate amino acids
         if not all(res in "ACDEFGHIKLMNPQRSTVWY" for res in clean_seq):
@@ -90,7 +108,7 @@ class SequenceAnalyzer:
         try:
             fasta = await self.uniprot_client.get_fasta_sequence(uniprot_id)
             lines = fasta.strip().splitlines()
-            if lines[0].startswith(">"):
+            if lines and lines[0].startswith(">"):
                 lines = lines[1:]
             wild_seq = "".join(lines).upper()
 
@@ -100,6 +118,9 @@ class SequenceAnalyzer:
             orig, pos, new = match.groups()
             pos = int(pos) - 1
 
+            if pos >= len(wild_seq) or pos < 0:
+                return {"error": f"Position {pos+1} is out of range for sequence of length {len(wild_seq)}"}
+            
             if wild_seq[pos] != orig:
                 return {"error": f"Reference mismatch: expected {orig} at position {pos+1}, found {wild_seq[pos]}"}
 

@@ -56,11 +56,11 @@ class PDBClient:
         Returns:
             list[dict]: Ligand metadata including ID, name, formula, and SMILES.
         """
-        pdb_ids = await self.uniprot_client.get_pdb_ids(uniprot_id)
-
-        ligands = []
-
         try:
+            pdb_ids = await self.uniprot_client.get_pdb_ids(uniprot_id)
+
+            ligands = []
+            
             async with httpx.AsyncClient() as client:
                 # For each PDB ID, extract ligand info from RCSB
                 for pdb_id in pdb_ids:
@@ -82,6 +82,6 @@ class PDBClient:
                         ligands.append(ligand_data)
 
             return ligands[:10]  # return top 10 ligands total
-
+            
         except Exception as e:
             return [{"error": str(e)}]
