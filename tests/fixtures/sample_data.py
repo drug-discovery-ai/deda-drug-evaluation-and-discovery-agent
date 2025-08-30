@@ -40,54 +40,30 @@ MOCK_UNIPROT_DETAILS_RESPONSE = {
     "organism": {
         "scientificName": "Severe acute respiratory syndrome coronavirus 2",
         "lineage": ["Viruses", "Riboviria", "Orthornavirae"],
-        "taxonId": 2697049
+        "taxonId": 2697049,
     },
-    "organismHosts": [
-        {
-            "scientificName": "Homo sapiens",
-            "commonName": "Human"
-        }
-    ],
+    "organismHosts": [{"scientificName": "Homo sapiens", "commonName": "Human"}],
     "comments": [
         {
             "commentType": "FUNCTION",
-            "texts": [
-                {
-                    "value": "Attaches the virion to the cell membrane"
-                }
-            ]
+            "texts": [{"value": "Attaches the virion to the cell membrane"}],
         }
     ],
     "proteinDescription": {
-        "recommendedName": {
-            "fullName": {
-                "value": "Spike glycoprotein"
-            }
-        }
+        "recommendedName": {"fullName": {"value": "Spike glycoprotein"}}
     },
-    "sequence": {
-        "value": "MFVFLVLLPLVSSQCV"
-    }
+    "sequence": {"value": "MFVFLVLLPLVSSQCV"},
 }
 
 MOCK_UNIPROT_PDB_RESPONSE = {
     "uniProtKBCrossReferences": [
+        {"database": "PDB", "id": "6VSB"},
+        {"database": "PDB", "id": "6VXX"},
+        {"database": "EMBL", "id": "MT326090"},
         {
             "database": "PDB",
-            "id": "6VSB"
+            "id": "6VSB",  # Duplicate
         },
-        {
-            "database": "PDB",
-            "id": "6VXX"
-        },
-        {
-            "database": "EMBL",
-            "id": "MT326090"
-        },
-        {
-            "database": "PDB",
-            "id": "6VSB"  # Duplicate
-        }
     ]
 }
 

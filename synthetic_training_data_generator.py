@@ -11,14 +11,16 @@ def generate_calendar_events(start_date, days=60):
     events = []
     for i in range(days):
         date = start_date + timedelta(days=i)
-        events.append({
-            "date": date.strftime("%Y-%m-%d"),
-            "events": [
-                f"{date.strftime('%Y-%m-%d')} 09:00 AM - Daily checkin with the team",
-                f"{date.strftime('%Y-%m-%d')} 02:00 PM - Project Update",
-                f"{date.strftime('%Y-%m-%d')} 05:00 PM - Review messages and Plan Next Day"
-            ]
-        })
+        events.append(
+            {
+                "date": date.strftime("%Y-%m-%d"),
+                "events": [
+                    f"{date.strftime('%Y-%m-%d')} 09:00 AM - Daily checkin with the team",
+                    f"{date.strftime('%Y-%m-%d')} 02:00 PM - Project Update",
+                    f"{date.strftime('%Y-%m-%d')} 05:00 PM - Review messages and Plan Next Day",
+                ],
+            }
+        )
     return events
 
 
@@ -44,7 +46,7 @@ def generate_messages():
         "Water bill due tomorrow.",
         "Submit timesheet before 6PM.",
         "Library books due in 2 days.",
-        "Car service booked for Monday at 10AM."
+        "Car service booked for Monday at 10AM.",
     ]
 
 
@@ -53,7 +55,7 @@ def make_chatml(user_msg: str, assistant_msg: str) -> dict:
     return {
         "messages": [
             {"role": "user", "content": user_msg.strip()},
-            {"role": "assistant", "content": assistant_msg.strip()}
+            {"role": "assistant", "content": assistant_msg.strip()},
         ]
     }
 
@@ -64,25 +66,36 @@ def generate_jsonl_dataset(calendar_events, messages, output_file):
 
     for entry in calendar_events:
         cal = entry["events"]
-        examples.append(make_chatml(
-            "What is my next event?\n" + "\n".join(cal),
-            f"Your next event is '{cal[0].split(' - ')[-1]}' at {cal[0].split(' ')[1]}."
-        ))
-        examples.append(make_chatml(
-            "Summarize today's schedule.\n" + "\n".join(cal),
-            f"You have {len(cal)} events today: " + "; ".join([e.split(' - ')[-1] for e in cal]) + "."
-        ))
-        examples.append(make_chatml(
-            "When is my last event?\n" + "\n".join(cal),
-            f"Your last event is '{cal[-1].split(' - ')[-1]}' at {cal[-1].split(' ')[1]}."
-        ))
+        examples.append(
+            make_chatml(
+                "What is my next event?\n" + "\n".join(cal),
+                f"Your next event is '{cal[0].split(' - ')[-1]}' at {cal[0].split(' ')[1]}.",
+            )
+        )
+        examples.append(
+            make_chatml(
+                "Summarize today's schedule.\n" + "\n".join(cal),
+                f"You have {len(cal)} events today: "
+                + "; ".join([e.split(" - ")[-1] for e in cal])
+                + ".",
+            )
+        )
+        examples.append(
+            make_chatml(
+                "When is my last event?\n" + "\n".join(cal),
+                f"Your last event is '{cal[-1].split(' - ')[-1]}' at {cal[-1].split(' ')[1]}.",
+            )
+        )
 
     for i in range(0, len(messages), 3):
-        group = messages[i:i + 3]
-        examples.append(make_chatml(
-            "Summarize key messages:\n" + "\n".join(group),
-            "Here are the important points:\n" + "\n".join(f"- {msg}" for msg in group)
-        ))
+        group = messages[i : i + 3]
+        examples.append(
+            make_chatml(
+                "Summarize key messages:\n" + "\n".join(group),
+                "Here are the important points:\n"
+                + "\n".join(f"- {msg}" for msg in group),
+            )
+        )
 
     unrelated_questions = [
         "Who is the president of the USA?",
@@ -90,13 +103,15 @@ def generate_jsonl_dataset(calendar_events, messages, output_file):
         "Can you write me a poem?",
         "Explain quantum mechanics.",
         "Tell me a joke.",
-        "What time is it?"
+        "What time is it?",
     ]
     for q in unrelated_questions:
-        examples.append(make_chatml(
-            q,
-            "Sorry, I’m your scheduling assistant. I can only help with calendar events and messages."
-        ))
+        examples.append(
+            make_chatml(
+                q,
+                "Sorry, I’m your scheduling assistant. I can only help with calendar events and messages.",
+            )
+        )
 
     # Shuffle to improve generalization
     random.shuffle(examples)

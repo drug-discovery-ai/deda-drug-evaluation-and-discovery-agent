@@ -1,24 +1,22 @@
 """Global pytest configuration and fixtures."""
 
 import asyncio
-import json
 from pathlib import Path
-from typing import Dict, Any, Generator
-from unittest.mock import AsyncMock, MagicMock
+from typing import Any
 
 import pytest
-import httpx
 import respx
 
-from drug_discovery_agent.core.uniprot import UniProtClient
-from drug_discovery_agent.core.pdb import PDBClient
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
+from drug_discovery_agent.core.pdb import PDBClient
+from drug_discovery_agent.core.uniprot import UniProtClient
 
 # Import shared fixtures (avoid duplicating existing ones)
-from tests.fixtures.http_helpers import *
-from tests.fixtures.env_helpers import *
-from tests.fixtures.sample_data import *
-from tests.fixtures.mock_clients import *
+# Import fixtures from other modules
+from tests.fixtures.mock_clients import *  # noqa: F401,F403
+from tests.fixtures.sample_data import *  # noqa: F401,F403
+from tests.fixtures.http_helpers import *  # noqa: F401,F403
+from tests.fixtures.env_helpers import *  # noqa: F401,F403
 
 
 @pytest.fixture(scope="session")
@@ -44,7 +42,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
 
 @pytest.fixture
-def sample_uniprot_details() -> Dict[str, Any]:
+def sample_uniprot_details() -> dict[str, Any]:
     """Sample UniProt protein details for testing."""
     return {
         "results": [
@@ -53,7 +51,7 @@ def sample_uniprot_details() -> Dict[str, Any]:
                 "entryName": "SPIKE_SARS2",
                 "proteinDescription": {
                     "recommendedName": {"fullName": {"value": "Spike glycoprotein"}},
-                    "alternativeNames": [{"fullName": {"value": "S glycoprotein"}}]
+                    "alternativeNames": [{"fullName": {"value": "S glycoprotein"}}],
                 },
                 "organism": {
                     "scientificName": "Severe acute respiratory syndrome coronavirus 2",
@@ -70,20 +68,22 @@ def sample_uniprot_details() -> Dict[str, Any]:
                         "Coronaviridae",
                         "Orthocoronavirinae",
                         "Betacoronavirus",
-                        "Sarbecovirus"
-                    ]
+                        "Sarbecovirus",
+                    ],
                 },
                 "proteinExistence": "1: Evidence at protein level",
                 "sequence": {
                     "value": "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT",
                     "length": 1273,
                     "molWeight": 141178,
-                    "crc64": "6A4A02EC81873171"
+                    "crc64": "6A4A02EC81873171",
                 },
                 "functions": [
                     {
                         "texts": [
-                            {"value": "Attaches the virion to the cell membrane by interacting with host receptor"}
+                            {
+                                "value": "Attaches the virion to the cell membrane by interacting with host receptor"
+                            }
                         ]
                     }
                 ],
@@ -93,25 +93,25 @@ def sample_uniprot_details() -> Dict[str, Any]:
                         "id": "6VSB",
                         "properties": [
                             {"key": "Method", "value": "X-ray"},
-                            {"key": "Resolution", "value": "3.46 A"}
-                        ]
+                            {"key": "Resolution", "value": "3.46 A"},
+                        ],
                     },
                     {
-                        "database": "PDB", 
+                        "database": "PDB",
                         "id": "6VXX",
                         "properties": [
                             {"key": "Method", "value": "X-ray"},
-                            {"key": "Resolution", "value": "2.80 A"}
-                        ]
-                    }
-                ]
+                            {"key": "Resolution", "value": "2.80 A"},
+                        ],
+                    },
+                ],
             }
         ]
     }
 
 
 @pytest.fixture
-def sample_pdb_details() -> Dict[str, Any]:
+def sample_pdb_details() -> dict[str, Any]:
     """Sample PDB structure details for testing."""
     return {
         "data": [
@@ -119,24 +119,20 @@ def sample_pdb_details() -> Dict[str, Any]:
                 "rcsb_id": "6VSB",
                 "struct": {
                     "title": "Prefusion 2019-nCoV spike glycoprotein with a single receptor-binding domain up",
-                    "pdbx_descriptor": "Spike glycoprotein"
+                    "pdbx_descriptor": "Spike glycoprotein",
                 },
                 "rcsb_entry_info": {
                     "resolution_combined": [3.46],
                     "structure_determination_methodology": "X-RAY DIFFRACTION",
                     "selected_polymer_entity_types": ["Protein"],
-                    "experimental_method": "X-RAY DIFFRACTION"
+                    "experimental_method": "X-RAY DIFFRACTION",
                 },
-                "exptl": [
-                    {
-                        "method": "X-RAY DIFFRACTION"
-                    }
-                ],
+                "exptl": [{"method": "X-RAY DIFFRACTION"}],
                 "rcsb_primary_citation": {
                     "title": "Cryo-EM structure of the 2019-nCoV spike in the prefusion conformation",
                     "journal_abbrev": "Science",
-                    "year": 2020
-                }
+                    "year": 2020,
+                },
             }
         ]
     }
@@ -150,7 +146,7 @@ def uniprot_client() -> UniProtClient:
 
 @pytest.fixture
 def pdb_client() -> PDBClient:
-    """PDB client instance.""" 
+    """PDB client instance."""
     return PDBClient()
 
 
@@ -167,10 +163,10 @@ def fixtures_path() -> Path:
 
 
 @pytest.fixture
-def sample_sequences() -> Dict[str, str]:
+def sample_sequences() -> dict[str, str]:
     """Sample protein sequences for testing."""
     return {
         "spike_protein": "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT",
         "short_protein": "MKTVRQERLKSIVRILERSKEPVSGAQLARKVP",
-        "invalid_sequence": "MKTVRQERLXZ"
+        "invalid_sequence": "MKTVRQERLXZ",
     }

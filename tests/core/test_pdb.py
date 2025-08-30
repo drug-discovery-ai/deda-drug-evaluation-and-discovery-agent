@@ -1,6 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-import httpx
+
+import pytest
 
 from drug_discovery_agent.core.pdb import PDBClient
 from drug_discovery_agent.core.uniprot import UniProtClient
@@ -21,12 +21,14 @@ class TestPDBClient:
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
-    async def test_get_structure_details_success(self, mock_client_cls, client, http_mock_helpers):
+    async def test_get_structure_details_success(
+        self, mock_client_cls, client, http_mock_helpers
+    ):
         """Test successful structure details retrieval."""
         mock_response = http_mock_helpers.create_structure_response(
             title="Prefusion 2019-nCoV spike glycoprotein",
             method="X-RAY DIFFRACTION",
-            resolution=3.46
+            resolution=3.46,
         )
         mock_response["rcsb_entry_info"]["deposited_atom_count"] = 22615
 
@@ -46,14 +48,18 @@ class TestPDBClient:
         assert result["keywords"] == "VIRAL PROTEIN"
         assert result["structure_url"] == "https://files.rcsb.org/download/6VSB.pdb"
 
-
     @pytest.mark.unit
-    @pytest.mark.parametrize("error_type,expected_error", [
-        ("not_found", "No entry found for PDB ID: INVALID"),
-        ("timeout", "Request failed")
-    ])
+    @pytest.mark.parametrize(
+        "error_type,expected_error",
+        [
+            ("not_found", "No entry found for PDB ID: INVALID"),
+            ("timeout", "Request failed"),
+        ],
+    )
     @patch("httpx.AsyncClient")
-    async def test_get_structure_details_errors(self, mock_client_cls, error_type, expected_error, client, common_http_errors):
+    async def test_get_structure_details_errors(
+        self, mock_client_cls, error_type, expected_error, client, common_http_errors
+    ):
         """Test structure details retrieval with various errors."""
         mock_async_client = AsyncMock()
         mock_async_client.get.side_effect = common_http_errors[error_type]
@@ -67,7 +73,9 @@ class TestPDBClient:
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
-    async def test_get_structure_details_missing_fields(self, mock_client_cls, client, http_mock_helpers):
+    async def test_get_structure_details_missing_fields(
+        self, mock_client_cls, client, http_mock_helpers
+    ):
         """Test structure details retrieval with missing fields."""
         mock_response = {}
         mock_http_response = http_mock_helpers.create_mock_http_response(mock_response)
@@ -87,7 +95,14 @@ class TestPDBClient:
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
-    async def test_get_ligands_for_uniprot_success(self, mock_client_cls, client, mock_uniprot_client, http_mock_helpers, spike_protein_uniprot_id):
+    async def test_get_ligands_for_uniprot_success(
+        self,
+        mock_client_cls,
+        client,
+        mock_uniprot_client,
+        http_mock_helpers,
+        spike_protein_uniprot_id,
+    ):
         """Test successful ligands retrieval for UniProt ID."""
         mock_uniprot_client.get_pdb_ids.return_value = ["6VSB", "6VXX"]
 
@@ -95,9 +110,15 @@ class TestPDBClient:
         responses = {
             "entry/6VSB": http_mock_helpers.create_entry_response(["3", "4"]),
             "entry/6VXX": http_mock_helpers.create_entry_response(["2"]),
-            "nonpolymer_entity/6VSB/3": http_mock_helpers.create_ligand_response("6VSB", "3", "NAG", "N-ACETYL-D-GLUCOSAMINE", "C8 H15 N O6"),
-            "nonpolymer_entity/6VSB/4": http_mock_helpers.create_ligand_response("6VSB", "4", "SO4", "SULFATE ION", "O4 S"),
-            "nonpolymer_entity/6VXX/2": http_mock_helpers.create_ligand_response("6VXX", "2", "ZN", "ZINC ION", "Zn")
+            "nonpolymer_entity/6VSB/3": http_mock_helpers.create_ligand_response(
+                "6VSB", "3", "NAG", "N-ACETYL-D-GLUCOSAMINE", "C8 H15 N O6"
+            ),
+            "nonpolymer_entity/6VSB/4": http_mock_helpers.create_ligand_response(
+                "6VSB", "4", "SO4", "SULFATE ION", "O4 S"
+            ),
+            "nonpolymer_entity/6VXX/2": http_mock_helpers.create_ligand_response(
+                "6VXX", "2", "ZN", "ZINC ION", "Zn"
+            ),
         }
 
         def get_side_effect(url, **kwargs):
@@ -119,7 +140,9 @@ class TestPDBClient:
         assert "ZN" in ligand_ids
 
     @pytest.mark.unit
-    async def test_get_ligands_for_uniprot_no_pdb_ids(self, client, mock_uniprot_client, spike_protein_uniprot_id):
+    async def test_get_ligands_for_uniprot_no_pdb_ids(
+        self, client, mock_uniprot_client, spike_protein_uniprot_id
+    ):
         """Test ligands retrieval when no PDB IDs are found."""
         mock_uniprot_client.get_pdb_ids.return_value = []
 
@@ -128,7 +151,9 @@ class TestPDBClient:
         assert result == []
 
     @pytest.mark.unit
-    async def test_get_ligands_for_uniprot_exception(self, client, mock_uniprot_client, spike_protein_uniprot_id):
+    async def test_get_ligands_for_uniprot_exception(
+        self, client, mock_uniprot_client, spike_protein_uniprot_id
+    ):
         """Test ligands retrieval with exception handling."""
         mock_uniprot_client.get_pdb_ids.side_effect = Exception("Network error")
 
@@ -152,24 +177,33 @@ class TestPDBClient:
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_get_structure_details_integration(self, client_with_default_uniprot, spike_protein_pdb_id):
+    async def test_get_structure_details_integration(
+        self, client_with_default_uniprot, spike_protein_pdb_id
+    ):
         """Integration test for structure details retrieval with real API."""
         # Test with known PDB structure
-        result = await client_with_default_uniprot.get_structure_details(spike_protein_pdb_id)
-        
+        result = await client_with_default_uniprot.get_structure_details(
+            spike_protein_pdb_id
+        )
+
         assert "error" not in result
         assert result["pdb_id"] == spike_protein_pdb_id
         assert result["title"] is not None
         assert "spike" in result["title"].lower()
         assert result["method"] is not None
         assert result["resolution"] is not None
-        assert result["structure_url"] == f"https://files.rcsb.org/download/{spike_protein_pdb_id}.pdb"
+        assert (
+            result["structure_url"]
+            == f"https://files.rcsb.org/download/{spike_protein_pdb_id}.pdb"
+        )
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_get_structure_details_invalid_pdb_integration(self, client_with_default_uniprot):
+    async def test_get_structure_details_invalid_pdb_integration(
+        self, client_with_default_uniprot
+    ):
         """Integration test for invalid PDB ID."""
         result = await client_with_default_uniprot.get_structure_details("INVALID")
-        
+
         assert "error" in result
         assert "No entry found" in result["error"]

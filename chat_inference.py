@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load your fine-tuned model
 MODEL_PATH = "./fine-tuned-model"
@@ -15,7 +15,7 @@ model.eval()
 
 def chat(user_question: str):
     prompt = f"""### Instruction:
-Answer the user's question concisely. 
+Answer the user's question concisely.
 
 ### Input:
 {user_question}
@@ -31,7 +31,7 @@ Answer the user's question concisely.
             temperature=0.7,
             top_p=0.9,
             do_sample=True,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.eos_token_id,
         )
 
     response = tokenizer.decode(output[0], skip_special_tokens=True)

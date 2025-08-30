@@ -1,17 +1,17 @@
 """Environment and configuration helpers for testing."""
 
-import pytest
-from unittest.mock import patch
 import os
+from unittest.mock import patch
+
+import pytest
 
 
 @pytest.fixture
 def mock_env_vars():
     """Mock environment variables for OpenAI."""
-    with patch.dict(os.environ, {
-        "OPENAI_API_KEY": "test-key",
-        "OPENAI_MODEL": "gpt-4o-mini"
-    }):
+    with patch.dict(
+        os.environ, {"OPENAI_API_KEY": "test-key", "OPENAI_MODEL": "gpt-4o-mini"}
+    ):
         yield
 
 
