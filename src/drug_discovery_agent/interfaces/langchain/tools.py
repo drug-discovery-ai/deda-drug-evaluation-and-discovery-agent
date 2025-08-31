@@ -22,11 +22,6 @@ from drug_discovery_agent.interfaces.langchain.models import (
 class BioinformaticsToolBase(BaseTool):
     """Base class for bioinformatics tools with injectable client instances."""
 
-    # Declare these as class attributes to avoid mypy issues
-    _uniprot_client: UniProtClient
-    _pdb_client: PDBClient
-    _sequence_analyzer: SequenceAnalyzer
-
     def __init__(
         self,
         uniprot_client: UniProtClient | None = None,
@@ -42,14 +37,15 @@ class BioinformaticsToolBase(BaseTool):
             sequence_analyzer: Sequence analyzer instance. Creates default if None.
             **kwargs: Additional arguments passed to BaseTool.
         """
-        # Initialize clients first - create defaults if not provided
+        # Initialize BaseTool first
+        super().__init__(**kwargs)
+        
+        # Initialize clients - create defaults if not provided
         self._uniprot_client = uniprot_client or UniProtClient()
         self._pdb_client = pdb_client or PDBClient(self._uniprot_client)
         self._sequence_analyzer = sequence_analyzer or SequenceAnalyzer(
             self._uniprot_client
         )
-        
-        super().__init__(**kwargs)
 
     @property
     def uniprot_client(self) -> UniProtClient:

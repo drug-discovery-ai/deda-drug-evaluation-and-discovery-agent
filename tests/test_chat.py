@@ -101,7 +101,13 @@ class TestBioinformaticsChatClient:
 
         # Test environment configuration
         call_kwargs = mock_chat_openai.call_args.kwargs
-        assert call_kwargs["api_key"] == "test-key"
+        # api_key is now a SecretStr, so we need to check its secret value
+        from pydantic import SecretStr
+        api_key = call_kwargs["api_key"]
+        if isinstance(api_key, SecretStr):
+            assert api_key.get_secret_value() == "test-key"
+        else:
+            assert api_key == "test-key"
         assert call_kwargs["model"] == "gpt-4o-mini"
         assert call_kwargs["temperature"] == 0.7
 
@@ -332,11 +338,13 @@ class TestChatIntegration:
 
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_chat_client_real_initialization(self) -> None:
-        """Integration test for real chat client initialization (requires API key)."""
-        # Skip if no API key available
-        if not os.getenv("OPENAI_API_KEY"):
-            pytest.skip("OPENAI_API_KEY not available for integration test")
+    @patch.dict(os.environ, {"OPENAI_API_KEY": "test-integration-key"})
+    @patch("drug_discovery_agent.chat.ChatOpenAI")
+    def test_chat_client_real_initialization(self, mock_chat_openai: MagicMock) -> None:
+        """Integration test for real chat client initialization (with mocked API)."""
+        # Mock the ChatOpenAI to avoid actual API calls
+        mock_chat_instance = MagicMock()
+        mock_chat_openai.return_value = mock_chat_instance
 
         try:
             client = BioinformaticsChatClient()
