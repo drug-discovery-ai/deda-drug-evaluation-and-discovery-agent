@@ -22,7 +22,7 @@ sequence_analyzer = SequenceAnalyzer(uniprot_client)
 mcp = FastMCP("FASTA")
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="get_virus_protein_FASTA_format_sequence",
     description="Retrieves the amino acid sequence in FASTA format for a given viral protein using its UniProt accession code.",
 )
@@ -46,7 +46,7 @@ async def get_fasta_protein(uniprot_code: str) -> str:
     return await uniprot_client.get_fasta_sequence(uniprot_code)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="get_virus_protein_details",
     description="Retrieve virus protein metadata (organism, species, lineage, function) from UniProt given an accession code like 'P0DTC2'.",
 )
@@ -64,7 +64,7 @@ async def get_virus_protein_details(uniprot_code: str) -> dict[str, Any]:
     return await uniprot_client.get_details(uniprot_code)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="analyze_sequence_properties",
     description="Analyze length, molecular weight (kDa), isoelectric point (pI), and composition of a protein sequence. Use 'get_fasta_protein' to retrieve the sequence for a UniProt ID.",
 )
@@ -87,7 +87,7 @@ async def analyze_protein_sequence_properties(uniprot_code: str) -> dict[str, An
     return await sequence_analyzer.analyze_from_uniprot(uniprot_code)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="compare_protein_variant",
     description=(
         "Compares a mutated protein (e.g., D614G) against the reference from UniProt. "
@@ -110,7 +110,7 @@ async def compare_variant_protein(uniprot_id: str, mutation: str) -> dict[str, A
     return await sequence_analyzer.compare_variant(uniprot_id, mutation)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="get_top_pdb_ids_for_uniprot",
     description="Returns up to 10 representative PDB IDs for a given UniProt protein. Useful for fetching 3D structures without flooding the client.",
 )
@@ -129,7 +129,7 @@ async def get_top_pdb_ids_for_uniprot(uniprot_id: str) -> list[str]:
     return await uniprot_client.get_pdb_ids(uniprot_id)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="get_experimental_structure_details",
     description="Fetches experimental structure metadata from RCSB PDB using a valid PDB ID (e.g., '4HHB'). Useful for grounding structure-related queries with resolution, method, and official description.",
 )
@@ -147,7 +147,7 @@ async def get_experimental_structure_details(pdb_id: str) -> dict[str, Any]:
     return await pdb_client.get_structure_details(pdb_id)
 
 
-@mcp.tool(
+@mcp.tool(  # type: ignore[misc]
     name="get_ligand_smiles_from_uniprot",
     description=(
         "Fetches up to 10 ligands (non-polymer entities) co-crystallized with PDB structures related to a UniProt ID. "
@@ -223,7 +223,7 @@ async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
-@mcp.prompt()
+@mcp.prompt()  # type: ignore[misc]
 def get_initial_prompts() -> list[base.Message]:
     return [
         base.UserMessage(

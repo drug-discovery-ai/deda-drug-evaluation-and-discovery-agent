@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -9,13 +10,13 @@ class TestUniProtClient:
     """Test suite for UniProtClient."""
 
     @pytest.fixture
-    def client(self):
+    def client(self) -> UniProtClient:
         """Create a UniProtClient instance."""
         return UniProtClient()
 
     @pytest.mark.unit
     @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
-    async def test_get_fasta_sequence_success(self, mock_request, client):
+    async def test_get_fasta_sequence_success(self, mock_request: Any, client: UniProtClient) -> None:
         """Test successful FASTA sequence retrieval."""
         expected_fasta = """>sp|P0DTC2|SPIKE_SARS2 Spike glycoprotein
 MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT"""
@@ -31,7 +32,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
     @pytest.mark.unit
     @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
-    async def test_get_fasta_sequence_empty_response(self, mock_request, client):
+    async def test_get_fasta_sequence_empty_response(self, mock_request: Any, client: UniProtClient) -> None:
         """Test FASTA sequence retrieval with empty response."""
         mock_request.return_value = None
 
@@ -42,8 +43,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_details_success(
-        self, mock_client_cls, client, mock_uniprot_details_response, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, client: UniProtClient, mock_uniprot_details_response: Any, http_mock_helpers: Any
+    ) -> None:
         """Test successful protein details retrieval."""
         http_mock_helpers.setup_httpx_mock(
             mock_client_cls, mock_uniprot_details_response
@@ -64,8 +65,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_details_http_error(
-        self, mock_client_cls, client, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any
+    ) -> None:
         """Test protein details retrieval with HTTP error."""
         http_mock_helpers.setup_httpx_mock(mock_client_cls, None, status_code=404)
 
@@ -78,8 +79,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_details_missing_fields(
-        self, mock_client_cls, client, http_mock_helpers, spike_protein_uniprot_id
-    ):
+        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test protein details retrieval with missing fields."""
         minimal_response = {"primaryAccession": spike_protein_uniprot_id}
         http_mock_helpers.setup_httpx_mock(mock_client_cls, minimal_response)
@@ -97,12 +98,12 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @patch("httpx.AsyncClient")
     async def test_get_pdb_ids_success(
         self,
-        mock_client_cls,
-        client,
-        mock_uniprot_pdb_response,
-        http_mock_helpers,
-        spike_protein_uniprot_id,
-    ):
+        mock_client_cls: Any,
+        client: UniProtClient,
+        mock_uniprot_pdb_response: Any,
+        http_mock_helpers: Any,
+        spike_protein_uniprot_id: str,
+    ) -> None:
         """Test successful PDB IDs retrieval."""
         http_mock_helpers.setup_httpx_mock(mock_client_cls, mock_uniprot_pdb_response)
 
@@ -114,8 +115,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_pdb_ids_no_pdb_refs(
-        self, mock_client_cls, client, http_mock_helpers, spike_protein_uniprot_id
-    ):
+        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test PDB IDs retrieval with no PDB cross-references."""
         no_pdb_response = {
             "uniProtKBCrossReferences": [{"database": "EMBL", "id": "MT326090"}]
@@ -129,8 +130,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_pdb_ids_http_error(
-        self, mock_client_cls, client, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any
+    ) -> None:
         """Test PDB IDs retrieval with HTTP error."""
         http_mock_helpers.setup_httpx_mock(
             mock_client_cls, None, side_effect=Exception("HTTP error")
@@ -144,12 +145,12 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @patch("httpx.AsyncClient")
     async def test_get_pdb_ids_timeout(
         self,
-        mock_client_cls,
-        client,
-        http_mock_helpers,
-        common_http_errors,
-        spike_protein_uniprot_id,
-    ):
+        mock_client_cls: Any,
+        client: UniProtClient,
+        http_mock_helpers: Any,
+        common_http_errors: Any,
+        spike_protein_uniprot_id: str,
+    ) -> None:
         """Test PDB IDs retrieval with timeout."""
         http_mock_helpers.setup_httpx_mock(
             mock_client_cls, None, side_effect=common_http_errors["timeout"]
@@ -161,7 +162,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_get_fasta_sequence_integration(self, client):
+    async def test_get_fasta_sequence_integration(self, client: UniProtClient) -> None:
         """Integration test for FASTA sequence retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
         result = await client.get_fasta_sequence("P0DTC2")
@@ -173,7 +174,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_get_details_integration(self, client):
+    async def test_get_details_integration(self, client: UniProtClient) -> None:
         """Integration test for protein details retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
         result = await client.get_details("P0DTC2")
@@ -187,8 +188,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_pdb_ids_integration(
-        self, client, spike_protein_uniprot_id, spike_protein_pdb_id
-    ):
+        self, client: UniProtClient, spike_protein_uniprot_id: str, spike_protein_pdb_id: str
+    ) -> None:
         """Integration test for PDB IDs retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
         result = await client.get_pdb_ids(spike_protein_uniprot_id)

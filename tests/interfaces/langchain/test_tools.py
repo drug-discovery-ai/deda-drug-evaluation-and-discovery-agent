@@ -1,5 +1,6 @@
 """Tests for langchain tools functionality."""
 
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -28,8 +29,8 @@ class TestBioinformaticsToolBase:
 
     @pytest.mark.unit
     def test_tool_base_initialization_with_clients(
-        self, mock_uniprot_client, mock_pdb_client, mock_sequence_analyzer
-    ):
+        self, mock_uniprot_client: Any, mock_pdb_client: Any, mock_sequence_analyzer: Any
+    ) -> None:
         """Test tool base initialization with provided clients."""
 
         # Create a concrete tool class for testing
@@ -37,10 +38,10 @@ class TestBioinformaticsToolBase:
             name: str = "test_tool"
             description: str = "Test tool"
 
-            def _run(self, **kwargs):
+            def _run(self, **kwargs: Any) -> str:
                 return "test"
 
-            async def _arun(self, **kwargs):
+            async def _arun(self, **kwargs: Any) -> str:
                 return "test"
 
         tool = TestTool(
@@ -54,17 +55,17 @@ class TestBioinformaticsToolBase:
         assert tool.sequence_analyzer == mock_sequence_analyzer
 
     @pytest.mark.unit
-    def test_tool_base_initialization_default_clients(self):
+    def test_tool_base_initialization_default_clients(self) -> None:
         """Test tool base initialization with default clients."""
 
         class TestTool(BioinformaticsToolBase):
             name: str = "test_tool"
             description: str = "Test tool"
 
-            def _run(self, **kwargs):
+            def _run(self, **kwargs: Any) -> str:
                 return "test"
 
-            async def _arun(self, **kwargs):
+            async def _arun(self, **kwargs: Any) -> str:
                 return "test"
 
         tool = TestTool()
@@ -89,7 +90,7 @@ class TestBioinformaticsToolBase:
         (GetLigandSmilesTool, "get_ligand_smiles_from_uniprot", "ligand"),
     ],
 )
-def test_tool_properties(tool_class, expected_name, expected_desc_contains):
+def test_tool_properties(tool_class: Any, expected_name: str, expected_desc_contains: str) -> None:
     """Test tool name and description for all tools."""
     tool = tool_class()
     assert tool.name == expected_name
@@ -100,14 +101,14 @@ class TestGetProteinFastaTool:
     """Test suite for GetProteinFastaTool."""
 
     @pytest.fixture
-    def fasta_tool(self, mock_uniprot_client):
+    def fasta_tool(self, mock_uniprot_client: Any) -> GetProteinFastaTool:
         """Create FASTA tool with mock client."""
         return GetProteinFastaTool(uniprot_client=mock_uniprot_client)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, fasta_tool, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, fasta_tool: GetProteinFastaTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_fasta = f">sp|{spike_protein_uniprot_id}|SPIKE_SARS2\nMKTVRQERL"
         mock_uniprot_client.get_fasta_sequence.return_value = expected_fasta
@@ -124,14 +125,14 @@ class TestGetProteinDetailsTool:
     """Test suite for GetProteinDetailsTool."""
 
     @pytest.fixture
-    def details_tool(self, mock_uniprot_client):
+    def details_tool(self, mock_uniprot_client: Any) -> GetProteinDetailsTool:
         """Create details tool with mock client."""
         return GetProteinDetailsTool(uniprot_client=mock_uniprot_client)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, details_tool, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, details_tool: GetProteinDetailsTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_details = {
             "accession": spike_protein_uniprot_id,
@@ -152,14 +153,14 @@ class TestAnalyzeSequencePropertiesTool:
     """Test suite for AnalyzeSequencePropertiesTool."""
 
     @pytest.fixture
-    def analyze_tool(self, mock_sequence_analyzer):
+    def analyze_tool(self, mock_sequence_analyzer: Any) -> AnalyzeSequencePropertiesTool:
         """Create analyze tool with mock analyzer."""
         return AnalyzeSequencePropertiesTool(sequence_analyzer=mock_sequence_analyzer)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, analyze_tool, mock_sequence_analyzer, spike_protein_uniprot_id
-    ):
+        self, analyze_tool: AnalyzeSequencePropertiesTool, mock_sequence_analyzer: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_analysis = {
             "length": 1273,
@@ -181,12 +182,12 @@ class TestAnalyzeRawSequenceTool:
     """Test suite for AnalyzeRawSequenceTool."""
 
     @pytest.fixture
-    def raw_analyze_tool(self, mock_sequence_analyzer):
+    def raw_analyze_tool(self, mock_sequence_analyzer: Any) -> AnalyzeRawSequenceTool:
         """Create raw analyze tool with mock analyzer."""
         return AnalyzeRawSequenceTool(sequence_analyzer=mock_sequence_analyzer)
 
     @pytest.mark.unit
-    async def test_async_run(self, raw_analyze_tool, mock_sequence_analyzer):
+    async def test_async_run(self, raw_analyze_tool: AnalyzeRawSequenceTool, mock_sequence_analyzer: Any) -> None:
         """Test asynchronous execution."""
         expected_analysis = {
             "length": 10,
@@ -205,14 +206,14 @@ class TestCompareProteinVariantTool:
     """Test suite for CompareProteinVariantTool."""
 
     @pytest.fixture
-    def variant_tool(self, mock_sequence_analyzer):
+    def variant_tool(self, mock_sequence_analyzer: Any) -> CompareProteinVariantTool:
         """Create variant tool with mock analyzer."""
         return CompareProteinVariantTool(sequence_analyzer=mock_sequence_analyzer)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, variant_tool, mock_sequence_analyzer, spike_protein_uniprot_id
-    ):
+        self, variant_tool: CompareProteinVariantTool, mock_sequence_analyzer: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_comparison = {
             "mutation": "D614G",
@@ -233,14 +234,14 @@ class TestGetTopPDBIdsTool:
     """Test suite for GetTopPDBIdsTool."""
 
     @pytest.fixture
-    def pdb_ids_tool(self, mock_uniprot_client):
+    def pdb_ids_tool(self, mock_uniprot_client: Any) -> GetTopPDBIdsTool:
         """Create PDB IDs tool with mock client."""
         return GetTopPDBIdsTool(uniprot_client=mock_uniprot_client)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, pdb_ids_tool, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, pdb_ids_tool: GetTopPDBIdsTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_pdb_ids = ["6VSB", "6VXX", "7CAM"]
         mock_uniprot_client.get_pdb_ids.return_value = expected_pdb_ids
@@ -257,14 +258,14 @@ class TestGetStructureDetailsTool:
     """Test suite for GetStructureDetailsTool."""
 
     @pytest.fixture
-    def structure_tool(self, mock_pdb_client):
+    def structure_tool(self, mock_pdb_client: Any) -> GetStructureDetailsTool:
         """Create structure tool with mock client."""
         return GetStructureDetailsTool(pdb_client=mock_pdb_client)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, structure_tool, mock_pdb_client, spike_protein_pdb_id
-    ):
+        self, structure_tool: GetStructureDetailsTool, mock_pdb_client: Any, spike_protein_pdb_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_details = {
             "pdb_id": spike_protein_pdb_id,
@@ -286,14 +287,14 @@ class TestGetLigandSmilesTool:
     """Test suite for GetLigandSmilesTool."""
 
     @pytest.fixture
-    def ligands_tool(self, mock_pdb_client):
+    def ligands_tool(self, mock_pdb_client: Any) -> GetLigandSmilesTool:
         """Create ligands tool with mock client."""
         return GetLigandSmilesTool(pdb_client=mock_pdb_client)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, ligands_tool, mock_pdb_client, spike_protein_uniprot_id
-    ):
+        self, ligands_tool: GetLigandSmilesTool, mock_pdb_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test asynchronous execution."""
         expected_ligands = [
             {"id": "NAG", "name": "N-ACETYL-D-GLUCOSAMINE", "formula": "C8 H15 N O6"},
@@ -313,7 +314,7 @@ class TestCreateBioinformaticsTools:
     """Test suite for create_bioinformatics_tools factory function."""
 
     @pytest.mark.unit
-    def test_create_with_default_clients(self):
+    def test_create_with_default_clients(self) -> None:
         """Test creating tools with default clients."""
         tools = create_bioinformatics_tools()
 
@@ -339,7 +340,7 @@ class TestCreateBioinformaticsTools:
         assert tool_names == expected_names
 
     @pytest.mark.unit
-    def test_create_with_custom_clients(self):
+    def test_create_with_custom_clients(self) -> None:
         """Test creating tools with custom clients."""
         mock_uniprot = AsyncMock(spec=UniProtClient)
         mock_pdb = MagicMock(spec=PDBClient)
@@ -363,7 +364,7 @@ class TestCreateBioinformaticsTools:
                 assert tool.sequence_analyzer == mock_analyzer
 
     @pytest.mark.unit
-    def test_create_with_partial_clients(self):
+    def test_create_with_partial_clients(self) -> None:
         """Test creating tools with some custom clients."""
         mock_uniprot = AsyncMock(spec=UniProtClient)
 
@@ -382,7 +383,7 @@ class TestCreateBioinformaticsTools:
                 assert isinstance(tool.sequence_analyzer, SequenceAnalyzer)
 
     @pytest.mark.unit
-    def test_tools_have_correct_args_schema(self):
+    def test_tools_have_correct_args_schema(self) -> None:
         """Test that all tools have the correct args schema."""
         tools = create_bioinformatics_tools()
 
@@ -410,7 +411,7 @@ class TestCreateBioinformaticsTools:
             assert tool.args_schema == expected_schema
 
     @pytest.mark.unit
-    def test_all_tools_exported(self):
+    def test_all_tools_exported(self) -> None:
         """Test that all expected tools are in __all__ exports."""
         from drug_discovery_agent.interfaces.langchain.tools import (
             __all__ as exported_names,

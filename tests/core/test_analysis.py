@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -10,19 +11,19 @@ class TestSequenceAnalyzer:
     """Test suite for SequenceAnalyzer."""
 
     @pytest.fixture
-    def analyzer(self, mock_uniprot_client):
+    def analyzer(self, mock_uniprot_client: Any) -> SequenceAnalyzer:
         """Create a SequenceAnalyzer instance with mocked UniProt client."""
         return SequenceAnalyzer(uniprot_client=mock_uniprot_client)
 
     @pytest.fixture
-    def analyzer_with_default_uniprot(self):
+    def analyzer_with_default_uniprot(self) -> SequenceAnalyzer:
         """Create a SequenceAnalyzer instance with default UniProt client."""
         return SequenceAnalyzer()
 
     @pytest.mark.unit
     async def test_analyze_from_uniprot_success(
-        self, analyzer, mock_uniprot_client, sample_fasta, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+    ) -> None:
         """Test successful sequence analysis from UniProt."""
         mock_uniprot_client.get_fasta_sequence.return_value = sample_fasta
 
@@ -41,7 +42,7 @@ class TestSequenceAnalyzer:
             assert aa in result["composition"]
 
     @pytest.mark.unit
-    def test_analyze_raw_sequence_success(self, analyzer, sample_sequence):
+    def test_analyze_raw_sequence_success(self, analyzer: SequenceAnalyzer, sample_sequence: str) -> None:
         """Test successful raw sequence analysis."""
         result = analyzer.analyze_raw_sequence(sample_sequence)
 
@@ -72,8 +73,8 @@ MKTVRQERLXZ""",
         ],
     )
     async def test_invalid_amino_acids(
-        self, analyzer, mock_uniprot_client, test_type, sequence_data, expected_error
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, test_type: str, sequence_data: dict[str, str], expected_error: str
+    ) -> None:
         """Test sequence analysis with invalid amino acids for both UniProt and raw sequences."""
         if test_type == "uniprot":
             mock_uniprot_client.get_fasta_sequence.return_value = sequence_data["fasta"]
@@ -88,8 +89,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_analyze_from_uniprot_empty_sequence(
-        self, analyzer, mock_uniprot_client
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any
+    ) -> None:
         """Test sequence analysis with empty sequence."""
         empty_fasta = ">sp|TEST|TEST Test protein\n"
         mock_uniprot_client.get_fasta_sequence.return_value = empty_fasta
@@ -101,7 +102,7 @@ MKTVRQERLXZ""",
         assert result["composition"] == {}
 
     @pytest.mark.unit
-    def test_analyze_raw_sequence_lowercase(self, analyzer):
+    def test_analyze_raw_sequence_lowercase(self, analyzer: SequenceAnalyzer) -> None:
         """Test raw sequence analysis with lowercase input."""
         lowercase_sequence = "mktvrqerl"
 
@@ -112,7 +113,7 @@ MKTVRQERLXZ""",
         assert result["molecular_weight_kda"] > 0
 
     @pytest.mark.unit
-    def test_analyze_raw_sequence_empty(self, analyzer):
+    def test_analyze_raw_sequence_empty(self, analyzer: SequenceAnalyzer) -> None:
         """Test raw sequence analysis with empty sequence."""
         result = analyzer.analyze_raw_sequence("")
 
@@ -122,8 +123,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_success(
-        self, analyzer, mock_uniprot_client, sample_fasta, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+    ) -> None:
         """Test successful variant comparison."""
         wild_fasta = sample_fasta.replace(
             sample_fasta.split("\n")[1], "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNDD"
@@ -148,8 +149,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_invalid_format(
-        self, analyzer, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test variant comparison with invalid mutation format."""
         wild_fasta = ">sp|P0DTC2|SPIKE_SARS2\nMFVFLVLLPLVSSQCV"
         mock_uniprot_client.get_fasta_sequence.return_value = wild_fasta
@@ -164,8 +165,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_reference_mismatch(
-        self, analyzer, mock_uniprot_client, sample_fasta, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+    ) -> None:
         """Test variant comparison with reference amino acid mismatch."""
         wild_fasta = sample_fasta.replace(
             sample_fasta.split("\n")[1], "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNDD"
@@ -182,8 +183,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_case_insensitive_mutation(
-        self, analyzer, mock_uniprot_client, sample_fasta, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+    ) -> None:
         """Test variant comparison with case-insensitive mutation format."""
         wild_fasta = sample_fasta.replace(
             sample_fasta.split("\n")[1], "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNDD"
@@ -198,8 +199,8 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_exception_handling(
-        self, analyzer, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test variant comparison with exception handling."""
         mock_uniprot_client.get_fasta_sequence.side_effect = Exception("Network error")
 
@@ -209,7 +210,7 @@ MKTVRQERLXZ""",
         assert "Network error" in result["error"]
 
     @pytest.mark.unit
-    def test_sequence_analyzer_initialization(self):
+    def test_sequence_analyzer_initialization(self) -> None:
         """Test SequenceAnalyzer initialization with and without UniProt client."""
         # Test with custom UniProt client
         mock_client = MagicMock(spec=UniProtClient)
@@ -221,7 +222,7 @@ MKTVRQERLXZ""",
         assert isinstance(analyzer_default.uniprot_client, UniProtClient)
 
     @pytest.mark.unit
-    def test_property_calculations_known_values(self, analyzer):
+    def test_property_calculations_known_values(self, analyzer: SequenceAnalyzer) -> None:
         """Test sequence analysis with known protein properties."""
         # Use a short, well-characterized sequence
         test_sequence = "AAAA"  # 4 alanines
@@ -239,8 +240,8 @@ MKTVRQERLXZ""",
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_uniprot_integration_with_spike_protein(
-        self, analyzer_with_default_uniprot, spike_protein_uniprot_id
-    ):
+        self, analyzer_with_default_uniprot: SequenceAnalyzer, spike_protein_uniprot_id: str
+    ) -> None:
         """Integration test for UniProt API with SARS-CoV-2 spike protein analysis and D614G variant."""
         # Test sequence analysis with known spike protein
         seq_result = await analyzer_with_default_uniprot.analyze_from_uniprot(

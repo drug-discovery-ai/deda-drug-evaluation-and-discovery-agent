@@ -1,6 +1,7 @@
 """Tests for chat module functionality."""
 
 import os
+from typing import Any, Tuple
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -22,13 +23,13 @@ class TestBioinformaticsChatClient:
     @patch("drug_discovery_agent.chat.AgentExecutor")
     def chat_client(
         self,
-        mock_agent_executor,
-        mock_create_agent,
-        mock_create_tools,
-        mock_chat_openai,
-        mock_env_vars,
-        mock_clients,
-    ):
+        mock_agent_executor: MagicMock,
+        mock_create_agent: MagicMock,
+        mock_create_tools: MagicMock,
+        mock_chat_openai: MagicMock,
+        mock_env_vars: Any,
+        mock_clients: Tuple[Any, Any, Any],
+    ) -> Any:
         """Create chat client with mocked dependencies."""
         uniprot_client, pdb_client, sequence_analyzer = mock_clients
 
@@ -64,15 +65,15 @@ class TestBioinformaticsChatClient:
     @patch("drug_discovery_agent.chat.AgentExecutor")
     def test_initialization(
         self,
-        mock_agent_executor,
-        mock_create_agent,
-        mock_create_tools,
-        mock_chat_openai,
-        clients,
-        expected_tools_call,
-        mock_env_vars,
-        mock_clients,
-    ):
+        mock_agent_executor: MagicMock,
+        mock_create_agent: MagicMock,
+        mock_create_tools: MagicMock,
+        mock_chat_openai: MagicMock,
+        clients: Tuple[Any, Any, Any],
+        expected_tools_call: Any,
+        mock_env_vars: Any,
+        mock_clients: Tuple[Any, Any, Any],
+    ) -> None:
         """Test initialization with custom and default clients."""
         mock_create_tools.return_value = [MagicMock() for _ in range(8)]
         mock_chat_openai.return_value = MagicMock()
@@ -105,7 +106,7 @@ class TestBioinformaticsChatClient:
         assert call_kwargs["temperature"] == 0.7
 
     @pytest.mark.unit
-    async def test_chat_success(self, chat_client, spike_protein_uniprot_id):
+    async def test_chat_success(self, chat_client: Any, spike_protein_uniprot_id: str) -> None:
         """Test successful chat interaction."""
         expected_response = (
             f"Here's information about the protein {spike_protein_uniprot_id}..."
@@ -126,7 +127,7 @@ class TestBioinformaticsChatClient:
         assert "chat_history" in call_args
 
     @pytest.mark.unit
-    async def test_chat_with_history(self, chat_client):
+    async def test_chat_with_history(self, chat_client: Any) -> None:
         """Test chat with existing conversation history."""
         from langchain_core.messages import AIMessage, HumanMessage
 
@@ -145,7 +146,7 @@ class TestBioinformaticsChatClient:
         assert len(chat_client.chat_history) == 4  # 2 previous + 2 new messages
 
     @pytest.mark.unit
-    async def test_chat_error_handling(self, chat_client):
+    async def test_chat_error_handling(self, chat_client: Any) -> None:
         """Test chat error handling."""
         chat_client._mock_executor.ainvoke.side_effect = Exception("Test error")
 
@@ -155,7 +156,7 @@ class TestBioinformaticsChatClient:
         assert "Test error" in result
 
     @pytest.mark.unit
-    async def test_chat_history_trimming(self, chat_client):
+    async def test_chat_history_trimming(self, chat_client: Any) -> None:
         """Test that chat history is properly trimmed when it exceeds max_history."""
         from langchain_core.messages import AIMessage, HumanMessage
 
@@ -178,7 +179,7 @@ class TestBioinformaticsChatClient:
             mock_trim.assert_called_once()
 
     @pytest.mark.unit
-    def test_clear_conversation(self, chat_client):
+    def test_clear_conversation(self, chat_client: Any) -> None:
         """Test conversation clearing."""
         from langchain_core.messages import AIMessage, HumanMessage
 
@@ -200,7 +201,7 @@ class TestBioinformaticsChatClient:
             ("regular message", False, None),
         ],
     )
-    def test_handle_commands(self, chat_client, command, expected_result, mock_method):
+    def test_handle_commands(self, chat_client: Any, command: str, expected_result: bool, mock_method: Any) -> None:
         """Test command handling for various inputs."""
         if mock_method:
             with patch.object(chat_client, mock_method) as mock_func:
@@ -213,7 +214,7 @@ class TestBioinformaticsChatClient:
 
     @pytest.mark.unit
     @pytest.mark.parametrize("quit_cmd", ["/quit", "quit", "exit"])
-    async def test_chat_loop_quit_commands(self, chat_client, quit_cmd):
+    async def test_chat_loop_quit_commands(self, chat_client: Any, quit_cmd: str) -> None:
         """Test chat loop quit commands."""
         with patch("builtins.input", return_value=quit_cmd):
             with patch("builtins.print") as mock_print:
@@ -223,7 +224,7 @@ class TestBioinformaticsChatClient:
                 assert any("Goodbye" in msg for msg in printed_messages)
 
     @pytest.mark.unit
-    async def test_chat_loop_empty_input(self, chat_client):
+    async def test_chat_loop_empty_input(self, chat_client: Any) -> None:
         """Test chat loop with empty input."""
         inputs = ["", "  ", "/quit"]  # Empty inputs followed by quit
 
@@ -243,8 +244,8 @@ class TestBioinformaticsChatClient:
         ],
     )
     async def test_chat_loop_error_handling(
-        self, chat_client, exception, expected_message
-    ):
+        self, chat_client: Any, exception: Any, expected_message: str
+    ) -> None:
         """Test chat loop error handling for various exceptions."""
         with patch("builtins.input", side_effect=exception):
             with patch("builtins.print") as mock_print:
@@ -254,7 +255,7 @@ class TestBioinformaticsChatClient:
                 assert any(expected_message in msg for msg in printed_messages)
 
     @pytest.mark.unit
-    async def test_chat_loop_regular_chat(self, chat_client, spike_protein_uniprot_id):
+    async def test_chat_loop_regular_chat(self, chat_client: Any, spike_protein_uniprot_id: str) -> None:
         """Test chat loop with regular chat interaction."""
         inputs = [f"Tell me about {spike_protein_uniprot_id}", "/quit"]
 
@@ -275,7 +276,7 @@ class TestMainFunctions:
 
     @pytest.mark.unit
     @patch("drug_discovery_agent.chat.BioinformaticsChatClient")
-    async def test_async_main_success(self, mock_client_class):
+    async def test_async_main_success(self, mock_client_class: MagicMock) -> None:
         """Test successful async main execution."""
         mock_client = AsyncMock()
         mock_client_class.return_value = mock_client
@@ -288,7 +289,7 @@ class TestMainFunctions:
     @pytest.mark.unit
     @patch("builtins.print")
     @patch.dict(os.environ, {}, clear=True)
-    async def test_async_main_missing_api_key(self, mock_print):
+    async def test_async_main_missing_api_key(self, mock_print: MagicMock) -> None:
         """Test async main with missing API key."""
         await async_main()
 
@@ -308,8 +309,8 @@ class TestMainFunctions:
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     @patch("drug_discovery_agent.chat.BioinformaticsChatClient")
     async def test_async_main_errors(
-        self, mock_client_class, mock_print, exception, expected_message
-    ):
+        self, mock_client_class: MagicMock, mock_print: MagicMock, exception: Exception, expected_message: str
+    ) -> None:
         """Test async main error handling."""
         mock_client_class.side_effect = exception
 
@@ -320,7 +321,7 @@ class TestMainFunctions:
 
     @pytest.mark.unit
     @patch("asyncio.run")
-    def test_main_function(self, mock_asyncio_run):
+    def test_main_function(self, mock_asyncio_run: MagicMock) -> None:
         """Test synchronous main function."""
         main()
         mock_asyncio_run.assert_called_once()
@@ -331,7 +332,7 @@ class TestChatIntegration:
 
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_chat_client_real_initialization(self):
+    def test_chat_client_real_initialization(self) -> None:
         """Integration test for real chat client initialization (requires API key)."""
         # Skip if no API key available
         if not os.getenv("OPENAI_API_KEY"):

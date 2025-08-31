@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -11,8 +12,8 @@ class TestHttpClient:
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_make_api_request_json_success(
-        self, mock_client_cls, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, http_mock_helpers: Any
+    ) -> None:
         """Test successful JSON API request."""
         expected_response = {"key": "value", "data": [1, 2, 3]}
 
@@ -31,8 +32,8 @@ class TestHttpClient:
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_make_api_request_text_success(
-        self, mock_client_cls, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, http_mock_helpers: Any
+    ) -> None:
         """Test successful text API request."""
         expected_text = "This is plain text response"
 
@@ -52,7 +53,7 @@ class TestHttpClient:
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
-    async def test_make_api_request_headers(self, mock_client_cls, http_mock_helpers):
+    async def test_make_api_request_headers(self, mock_client_cls: Any, http_mock_helpers: Any) -> None:
         """Test API request with headers - custom, default, and override scenarios."""
         expected_response = {"status": "ok"}
 
@@ -100,8 +101,8 @@ class TestHttpClient:
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_make_api_request_with_timeout(
-        self, mock_client_cls, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, http_mock_helpers: Any
+    ) -> None:
         """Test API request with custom timeout."""
         expected_response = {"data": "test"}
 
@@ -131,18 +132,18 @@ class TestHttpClient:
     )
     async def test_make_api_request_errors(
         self,
-        mock_client_cls,
-        error_type,
-        error_instance,
-        common_http_errors,
-        http_mock_helpers,
-    ):
+        mock_client_cls: Any,
+        error_type: str,
+        error_instance: Any,
+        common_http_errors: Any,
+        http_mock_helpers: Any,
+    ) -> None:
         """Test API request error handling - HTTP, timeout, connection, and JSON decode errors."""
         mock_async_client = AsyncMock()
 
         if error_type == "json_decode_error":
 
-            def raise_error():
+            def raise_error() -> None:
                 raise ValueError("Invalid JSON")
 
             mock_response = AsyncMock()
@@ -177,8 +178,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIH""",
         ],
     )
     async def test_make_fasta_request(
-        self, mock_request, return_value, expected_result
-    ):
+        self, mock_request: Any, return_value: str | None, expected_result: str | None
+    ) -> None:
         """Test FASTA request success and failure scenarios."""
         mock_request.return_value = return_value
 
@@ -191,7 +192,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIH""",
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_make_api_request_real_request(self):
+    async def test_make_api_request_real_request(self) -> None:
         """Integration test with real HTTP request."""
         # Test with a reliable public API
         result = await make_api_request("https://httpbin.org/json", timeout=10.0)
@@ -201,7 +202,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIH""",
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_make_fasta_request_real_request(self):
+    async def test_make_fasta_request_real_request(self) -> None:
         """Integration test with real FASTA request."""
         # Test with a simple text endpoint
         result = await make_fasta_request("https://httpbin.org/robots.txt")

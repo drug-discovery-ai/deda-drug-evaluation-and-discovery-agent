@@ -1,6 +1,6 @@
 """HTTP client utilities for API requests."""
 
-from typing import Any
+from typing import Union
 
 import httpx
 
@@ -12,7 +12,7 @@ async def make_api_request(
     headers: dict[str, str] | None = None,
     timeout: float = 30.0,
     accept_format: str = "application/json",
-) -> Any | None:
+) -> Union[dict[str, object], str, None]:
     """Make an HTTP request with proper error handling.
 
     Args:
@@ -35,9 +35,14 @@ async def make_api_request(
             response.raise_for_status()
 
             if accept_format == "text/plain":
-                return response.text
+                text_response: str = response.text
+                return text_response
             else:
-                return response.json()
+                json_data = response.json()
+                # Ensure we return dict[str, object] or None as promised
+                if isinstance(json_data, dict):
+                    return json_data
+                return None
 
         except Exception:
             return None
@@ -52,4 +57,6 @@ async def make_fasta_request(url: str) -> str | None:
     Returns:
         FASTA text or None if failed
     """
-    return await make_api_request(url, accept_format="text/plain")
+    result = await make_api_request(url, accept_format="text/plain")
+    # Since we specify text/plain, we should get str or None
+    return result if isinstance(result, str) else None

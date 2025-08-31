@@ -2,7 +2,7 @@
 
 import asyncio
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Generator
 
 import pytest
 import respx
@@ -20,7 +20,7 @@ from tests.fixtures.env_helpers import *  # noqa: F401,F403
 
 
 @pytest.fixture(scope="session")
-def event_loop():
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for the test session."""
     loop = asyncio.new_event_loop()
     yield loop
@@ -28,7 +28,7 @@ def event_loop():
 
 
 @pytest.fixture
-def respx_mock():
+def respx_mock() -> Generator[Any, None, None]:
     """Provide respx mock for testing HTTP requests."""
     with respx.mock as mock:
         yield mock
