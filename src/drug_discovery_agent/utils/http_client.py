@@ -9,7 +9,7 @@ from drug_discovery_agent.utils.constants import USER_AGENT
 
 async def make_api_request(
     url: str,
-    headers: dict | None = None,
+    headers: dict[str, str] | None = None,
     timeout: float = 30.0,
     accept_format: str = "application/json",
 ) -> Any | None:
