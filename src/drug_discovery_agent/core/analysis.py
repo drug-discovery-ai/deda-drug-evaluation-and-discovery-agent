@@ -61,7 +61,8 @@ class SequenceAnalyzer:
         return {
             "length": len(seq_obj),
             "molecular_weight_kda": round(
-                molecular_weight(seq_obj, seq_type="protein") / 1000, 2
+                molecular_weight(seq_obj, seq_type="protein") / 1000,
+                2,
             ),
             "isoelectric_point": round(pI_calc.pi(), 2),
             "composition": {aa: clean_seq.count(aa) for aa in sorted(set(clean_seq))},
@@ -99,7 +100,8 @@ class SequenceAnalyzer:
         return {
             "length": len(seq_obj),
             "molecular_weight_kda": round(
-                molecular_weight(seq_obj, seq_type="protein") / 1000, 2
+                molecular_weight(seq_obj, seq_type="protein") / 1000,
+                2,
             ),
             "isoelectric_point": round(pI_calc.pi(), 2),
             "composition": {aa: clean_seq.count(aa) for aa in sorted(set(clean_seq))},

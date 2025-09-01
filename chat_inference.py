@@ -8,12 +8,12 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, trust_remote_code=True)
 
 # Use Apple MPS or fallback to CPU
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-model.to(device)
+device_str = "mps" if torch.backends.mps.is_available() else "cpu"
+model = model.to(device_str)  # type: ignore[arg-type]
 model.eval()
 
 
-def chat(user_question: str):
+def chat(user_question: str) -> str:
     prompt = f"""### Instruction:
 Answer the user's question concisely.
 
@@ -22,7 +22,7 @@ Answer the user's question concisely.
 
 ### Response:
 """
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    inputs = tokenizer(prompt, return_tensors="pt").to(device_str)
 
     with torch.no_grad():
         output = model.generate(
@@ -34,7 +34,7 @@ Answer the user's question concisely.
             pad_token_id=tokenizer.eos_token_id,
         )
 
-    response = tokenizer.decode(output[0], skip_special_tokens=True)
+    response: str = tokenizer.decode(output[0], skip_special_tokens=True)
     return response.split("### Response:")[-1].strip()
 
 

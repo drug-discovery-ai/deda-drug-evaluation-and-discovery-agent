@@ -1,10 +1,11 @@
 from typing import Any
 
 import uvicorn
+from fastmcp import FastMCP
+from fastmcp.prompts.prompt import Message
 from mcp.server import Server
-from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.prompts import base
 from mcp.server.sse import SseServerTransport
+from mcp.types import PromptMessage
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -172,7 +173,7 @@ async def get_ligand_smiles_from_uniprot(uniprot_id: str) -> list[dict[str, Any]
 async def rest_get_fasta_protein(request: Request) -> JSONResponse:
     try:
         state = request.query_params["uniprot_code"]
-        result = await get_fasta_protein(state)
+        result = await get_fasta_protein.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -181,7 +182,7 @@ async def rest_get_fasta_protein(request: Request) -> JSONResponse:
 async def rest_get_details_protein(request: Request) -> JSONResponse:
     try:
         state = request.query_params["uniprot_code"]
-        result = await get_virus_protein_details(state)
+        result = await get_virus_protein_details.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -190,7 +191,7 @@ async def rest_get_details_protein(request: Request) -> JSONResponse:
 async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
     try:
         state = request.query_params["uniprot_code"]
-        result = await analyze_protein_sequence_properties(state)
+        result = await analyze_protein_sequence_properties.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -199,7 +200,7 @@ async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
 async def rest_get_top_pdb_ids_for_uniprot(request: Request) -> JSONResponse:
     try:
         state = request.query_params["uniprot_code"]
-        result = await get_top_pdb_ids_for_uniprot(state)
+        result = await get_top_pdb_ids_for_uniprot.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -208,7 +209,7 @@ async def rest_get_top_pdb_ids_for_uniprot(request: Request) -> JSONResponse:
 async def rest_get_experimental_structure_details(request: Request) -> JSONResponse:
     try:
         state = request.query_params["pdb_id"]
-        result = await get_experimental_structure_details(state)
+        result = await get_experimental_structure_details.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -217,22 +218,23 @@ async def rest_get_experimental_structure_details(request: Request) -> JSONRespo
 async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
     try:
         state = request.query_params["uniprot_code"]
-        result = await get_ligand_smiles_from_uniprot(state)
+        result = await get_ligand_smiles_from_uniprot.fn(state)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
 @mcp.prompt()
-def get_initial_prompts() -> list[base.Message]:
+def get_initial_prompts() -> list[PromptMessage]:
     return [
-        base.UserMessage(
+        Message(
             "You are a knowledgeable bioinformatics assistant. "
             "You help users prepare molecular inputs for docking and drug discovery workflows, particularly for the Boltz system. "
             "You can fetch protein information from UniProt, download FASTA or PDB data, explain virus protein structures, and guide users on formatting inputs. "
             "When needed, you call the appropriate tools to fetch sequence data, provide metadata, or guide formatting. "
             "Always ask clarifying questions if input is ambiguous. "
-            "Keep your responses concise, scientific, and user-friendly."
+            "Keep your responses concise, scientific, and user-friendly.",
+            role="user",
         )
     ]
 
@@ -245,7 +247,7 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         async with sse.connect_sse(
             request.scope,
             request.receive,
-            request._send,  # noqa: SLF001
+            request._send,
         ) as (read_stream, write_stream):
             await mcp_server.run(
                 read_stream,
@@ -288,8 +290,9 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
     )
 
 
-if __name__ == "__main__":
-    mcp_server = mcp._mcp_server  # noqa: WPS437
+def main() -> None:
+    """Main entry point for the MCP server."""
+    mcp_server = mcp._mcp_server
 
     import argparse
 
@@ -302,3 +305,7 @@ if __name__ == "__main__":
     starlette_app = create_starlette_app(mcp_server, debug=True)
 
     uvicorn.run(starlette_app, host=args.host, port=args.port)
+
+
+if __name__ == "__main__":
+    main()

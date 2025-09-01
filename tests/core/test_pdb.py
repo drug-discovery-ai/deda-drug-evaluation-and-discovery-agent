@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -10,20 +11,20 @@ class TestPDBClient:
     """Test suite for PDBClient."""
 
     @pytest.fixture
-    def client(self, mock_uniprot_client):
+    def client(self, mock_uniprot_client: Any) -> PDBClient:
         """Create a PDBClient instance with mocked UniProt client."""
         return PDBClient(uniprot_client=mock_uniprot_client)
 
     @pytest.fixture
-    def client_with_default_uniprot(self):
+    def client_with_default_uniprot(self) -> PDBClient:
         """Create a PDBClient instance with default UniProt client."""
         return PDBClient()
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_structure_details_success(
-        self, mock_client_cls, client, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, client: PDBClient, http_mock_helpers: Any
+    ) -> None:
         """Test successful structure details retrieval."""
         mock_response = http_mock_helpers.create_structure_response(
             title="Prefusion 2019-nCoV spike glycoprotein",
@@ -58,8 +59,13 @@ class TestPDBClient:
     )
     @patch("httpx.AsyncClient")
     async def test_get_structure_details_errors(
-        self, mock_client_cls, error_type, expected_error, client, common_http_errors
-    ):
+        self,
+        mock_client_cls: Any,
+        error_type: str,
+        expected_error: str,
+        client: PDBClient,
+        common_http_errors: Any,
+    ) -> None:
         """Test structure details retrieval with various errors."""
         mock_async_client = AsyncMock()
         mock_async_client.get.side_effect = common_http_errors[error_type]
@@ -74,10 +80,10 @@ class TestPDBClient:
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_structure_details_missing_fields(
-        self, mock_client_cls, client, http_mock_helpers
-    ):
+        self, mock_client_cls: Any, client: PDBClient, http_mock_helpers: Any
+    ) -> None:
         """Test structure details retrieval with missing fields."""
-        mock_response = {}
+        mock_response: dict[str, Any] = {}
         mock_http_response = http_mock_helpers.create_mock_http_response(mock_response)
         mock_async_client = AsyncMock()
         mock_async_client.get.return_value = mock_http_response
@@ -97,12 +103,12 @@ class TestPDBClient:
     @patch("httpx.AsyncClient")
     async def test_get_ligands_for_uniprot_success(
         self,
-        mock_client_cls,
-        client,
-        mock_uniprot_client,
-        http_mock_helpers,
-        spike_protein_uniprot_id,
-    ):
+        mock_client_cls: Any,
+        client: PDBClient,
+        mock_uniprot_client: Any,
+        http_mock_helpers: Any,
+        spike_protein_uniprot_id: str,
+    ) -> None:
         """Test successful ligands retrieval for UniProt ID."""
         mock_uniprot_client.get_pdb_ids.return_value = ["6VSB", "6VXX"]
 
@@ -121,7 +127,7 @@ class TestPDBClient:
             ),
         }
 
-        def get_side_effect(url, **kwargs):
+        def get_side_effect(url: str, **kwargs: Any) -> Any:
             for url_pattern, response_data in responses.items():
                 if url_pattern in url:
                     return http_mock_helpers.create_mock_http_response(response_data)
@@ -141,8 +147,8 @@ class TestPDBClient:
 
     @pytest.mark.unit
     async def test_get_ligands_for_uniprot_no_pdb_ids(
-        self, client, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, client: PDBClient, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test ligands retrieval when no PDB IDs are found."""
         mock_uniprot_client.get_pdb_ids.return_value = []
 
@@ -152,8 +158,8 @@ class TestPDBClient:
 
     @pytest.mark.unit
     async def test_get_ligands_for_uniprot_exception(
-        self, client, mock_uniprot_client, spike_protein_uniprot_id
-    ):
+        self, client: PDBClient, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+    ) -> None:
         """Test ligands retrieval with exception handling."""
         mock_uniprot_client.get_pdb_ids.side_effect = Exception("Network error")
 
@@ -164,7 +170,7 @@ class TestPDBClient:
         assert "Network error" in result[0]["error"]
 
     @pytest.mark.unit
-    def test_pdb_client_initialization(self):
+    def test_pdb_client_initialization(self) -> None:
         """Test PDBClient initialization with and without UniProt client."""
         # Test with custom UniProt client
         mock_client = MagicMock(spec=UniProtClient)
@@ -178,8 +184,8 @@ class TestPDBClient:
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_structure_details_integration(
-        self, client_with_default_uniprot, spike_protein_pdb_id
-    ):
+        self, client_with_default_uniprot: PDBClient, spike_protein_pdb_id: str
+    ) -> None:
         """Integration test for structure details retrieval with real API."""
         # Test with known PDB structure
         result = await client_with_default_uniprot.get_structure_details(
@@ -200,8 +206,8 @@ class TestPDBClient:
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_structure_details_invalid_pdb_integration(
-        self, client_with_default_uniprot
-    ):
+        self, client_with_default_uniprot: PDBClient
+    ) -> None:
         """Integration test for invalid PDB ID."""
         result = await client_with_default_uniprot.get_structure_details("INVALID")
 

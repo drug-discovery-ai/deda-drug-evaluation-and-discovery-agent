@@ -8,6 +8,7 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, trim_messages
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
 from drug_discovery_agent.core.pdb import PDBClient
@@ -36,8 +37,9 @@ class BioinformaticsChatClient:
             sequence_analyzer: Sequence analyzer instance. Creates default if None.
         """
         # Initialize LangChain components
+        api_key = os.getenv("OPENAI_API_KEY")
         self.llm = ChatOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key=SecretStr(api_key) if api_key else None,
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0.7,
         )
@@ -154,7 +156,8 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
 
     def _show_help(self) -> None:
         """Display comprehensive help information."""
-        print("""
+        print(
+            """
 🧬 Bioinformatics Assistant - Help
 
 CHAT EXAMPLES:
@@ -193,7 +196,8 @@ TIPS:
   • Mutations use standard notation: original amino acid + position + new amino acid
   • The assistant maintains conversation context for follow-up questions
   • All data is fetched from authoritative sources (UniProt, PDB, RCSB)
-        """)
+        """
+        )
 
     async def chat_loop(self) -> None:
         """Run interactive langchain loop with proper error handling."""
