@@ -1,8 +1,9 @@
 """Global pytest configuration and fixtures."""
 
 import asyncio
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Dict, Generator
+from typing import Any
 
 import pytest
 import respx
@@ -10,13 +11,35 @@ import respx
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
 from drug_discovery_agent.core.pdb import PDBClient
 from drug_discovery_agent.core.uniprot import UniProtClient
+from tests.fixtures.env_helpers import (
+    empty_env,
+    mock_env_vars,
+    openai_api_key,
+    openai_model,
+)
+from tests.fixtures.http_helpers import (
+    common_http_errors,
+    http_mock_helpers,
+)
 
 # Import shared fixtures (avoid duplicating existing ones)
 # Import fixtures from other modules
-from tests.fixtures.mock_clients import *  # noqa: F401,F403
-from tests.fixtures.sample_data import *  # noqa: F401,F403
-from tests.fixtures.http_helpers import *  # noqa: F401,F403
-from tests.fixtures.env_helpers import *  # noqa: F401,F403
+from tests.fixtures.mock_clients import (
+    mock_clients,
+    mock_pdb_client,
+    mock_sequence_analyzer,
+    mock_uniprot_client,
+)
+from tests.fixtures.sample_data import (
+    invalid_sequence,
+    mock_uniprot_details_response,
+    mock_uniprot_pdb_response,
+    sample_fasta,
+    sample_fasta_long,
+    sample_sequence,
+    spike_protein_pdb_id,
+    spike_protein_uniprot_id,
+)
 
 
 @pytest.fixture(scope="session")

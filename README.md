@@ -80,16 +80,27 @@ Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, foll
 
 This project uses `ruff` for linting and formatting, and `mypy` for type checking.
 
+### Development Setup
+
 Install development dependencies:
 ```bash
 pip install -e ".[dev]"
+pre-commit install
 ```
+
+The `pre-commit install` sets up Git hooks to automatically run `ruff`, `mypy`, and `pytest` before each commit,
+preventing broken code from reaching the repository.
 
 Run linting:
 ```bash
 ruff check .          # Check for linting issues
 ruff check . --fix    # Auto-fix linting issues
 ruff format .         # Auto-format code
+```
+
+Run type checking:
+```bash
+mypy .                # Run type checking on all files
 ```
 
 ## Run tests

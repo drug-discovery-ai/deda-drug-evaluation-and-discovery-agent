@@ -1,6 +1,6 @@
 """Shared HTTP mocking helpers for testing."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 from unittest.mock import AsyncMock
 
 import httpx
@@ -11,7 +11,11 @@ class HttpMockHelpers:
     """Helper class for HTTP mocking patterns."""
 
     @staticmethod
-    def create_mock_http_response(response_data: Optional[Any], status_code: int = 200, text_data: Optional[str] = None) -> AsyncMock:
+    def create_mock_http_response(
+        response_data: Any | None,
+        status_code: int = 200,
+        text_data: str | None = None,
+    ) -> AsyncMock:
         """Helper method to create mock HTTP response."""
         mock_response = AsyncMock()
         mock_response.status_code = status_code
@@ -26,8 +30,10 @@ class HttpMockHelpers:
 
     @staticmethod
     def create_structure_response(
-        title: str = "Test Structure", method: str = "X-RAY DIFFRACTION", resolution: float = 2.5
-    ) -> Dict[str, Any]:
+        title: str = "Test Structure",
+        method: str = "X-RAY DIFFRACTION",
+        resolution: float = 2.5,
+    ) -> dict[str, Any]:
         """Helper method to create mock structure response data."""
         return {
             "struct": {"title": title},
@@ -38,14 +44,16 @@ class HttpMockHelpers:
         }
 
     @staticmethod
-    def create_entry_response(entity_ids: List[str]) -> Dict[str, Any]:
+    def create_entry_response(entity_ids: list[str]) -> dict[str, Any]:
         """Helper method to create mock entry response data."""
         return {
             "rcsb_entry_container_identifiers": {"non_polymer_entity_ids": entity_ids}
         }
 
     @staticmethod
-    def create_ligand_response(pdb_id: str, entity_id: str, comp_id: str, name: str, formula: str) -> Dict[str, Any]:
+    def create_ligand_response(
+        pdb_id: str, entity_id: str, comp_id: str, name: str, formula: str
+    ) -> dict[str, Any]:
         """Helper method to create mock ligand response data."""
         return {
             "rcsb_id": f"{pdb_id}_{entity_id}",
@@ -54,7 +62,10 @@ class HttpMockHelpers:
 
     @staticmethod
     def setup_httpx_mock(
-        mock_client_cls: Any, response_data: Any, status_code: int = 200, side_effect: Optional[Any] = None
+        mock_client_cls: Any,
+        response_data: Any,
+        status_code: int = 200,
+        side_effect: Any | None = None,
     ) -> AsyncMock:
         """Helper method to set up httpx client mocking."""
         mock_response_obj = AsyncMock()
@@ -82,11 +93,13 @@ def http_mock_helpers() -> type[HttpMockHelpers]:
 
 
 @pytest.fixture
-def common_http_errors() -> Dict[str, Union[httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError]]:
+def common_http_errors() -> dict[
+    str, httpx.HTTPStatusError | httpx.TimeoutException | httpx.ConnectError
+]:
     """Common HTTP error scenarios for testing."""
     return {
         "not_found": httpx.HTTPStatusError(
-            "Not found", request=None, response=AsyncMock(status_code=404)
+            "Not found", request=AsyncMock(), response=AsyncMock(status_code=404)
         ),
         "timeout": httpx.TimeoutException("Request timeout"),
         "connection_error": httpx.ConnectError("Connection failed"),

@@ -1,7 +1,5 @@
 """HTTP client utilities for API requests."""
 
-from typing import Union
-
 import httpx
 
 from drug_discovery_agent.utils.constants import USER_AGENT
@@ -12,7 +10,7 @@ async def make_api_request(
     headers: dict[str, str] | None = None,
     timeout: float = 30.0,
     accept_format: str = "application/json",
-) -> Union[dict[str, object], str, None]:
+) -> dict[str, object] | str | None:
     """Make an HTTP request with proper error handling.
 
     Args:

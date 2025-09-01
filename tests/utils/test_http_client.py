@@ -53,7 +53,9 @@ class TestHttpClient:
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
-    async def test_make_api_request_headers(self, mock_client_cls: Any, http_mock_helpers: Any) -> None:
+    async def test_make_api_request_headers(
+        self, mock_client_cls: Any, http_mock_helpers: Any
+    ) -> None:
         """Test API request with headers - custom, default, and override scenarios."""
         expected_response = {"status": "ok"}
 

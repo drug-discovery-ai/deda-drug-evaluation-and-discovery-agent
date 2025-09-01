@@ -22,7 +22,11 @@ class TestSequenceAnalyzer:
 
     @pytest.mark.unit
     async def test_analyze_from_uniprot_success(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        sample_fasta: str,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test successful sequence analysis from UniProt."""
         mock_uniprot_client.get_fasta_sequence.return_value = sample_fasta
@@ -42,7 +46,9 @@ class TestSequenceAnalyzer:
             assert aa in result["composition"]
 
     @pytest.mark.unit
-    def test_analyze_raw_sequence_success(self, analyzer: SequenceAnalyzer, sample_sequence: str) -> None:
+    def test_analyze_raw_sequence_success(
+        self, analyzer: SequenceAnalyzer, sample_sequence: str
+    ) -> None:
         """Test successful raw sequence analysis."""
         result = analyzer.analyze_raw_sequence(sample_sequence)
 
@@ -73,7 +79,12 @@ MKTVRQERLXZ""",
         ],
     )
     async def test_invalid_amino_acids(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, test_type: str, sequence_data: dict[str, str], expected_error: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        test_type: str,
+        sequence_data: dict[str, str],
+        expected_error: str,
     ) -> None:
         """Test sequence analysis with invalid amino acids for both UniProt and raw sequences."""
         if test_type == "uniprot":
@@ -123,7 +134,11 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_success(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        sample_fasta: str,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test successful variant comparison."""
         wild_fasta = sample_fasta.replace(
@@ -149,7 +164,10 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_invalid_format(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test variant comparison with invalid mutation format."""
         wild_fasta = ">sp|P0DTC2|SPIKE_SARS2\nMFVFLVLLPLVSSQCV"
@@ -165,7 +183,11 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_reference_mismatch(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        sample_fasta: str,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test variant comparison with reference amino acid mismatch."""
         wild_fasta = sample_fasta.replace(
@@ -183,7 +205,11 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_case_insensitive_mutation(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, sample_fasta: str, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        sample_fasta: str,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test variant comparison with case-insensitive mutation format."""
         wild_fasta = sample_fasta.replace(
@@ -199,7 +225,10 @@ MKTVRQERLXZ""",
 
     @pytest.mark.unit
     async def test_compare_variant_exception_handling(
-        self, analyzer: SequenceAnalyzer, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+        self,
+        analyzer: SequenceAnalyzer,
+        mock_uniprot_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test variant comparison with exception handling."""
         mock_uniprot_client.get_fasta_sequence.side_effect = Exception("Network error")
@@ -222,7 +251,9 @@ MKTVRQERLXZ""",
         assert isinstance(analyzer_default.uniprot_client, UniProtClient)
 
     @pytest.mark.unit
-    def test_property_calculations_known_values(self, analyzer: SequenceAnalyzer) -> None:
+    def test_property_calculations_known_values(
+        self, analyzer: SequenceAnalyzer
+    ) -> None:
         """Test sequence analysis with known protein properties."""
         # Use a short, well-characterized sequence
         test_sequence = "AAAA"  # 4 alanines
@@ -240,7 +271,9 @@ MKTVRQERLXZ""",
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_uniprot_integration_with_spike_protein(
-        self, analyzer_with_default_uniprot: SequenceAnalyzer, spike_protein_uniprot_id: str
+        self,
+        analyzer_with_default_uniprot: SequenceAnalyzer,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Integration test for UniProt API with SARS-CoV-2 spike protein analysis and D614G variant."""
         # Test sequence analysis with known spike protein

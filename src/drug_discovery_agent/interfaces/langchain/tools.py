@@ -28,7 +28,7 @@ class BioinformaticsToolBase(BaseTool):
         pdb_client: PDBClient | None = None,
         sequence_analyzer: SequenceAnalyzer | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize with optional client instances.
 
         Args:
@@ -39,7 +39,7 @@ class BioinformaticsToolBase(BaseTool):
         """
         # Initialize BaseTool first
         super().__init__(**kwargs)
-        
+
         # Initialize clients - create defaults if not provided
         self._uniprot_client = uniprot_client or UniProtClient()
         self._pdb_client = pdb_client or PDBClient(self._uniprot_client)
@@ -70,6 +70,10 @@ class GetProteinFastaTool(BioinformaticsToolBase):
     description: str = "Retrieves FASTA sequence for a viral protein from UniProt"
     args_schema: type[BaseModel] = UniProtCodeInput
 
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
     def _run(
         self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> str:
@@ -91,6 +95,10 @@ class GetProteinDetailsTool(BioinformaticsToolBase):
     name: str = "get_protein_details"
     description: str = "Gets detailed metadata for a viral protein from UniProt"
     args_schema: type[BaseModel] = UniProtCodeInput
+
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
     def _run(
         self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
@@ -114,6 +122,10 @@ class AnalyzeSequencePropertiesTool(BioinformaticsToolBase):
     description: str = "Analyze properties of a protein sequence for a viral protein"
     args_schema: type[BaseModel] = UniProtCodeInput
 
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
     def _run(
         self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> dict[str, Any]:
@@ -136,6 +148,10 @@ class AnalyzeRawSequenceTool(BioinformaticsToolBase):
     description: str = "Analyze properties of a raw protein sequence string"
     args_schema: type[BaseModel] = RawSequenceInput
 
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
     def _run(
         self, sequence: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> dict[str, Any]:
@@ -157,6 +173,10 @@ class CompareProteinVariantTool(BioinformaticsToolBase):
     name: str = "compare_protein_variant"
     description: str = "Compare a mutated protein against the reference from UniProt"
     args_schema: type[BaseModel] = ProteinVariantInput
+
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
     def _run(
         self,
@@ -186,6 +206,10 @@ class GetTopPDBIdsTool(BioinformaticsToolBase):
     )
     args_schema: type[BaseModel] = UniProtCodeInput
 
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
     def _run(
         self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> list[str]:
@@ -208,6 +232,10 @@ class GetStructureDetailsTool(BioinformaticsToolBase):
     description: str = "Get experimental structure details from RCSB PDB"
     args_schema: type[BaseModel] = PDBIdInput
 
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
     def _run(
         self, pdb_id: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> dict[str, Any]:
@@ -227,6 +255,10 @@ class GetLigandSmilesTool(BioinformaticsToolBase):
     name: str = "get_ligand_smiles_from_uniprot"
     description: str = "Fetch ligands from PDB structures related to a UniProt ID"
     args_schema: type[BaseModel] = UniProtCodeInput
+
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
     def _run(
         self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
@@ -268,42 +300,42 @@ def create_bioinformatics_tools(
         sequence_analyzer = SequenceAnalyzer(uniprot_client)
 
     return [
-        GetProteinFastaTool(  # type: ignore[call-arg]
+        GetProteinFastaTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        GetProteinDetailsTool(  # type: ignore[call-arg]
+        GetProteinDetailsTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        AnalyzeSequencePropertiesTool(  # type: ignore[call-arg]
+        AnalyzeSequencePropertiesTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        AnalyzeRawSequenceTool(  # type: ignore[call-arg]
+        AnalyzeRawSequenceTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        CompareProteinVariantTool(  # type: ignore[call-arg]
+        CompareProteinVariantTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        GetTopPDBIdsTool(  # type: ignore[call-arg]
+        GetTopPDBIdsTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        GetStructureDetailsTool(  # type: ignore[call-arg]
+        GetStructureDetailsTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,
         ),
-        GetLigandSmilesTool(  # type: ignore[call-arg]
+        GetLigandSmilesTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
             sequence_analyzer=sequence_analyzer,

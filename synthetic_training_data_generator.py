@@ -2,12 +2,15 @@ import json
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 USE_CHATML_FORMAT = True  # Set to False for plain instruction-input-output format
 
 
 # Generate synthetic calendar events
-def generate_calendar_events(start_date, days=60):
+def generate_calendar_events(
+    start_date: datetime, days: int = 60
+) -> list[dict[str, Any]]:
     events = []
     for i in range(days):
         date = start_date + timedelta(days=i)
@@ -25,7 +28,7 @@ def generate_calendar_events(start_date, days=60):
 
 
 # Synthetic message pool
-def generate_messages():
+def generate_messages() -> list[str]:
     return [
         "Reminder: Submit AI proposal by Friday.",
         "Client rescheduled meeting to Tuesday.",
@@ -61,7 +64,9 @@ def make_chatml(user_msg: str, assistant_msg: str) -> dict:
 
 
 # Create dataset entries
-def generate_jsonl_dataset(calendar_events, messages, output_file):
+def generate_jsonl_dataset(
+    calendar_events: list[dict[str, Any]], messages: list[str], output_file: Path
+) -> None:
     examples = []
 
     for entry in calendar_events:

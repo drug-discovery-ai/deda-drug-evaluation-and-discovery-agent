@@ -56,14 +56,15 @@ class SequenceAnalyzer:
             }
 
         seq_obj = Seq(clean_seq)
-        pI_calc = IsoelectricPointCalculator(str(seq_obj))  # type: ignore[no-untyped-call]
+        pI_calc = IsoelectricPointCalculator(str(seq_obj))
 
         return {
             "length": len(seq_obj),
             "molecular_weight_kda": round(
-                molecular_weight(seq_obj, seq_type="protein") / 1000, 2  # type: ignore[no-untyped-call]
+                molecular_weight(seq_obj, seq_type="protein") / 1000,
+                2,
             ),
-            "isoelectric_point": round(pI_calc.pi(), 2),  # type: ignore[no-untyped-call]
+            "isoelectric_point": round(pI_calc.pi(), 2),
             "composition": {aa: clean_seq.count(aa) for aa in sorted(set(clean_seq))},
         }
 
@@ -94,14 +95,15 @@ class SequenceAnalyzer:
             }
 
         seq_obj = Seq(clean_seq)
-        pI_calc = IsoelectricPointCalculator(str(seq_obj))  # type: ignore[no-untyped-call]
+        pI_calc = IsoelectricPointCalculator(str(seq_obj))
 
         return {
             "length": len(seq_obj),
             "molecular_weight_kda": round(
-                molecular_weight(seq_obj, seq_type="protein") / 1000, 2  # type: ignore[no-untyped-call]
+                molecular_weight(seq_obj, seq_type="protein") / 1000,
+                2,
             ),
-            "isoelectric_point": round(pI_calc.pi(), 2),  # type: ignore[no-untyped-call]
+            "isoelectric_point": round(pI_calc.pi(), 2),
             "composition": {aa: clean_seq.count(aa) for aa in sorted(set(clean_seq))},
         }
 

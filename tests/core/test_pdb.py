@@ -59,7 +59,12 @@ class TestPDBClient:
     )
     @patch("httpx.AsyncClient")
     async def test_get_structure_details_errors(
-        self, mock_client_cls: Any, error_type: str, expected_error: str, client: PDBClient, common_http_errors: Any
+        self,
+        mock_client_cls: Any,
+        error_type: str,
+        expected_error: str,
+        client: PDBClient,
+        common_http_errors: Any,
     ) -> None:
         """Test structure details retrieval with various errors."""
         mock_async_client = AsyncMock()

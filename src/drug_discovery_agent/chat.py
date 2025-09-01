@@ -156,7 +156,8 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
 
     def _show_help(self) -> None:
         """Display comprehensive help information."""
-        print("""
+        print(
+            """
 🧬 Bioinformatics Assistant - Help
 
 CHAT EXAMPLES:
@@ -195,7 +196,8 @@ TIPS:
   • Mutations use standard notation: original amino acid + position + new amino acid
   • The assistant maintains conversation context for follow-up questions
   • All data is fetched from authoritative sources (UniProt, PDB, RCSB)
-        """)
+        """
+        )
 
     async def chat_loop(self) -> None:
         """Run interactive langchain loop with proper error handling."""

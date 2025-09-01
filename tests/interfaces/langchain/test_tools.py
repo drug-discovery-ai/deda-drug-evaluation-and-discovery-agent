@@ -29,7 +29,10 @@ class TestBioinformaticsToolBase:
 
     @pytest.mark.unit
     def test_tool_base_initialization_with_clients(
-        self, mock_uniprot_client: Any, mock_pdb_client: Any, mock_sequence_analyzer: Any
+        self,
+        mock_uniprot_client: Any,
+        mock_pdb_client: Any,
+        mock_sequence_analyzer: Any,
     ) -> None:
         """Test tool base initialization with provided clients."""
 
@@ -37,6 +40,9 @@ class TestBioinformaticsToolBase:
         class TestTool(BioinformaticsToolBase):
             name: str = "test_tool"
             description: str = "Test tool"
+
+            def __init__(self, **kwargs: Any) -> None:
+                super().__init__(**kwargs)
 
             def _run(self, **kwargs: Any) -> str:
                 return "test"
@@ -61,6 +67,9 @@ class TestBioinformaticsToolBase:
         class TestTool(BioinformaticsToolBase):
             name: str = "test_tool"
             description: str = "Test tool"
+
+            def __init__(self, **kwargs: Any) -> None:
+                super().__init__(**kwargs)
 
             def _run(self, **kwargs: Any) -> str:
                 return "test"
@@ -90,7 +99,9 @@ class TestBioinformaticsToolBase:
         (GetLigandSmilesTool, "get_ligand_smiles_from_uniprot", "ligand"),
     ],
 )
-def test_tool_properties(tool_class: Any, expected_name: str, expected_desc_contains: str) -> None:
+def test_tool_properties(
+    tool_class: Any, expected_name: str, expected_desc_contains: str
+) -> None:
     """Test tool name and description for all tools."""
     tool = tool_class()
     assert tool.name == expected_name
@@ -107,7 +118,10 @@ class TestGetProteinFastaTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, fasta_tool: GetProteinFastaTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+        self,
+        fasta_tool: GetProteinFastaTool,
+        mock_uniprot_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_fasta = f">sp|{spike_protein_uniprot_id}|SPIKE_SARS2\nMKTVRQERL"
@@ -131,7 +145,10 @@ class TestGetProteinDetailsTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, details_tool: GetProteinDetailsTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+        self,
+        details_tool: GetProteinDetailsTool,
+        mock_uniprot_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_details = {
@@ -153,13 +170,18 @@ class TestAnalyzeSequencePropertiesTool:
     """Test suite for AnalyzeSequencePropertiesTool."""
 
     @pytest.fixture
-    def analyze_tool(self, mock_sequence_analyzer: Any) -> AnalyzeSequencePropertiesTool:
+    def analyze_tool(
+        self, mock_sequence_analyzer: Any
+    ) -> AnalyzeSequencePropertiesTool:
         """Create analyze tool with mock analyzer."""
         return AnalyzeSequencePropertiesTool(sequence_analyzer=mock_sequence_analyzer)
 
     @pytest.mark.unit
     async def test_async_run(
-        self, analyze_tool: AnalyzeSequencePropertiesTool, mock_sequence_analyzer: Any, spike_protein_uniprot_id: str
+        self,
+        analyze_tool: AnalyzeSequencePropertiesTool,
+        mock_sequence_analyzer: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_analysis = {
@@ -187,7 +209,9 @@ class TestAnalyzeRawSequenceTool:
         return AnalyzeRawSequenceTool(sequence_analyzer=mock_sequence_analyzer)
 
     @pytest.mark.unit
-    async def test_async_run(self, raw_analyze_tool: AnalyzeRawSequenceTool, mock_sequence_analyzer: Any) -> None:
+    async def test_async_run(
+        self, raw_analyze_tool: AnalyzeRawSequenceTool, mock_sequence_analyzer: Any
+    ) -> None:
         """Test asynchronous execution."""
         expected_analysis = {
             "length": 10,
@@ -212,7 +236,10 @@ class TestCompareProteinVariantTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, variant_tool: CompareProteinVariantTool, mock_sequence_analyzer: Any, spike_protein_uniprot_id: str
+        self,
+        variant_tool: CompareProteinVariantTool,
+        mock_sequence_analyzer: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_comparison = {
@@ -240,7 +267,10 @@ class TestGetTopPDBIdsTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, pdb_ids_tool: GetTopPDBIdsTool, mock_uniprot_client: Any, spike_protein_uniprot_id: str
+        self,
+        pdb_ids_tool: GetTopPDBIdsTool,
+        mock_uniprot_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_pdb_ids = ["6VSB", "6VXX", "7CAM"]
@@ -264,7 +294,10 @@ class TestGetStructureDetailsTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, structure_tool: GetStructureDetailsTool, mock_pdb_client: Any, spike_protein_pdb_id: str
+        self,
+        structure_tool: GetStructureDetailsTool,
+        mock_pdb_client: Any,
+        spike_protein_pdb_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_details = {
@@ -293,7 +326,10 @@ class TestGetLigandSmilesTool:
 
     @pytest.mark.unit
     async def test_async_run(
-        self, ligands_tool: GetLigandSmilesTool, mock_pdb_client: Any, spike_protein_uniprot_id: str
+        self,
+        ligands_tool: GetLigandSmilesTool,
+        mock_pdb_client: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test asynchronous execution."""
         expected_ligands = [

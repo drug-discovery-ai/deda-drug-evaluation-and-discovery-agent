@@ -1,6 +1,5 @@
 """Shared mock client fixtures for testing."""
 
-from typing import Any, Tuple
 from unittest.mock import AsyncMock
 
 import pytest
@@ -29,6 +28,10 @@ def mock_sequence_analyzer() -> AsyncMock:
 
 
 @pytest.fixture
-def mock_clients(mock_uniprot_client: AsyncMock, mock_pdb_client: AsyncMock, mock_sequence_analyzer: AsyncMock) -> Tuple[AsyncMock, AsyncMock, AsyncMock]:
+def mock_clients(
+    mock_uniprot_client: AsyncMock,
+    mock_pdb_client: AsyncMock,
+    mock_sequence_analyzer: AsyncMock,
+) -> tuple[AsyncMock, AsyncMock, AsyncMock]:
     """Create all mock clients as a tuple."""
     return mock_uniprot_client, mock_pdb_client, mock_sequence_analyzer

@@ -16,7 +16,9 @@ class TestUniProtClient:
 
     @pytest.mark.unit
     @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
-    async def test_get_fasta_sequence_success(self, mock_request: Any, client: UniProtClient) -> None:
+    async def test_get_fasta_sequence_success(
+        self, mock_request: Any, client: UniProtClient
+    ) -> None:
         """Test successful FASTA sequence retrieval."""
         expected_fasta = """>sp|P0DTC2|SPIKE_SARS2 Spike glycoprotein
 MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT"""
@@ -32,7 +34,9 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
     @pytest.mark.unit
     @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
-    async def test_get_fasta_sequence_empty_response(self, mock_request: Any, client: UniProtClient) -> None:
+    async def test_get_fasta_sequence_empty_response(
+        self, mock_request: Any, client: UniProtClient
+    ) -> None:
         """Test FASTA sequence retrieval with empty response."""
         mock_request.return_value = None
 
@@ -43,7 +47,11 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_details_success(
-        self, mock_client_cls: Any, client: UniProtClient, mock_uniprot_details_response: Any, http_mock_helpers: Any
+        self,
+        mock_client_cls: Any,
+        client: UniProtClient,
+        mock_uniprot_details_response: Any,
+        http_mock_helpers: Any,
     ) -> None:
         """Test successful protein details retrieval."""
         http_mock_helpers.setup_httpx_mock(
@@ -79,7 +87,11 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_details_missing_fields(
-        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any, spike_protein_uniprot_id: str
+        self,
+        mock_client_cls: Any,
+        client: UniProtClient,
+        http_mock_helpers: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test protein details retrieval with missing fields."""
         minimal_response = {"primaryAccession": spike_protein_uniprot_id}
@@ -115,7 +127,11 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.unit
     @patch("httpx.AsyncClient")
     async def test_get_pdb_ids_no_pdb_refs(
-        self, mock_client_cls: Any, client: UniProtClient, http_mock_helpers: Any, spike_protein_uniprot_id: str
+        self,
+        mock_client_cls: Any,
+        client: UniProtClient,
+        http_mock_helpers: Any,
+        spike_protein_uniprot_id: str,
     ) -> None:
         """Test PDB IDs retrieval with no PDB cross-references."""
         no_pdb_response = {
@@ -188,7 +204,10 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_pdb_ids_integration(
-        self, client: UniProtClient, spike_protein_uniprot_id: str, spike_protein_pdb_id: str
+        self,
+        client: UniProtClient,
+        spike_protein_uniprot_id: str,
+        spike_protein_pdb_id: str,
     ) -> None:
         """Integration test for PDB IDs retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein

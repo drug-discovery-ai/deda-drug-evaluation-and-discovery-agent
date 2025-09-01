@@ -1,6 +1,6 @@
 """Shared sample data fixtures for testing."""
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -71,13 +71,13 @@ MOCK_UNIPROT_PDB_RESPONSE = {
 
 
 @pytest.fixture
-def mock_uniprot_details_response() -> Dict[str, Any]:
+def mock_uniprot_details_response() -> dict[str, Any]:
     """Mock UniProt details response."""
     return MOCK_UNIPROT_DETAILS_RESPONSE.copy()
 
 
 @pytest.fixture
-def mock_uniprot_pdb_response() -> Dict[str, Any]:
+def mock_uniprot_pdb_response() -> dict[str, Any]:
     """Mock UniProt PDB response."""
     return MOCK_UNIPROT_PDB_RESPONSE.copy()
 

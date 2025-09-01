@@ -1,7 +1,7 @@
 """Environment and configuration helpers for testing."""
 
 import os
-from typing import Any, Generator
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest

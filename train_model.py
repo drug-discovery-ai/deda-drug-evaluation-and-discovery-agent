@@ -20,12 +20,12 @@ dataset = load_dataset(
 )
 
 # Use MPS (Apple GPU) if available
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+device_str = "mps" if torch.backends.mps.is_available() else "cpu"
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, trust_remote_code=True)
-model.to(device)  # type: ignore[arg-type]
+model = model.to(device_str)  # type: ignore[arg-type]
 
 
 def tokenize_fn(example_batch: dict[str, Any]) -> dict[str, Any]:
