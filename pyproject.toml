@@ -18,6 +18,7 @@ test = [
     "pytest-mock>=3.10.0",
     "pytest-cov>=4.0.0",
     "pytest-httpx>=0.30.0",
+    "pytest-testmon>=2.0.0",
     "responses>=0.23.0",
     "respx>=0.22.0",
 ]
@@ -77,3 +78,13 @@ ignore_missing_imports = true
 strict_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+
+[tool.testmon]
+# Exclude integration test patterns to avoid async httpx issues
+norecursedirs = ["tests/*integration*"]
+ignore_changes = [
+    # Ignore external dependencies that don't affect integration tests
+    "*/httpx/*",
+    "*/urllib3/*",
+    "*/requests/*",
+]
