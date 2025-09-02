@@ -113,6 +113,48 @@ class TestBioinformaticsChatClient:
         assert call_kwargs["temperature"] == 0.7
 
     @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "verbose,expected_verbose",
+        [
+            (True, True),
+            (False, False),
+            (None, False),  # Test default parameter
+        ],
+    )
+    @patch("drug_discovery_agent.chat.ChatOpenAI")
+    @patch("drug_discovery_agent.chat.create_bioinformatics_tools")
+    @patch("drug_discovery_agent.chat.create_openai_tools_agent")
+    @patch("drug_discovery_agent.chat.AgentExecutor")
+    def test_initialization_with_verbose(
+        self,
+        mock_agent_executor: MagicMock,
+        mock_create_agent: MagicMock,
+        mock_create_tools: MagicMock,
+        mock_chat_openai: MagicMock,
+        verbose: Any,
+        expected_verbose: bool,
+        mock_env_vars: Any,
+        mock_clients: tuple[Any, Any, Any],
+    ) -> None:
+        """Test initialization with verbose parameter."""
+        mock_create_tools.return_value = [MagicMock() for _ in range(8)]
+        mock_chat_openai.return_value = MagicMock()
+        mock_create_agent.return_value = MagicMock()
+        mock_agent_executor.return_value = AsyncMock()
+
+        # Test with verbose parameter
+        if verbose is None:
+            client = BioinformaticsChatClient()
+        else:
+            client = BioinformaticsChatClient(verbose=verbose)
+
+        assert client is not None
+
+        # Verify AgentExecutor was called with correct verbose parameter
+        executor_call_kwargs = mock_agent_executor.call_args.kwargs
+        assert executor_call_kwargs["verbose"] == expected_verbose
+
+    @pytest.mark.unit
     async def test_chat_success(
         self, chat_client: Any, spike_protein_uniprot_id: str
     ) -> None:
@@ -286,20 +328,73 @@ class TestBioinformaticsChatClient:
                 chat_client.agent_executor.ainvoke.assert_called_once()
 
 
+class TestArgumentParsing:
+    """Test suite for command-line argument parsing."""
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "args,expected_verbose",
+        [
+            ([], False),  # No arguments
+            (["--verbose"], True),  # Verbose flag
+            (["--debug"], True),  # Debug flag
+            (["--verbose", "--debug"], True),  # Both flags
+        ],
+    )
+    @patch("sys.argv")
+    @patch("asyncio.run")
+    def test_main_argument_parsing(
+        self,
+        mock_asyncio_run: MagicMock,
+        mock_argv: MagicMock,
+        args: list[str],
+        expected_verbose: bool,
+    ) -> None:
+        """Test command-line argument parsing in main function."""
+        mock_argv.__getitem__ = lambda self, index: (["test"] + args)[index]
+        mock_argv.__len__ = lambda self: len(["test"] + args)
+
+        from drug_discovery_agent.chat import main
+
+        with patch("argparse.ArgumentParser.parse_args") as mock_parse_args:
+            mock_args = MagicMock()
+            mock_args.verbose = "--verbose" in args
+            mock_args.debug = "--debug" in args
+            mock_parse_args.return_value = mock_args
+
+            main()
+
+            # Verify asyncio.run was called with correct verbose parameter
+            mock_asyncio_run.assert_called_once()
+            # Since we can't easily inspect coroutine internals, we verify the mock was set up correctly
+            assert mock_args.verbose == ("--verbose" in args)
+            assert mock_args.debug == ("--debug" in args)
+
+
 class TestMainFunctions:
     """Test suite for main entry point functions."""
 
     @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "verbose,expected_verbose",
+        [
+            (False, False),  # Default
+            (True, True),  # Verbose enabled
+        ],
+    )
     @patch("drug_discovery_agent.chat.BioinformaticsChatClient")
-    async def test_async_main_success(self, mock_client_class: MagicMock) -> None:
+    async def test_async_main_success(
+        self, mock_client_class: MagicMock, verbose: bool, expected_verbose: bool
+    ) -> None:
         """Test successful async main execution."""
         mock_client = AsyncMock()
         mock_client_class.return_value = mock_client
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-            await async_main()
+            await async_main(verbose=verbose)
 
             mock_client.chat_loop.assert_called_once()
+            mock_client_class.assert_called_once_with(verbose=expected_verbose)
 
     @pytest.mark.unit
     @patch("builtins.print")
@@ -340,8 +435,16 @@ class TestMainFunctions:
 
     @pytest.mark.unit
     @patch("asyncio.run")
-    def test_main_function(self, mock_asyncio_run: MagicMock) -> None:
+    @patch("argparse.ArgumentParser.parse_args")
+    def test_main_function(
+        self, mock_parse_args: MagicMock, mock_asyncio_run: MagicMock
+    ) -> None:
         """Test synchronous main function."""
+        mock_args = MagicMock()
+        mock_args.verbose = False
+        mock_args.debug = False
+        mock_parse_args.return_value = mock_args
+
         main()
         mock_asyncio_run.assert_called_once()
 

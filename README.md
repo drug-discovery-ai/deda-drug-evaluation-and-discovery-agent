@@ -72,6 +72,22 @@ python -m drug_discovery_agent.chat
 chat
 ```
 
+#### Debug and Verbose Mode
+
+To see detailed tool selection and execution activity (useful for debugging or understanding how the AI agent works), use the verbose flags:
+
+```bash
+python -m drug_discovery_agent.chat --verbose
+# or
+python -m drug_discovery_agent.chat --debug
+```
+
+This will show:
+- Tool selection decisions made by the LLM
+- Tool execution steps and reasoning
+- Input/output details for each tool call
+- Agent's internal reasoning process
+
 Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
 
 # Development

@@ -1,5 +1,6 @@
 """Comprehensive LangChain-based langchain interface for bioinformatics analysis."""
 
+import argparse
 import asyncio
 import os
 
@@ -28,6 +29,7 @@ class BioinformaticsChatClient:
         uniprot_client: UniProtClient | None = None,
         pdb_client: PDBClient | None = None,
         sequence_analyzer: SequenceAnalyzer | None = None,
+        verbose: bool = False,
     ):
         """Initialize the langchain client with LangChain components.
 
@@ -35,6 +37,7 @@ class BioinformaticsChatClient:
             uniprot_client: UniProt client instance. Creates default if None.
             pdb_client: PDB client instance. Creates default if None.
             sequence_analyzer: Sequence analyzer instance. Creates default if None.
+            verbose: Enable verbose output for debugging tool selection.
         """
         # Initialize LangChain components
         api_key = os.getenv("OPENAI_API_KEY")
@@ -56,9 +59,9 @@ class BioinformaticsChatClient:
         self.max_history = 20
 
         # Create agent with bioinformatics-focused prompt
-        self.agent_executor = self._create_agent()
+        self.agent_executor = self._create_agent(verbose=verbose)
 
-    def _create_agent(self) -> AgentExecutor:
+    def _create_agent(self, verbose: bool = False) -> AgentExecutor:
         """Create LangChain agent with bioinformatics tools and prompt."""
 
         # Bioinformatics-focused system prompt
@@ -100,7 +103,7 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
         return AgentExecutor(
             agent=agent,
             tools=self.tools,
-            verbose=False,  # Clean output
+            verbose=verbose,  # Show tool selection when enabled
             handle_parsing_errors=True,
             max_iterations=5,  # Prevent infinite loops
         )
@@ -239,7 +242,7 @@ TIPS:
                 print("💡 Try '/help' for usage examples or '/quit' to exit\n")
 
 
-async def async_main() -> None:
+async def async_main(verbose: bool = False) -> None:
     """Async entry point for running the langchain interface."""
     try:
         # Check for required environment variables
@@ -250,7 +253,7 @@ async def async_main() -> None:
             return
 
         # Initialize and run langchain client
-        client = BioinformaticsChatClient()
+        client = BioinformaticsChatClient(verbose=verbose)
         await client.chat_loop()
 
     except ImportError as e:
@@ -265,7 +268,22 @@ async def async_main() -> None:
 
 def main() -> None:
     """Synchronous entry point that runs the async main function."""
-    asyncio.run(async_main())
+    parser = argparse.ArgumentParser(
+        description="Bioinformatics Assistant - Interactive chat interface for protein analysis"
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output showing tool selection and execution details",
+    )
+    parser.add_argument(
+        "--debug", action="store_true", help="Enable debug mode (same as --verbose)"
+    )
+
+    args = parser.parse_args()
+    verbose = args.verbose or args.debug
+
+    asyncio.run(async_main(verbose=verbose))
 
 
 if __name__ == "__main__":
