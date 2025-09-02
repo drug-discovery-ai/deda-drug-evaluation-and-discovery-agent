@@ -41,15 +41,14 @@ Then activate the environment *mcp*.
 source venv/bin/activate
 ```
 
-Optional
-```bash
-pip install -e .
-```
-
 Then install the required packages:
 
 ```bash
 pip install -r requirements.txt
+```
+
+```bash
+pip install -e .
 ```
 
 In Order to run Ai agent, set environment variable first.
