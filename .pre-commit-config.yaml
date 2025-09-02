@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest
+        entry: pytest --testmon -m "not integration and not slow"
         language: system
-        pass_filenames: false
-        always_run: true
+        files: \.py$
+        types: [python]
