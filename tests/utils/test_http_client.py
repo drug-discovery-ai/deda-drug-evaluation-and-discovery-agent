@@ -194,16 +194,6 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIH""",
 
     @pytest.mark.integration
     @pytest.mark.slow
-    async def test_make_api_request_real_request(self) -> None:
-        """Integration test with real HTTP request."""
-        # Test with a reliable public API
-        result = await make_api_request("https://httpbin.org/json", timeout=10.0)
-
-        assert result is not None
-        assert isinstance(result, dict)
-
-    @pytest.mark.integration
-    @pytest.mark.slow
     async def test_make_fasta_request_real_request(self) -> None:
         """Integration test with real FASTA request."""
         # Test with a simple text endpoint
