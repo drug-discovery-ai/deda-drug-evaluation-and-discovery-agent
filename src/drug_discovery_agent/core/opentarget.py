@@ -10,8 +10,9 @@ class OpenTargetsClient:
         self.ontology_id = ontology_id
         self.limit = limit
 
-    
-    async def fetch_target_associated_drugs(self, target_id: str, limit: int = 50) -> list[dict[str, Any]]:
+    async def fetch_target_associated_drugs(
+        self, target_id: str, limit: int = 50
+    ) -> list[dict[str, Any]]:
         """Fetch drugs linked to a given target (via mechanisms of action)."""
         query = """
         query targetDrugs($ensemblId: String!, $size: Int!) {
@@ -120,14 +121,16 @@ class OpenTargetsClient:
 
         targets = await self.fetch_disease_associated_target()
         return {"disease": disease_meta, "targets": targets}
-    
+
     async def disease_pipeline(self, efo_id: str, limit: int = 20) -> dict[str, Any]:
         """Disease → Targets → Drugs"""
         disease = await self.fetch_target_attributes_for_opentarget()
         targets = await self.fetch_disease_associated_target()
         enriched = []
         for t in targets:
-            drugs = await self.fetch_target_associated_drugs(t["target_id"], limit=limit)
+            drugs = await self.fetch_target_associated_drugs(
+                t["target_id"], limit=limit
+            )
             enriched.append({**t, "drugs": drugs})
         return {"disease": disease["disease"], "targets": enriched}
 
@@ -137,13 +140,17 @@ class OpenTargetsClient:
         enriched = []
         for m in drug["mechanisms"]:
             target_id = m["targetId"]
-            diseases = await self.fetch_target_associated_diseases(target_id, limit=limit)
+            diseases = await self.fetch_target_associated_diseases(
+                target_id, limit=limit
+            )
             enriched.append({**m, "diseases": diseases})
-        return {"drug": {"id": drug["drug_id"], "name": drug["drug_name"]}, "targets": enriched}
+        return {
+            "drug": {"id": drug["drug_id"], "name": drug["drug_name"]},
+            "targets": enriched,
+        }
 
     async def target_pipeline(self, ensembl_id: str, limit: int = 20) -> dict[str, Any]:
         """Target → Diseases → Drugs"""
         diseases = await self.fetch_target_associated_diseases(ensembl_id, limit=limit)
         drugs = await self.fetch_target_associated_drugs(ensembl_id, limit=limit)
         return {"target": ensembl_id, "diseases": diseases, "drugs": drugs}
-
