@@ -451,10 +451,16 @@ class TestChatServerCORS:
                     "app://electron-app",
                     "http://127.0.0.1:3000",
                 ]
+
+                allow_origins = kwargs["allow_origins"]
+                assert isinstance(allow_origins, list)
                 for origin in expected_origins:
-                    assert origin in kwargs["allow_origins"]
-                assert "GET" in kwargs["allow_methods"]
-                assert "POST" in kwargs["allow_methods"]
+                    assert origin in allow_origins
+
+                allow_methods = kwargs["allow_methods"]
+                assert isinstance(allow_methods, list)
+                assert "GET" in allow_methods
+                assert "POST" in allow_methods
                 assert kwargs["allow_headers"] == ["*"]
                 break
 

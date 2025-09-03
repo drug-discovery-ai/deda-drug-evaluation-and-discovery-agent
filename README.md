@@ -35,7 +35,7 @@ Create a virtual environment using `python` version `3.12` or later.
 python3 -m venv venv
 ```
 
-Then activate the environment *mcp*.
+Then activate the environment:
 
 ```bash
 source venv/bin/activate
@@ -50,20 +50,45 @@ pip install -r requirements.txt
 ```bash
 pip install -e .
 ```
-
-In Order to run Ai agent, set environment variable first.
-
 #### Setting Up Environment Variables
 
-Before running the MCP client code, make sure to configure the required environment variables.
+Before running any component, configure the required environment variables.
 Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
-If you have credit in your `OPENAI_API_KEY`, chat in the terminal.
 
-Run the chat interface:
+Edit the `.env` file and add your OpenAI API key:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+---
+
+## Running the Application
+
+This project provides multiple ways to interact with the bioinformatics AI agent:
+
+### 1. Running MCP Server
+
+The Model Control Protocol (MCP) server provides the core AI agent functionality that can be integrated with compatible clients like Claude Desktop.
+
+Start the MCP server:
+
+```bash
+# Basic server
+python -m drug_discovery_agent.interfaces.mcp.server
+
+# With custom port
+python -m drug_discovery_agent.interfaces.mcp.server --port 8081
+```
+
+The server will start on `localhost:8080` by default and can be connected to by MCP-compatible clients.
+
+### 2. Running Chat on CLI
+
+For quick terminal-based interactions with the AI agent:
 
 ```bash
 python -m drug_discovery_agent.chat
@@ -73,7 +98,7 @@ chat
 
 #### Debug and Verbose Mode
 
-To see detailed tool selection and execution activity (useful for debugging or understanding how the AI agent works), use the verbose flags:
+To see detailed tool selection and execution activity (useful for debugging or understanding how the AI agent works):
 
 ```bash
 python -m drug_discovery_agent.chat --verbose
@@ -87,7 +112,27 @@ This will show:
 - Input/output details for each tool call
 - Agent's internal reasoning process
 
-Enjoy chatting! Start queries like `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
+Try queries like: `Show me details for UniProt ID P0DTC2`, followed by `What are the structural properties of this protein?`
+
+### 3. Running Chat on UI (Desktop App)
+
+For a modern, user-friendly desktop experience, use the Electron-based chat interface:
+
+**📱 [See the full Desktop App documentation →](electron-app/README.md)**
+
+Quick setup:
+```bash
+cd electron-app
+npm install
+npm run dev
+```
+
+The desktop app provides:
+- Modern chat interface with message history
+- Real-time AI responses with progress indicators
+- Session management and conversation persistence
+- Cross-platform support (Windows, macOS, Linux)
+- Integrated backend server management
 
 # Development
 

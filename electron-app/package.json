@@ -1,0 +1,114 @@
+{
+  "name": "bioinformatics-chat-assistant",
+  "version": "1.0.0",
+  "description": "Desktop application for AI-powered bioinformatics research and analysis",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:python\" \"npm run dev:electron\"",
+    "dev:python": "cd .. && source venv/bin/activate && PYTHONPATH=src python -m drug_discovery_agent.chat_server --port 8080",
+    "dev:electron": "electron . --inspect=5858",
+    "build": "npm run build:python && npm run build:electron",
+    "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=biopython --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
+    "build:electron": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder --mac --win --linux",
+    "package": "npm run build",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint *.js src/*.js",
+    "lint:fix": "eslint *.js src/*.js --fix"
+  },
+  "keywords": [
+    "bioinformatics",
+    "electron",
+    "chat",
+    "ai",
+    "desktop",
+    "research",
+    "protein",
+    "molecular"
+  ],
+  "author": "Bioinformatics Research Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron.git"
+  },
+  "homepage": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "concurrently": "^8.2.2",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.4"
+  },
+  "build": {
+    "appId": "com.drugdiscovery.biochat",
+    "productName": "Bioinformatics Chat Assistant",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "!src/**/*.test.js",
+      "!**/*.md",
+      "python-backend/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist/",
+        "to": "python-backend/",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Science",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

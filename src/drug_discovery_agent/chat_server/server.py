@@ -122,7 +122,9 @@ class ChatServer:
         except Exception as e:
             return JSONResponse({"error": str(e)}, status_code=400)
 
-    async def chat_stream_endpoint(self, request: Request) -> StreamingResponse:
+    async def chat_stream_endpoint(
+        self, request: Request
+    ) -> StreamingResponse | JSONResponse:
         """Stateful streaming chat endpoint using Server-Sent Events."""
         try:
             body = await request.json()
