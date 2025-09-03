@@ -32,6 +32,7 @@ dev = [
 [project.scripts]
 chat = "drug_discovery_agent.chat:main"
 mcp-server = "drug_discovery_agent.interfaces.mcp.server:main"
+chat-server = "drug_discovery_agent.chat_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
