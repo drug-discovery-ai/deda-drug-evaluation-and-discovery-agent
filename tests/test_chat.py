@@ -16,6 +16,11 @@ from drug_discovery_agent.chat import (
 class TestBioinformaticsChatClient:
     """Test suite for BioinformaticsChatClient."""
 
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
+
     @pytest.fixture
     @patch("drug_discovery_agent.chat.ChatOpenAI")
     @patch("drug_discovery_agent.chat.create_bioinformatics_tools")
@@ -27,7 +32,6 @@ class TestBioinformaticsChatClient:
         mock_create_agent: MagicMock,
         mock_create_tools: MagicMock,
         mock_chat_openai: MagicMock,
-        mock_env_vars: Any,
         mock_clients: tuple[Any, Any, Any],
     ) -> Any:
         """Create chat client with mocked dependencies."""
@@ -71,7 +75,6 @@ class TestBioinformaticsChatClient:
         mock_chat_openai: MagicMock,
         clients: tuple[Any, Any, Any],
         expected_tools_call: Any,
-        mock_env_vars: Any,
         mock_clients: tuple[Any, Any, Any],
     ) -> None:
         """Test initialization with custom and default clients."""
@@ -133,7 +136,6 @@ class TestBioinformaticsChatClient:
         mock_chat_openai: MagicMock,
         verbose: Any,
         expected_verbose: bool,
-        mock_env_vars: Any,
         mock_clients: tuple[Any, Any, Any],
     ) -> None:
         """Test initialization with verbose parameter."""

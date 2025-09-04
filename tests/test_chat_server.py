@@ -1,6 +1,7 @@
 """Tests for stateful chat server functionality."""
 
 import json
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -87,6 +88,11 @@ class TestChatServerModels:
 
 class TestChatServerSessionManagement:
     """Test suite for session management endpoints."""
+
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
 
     @pytest.fixture
     def chat_server(self) -> ChatServer:
@@ -200,6 +206,11 @@ class TestChatServerSessionManagement:
 
 class TestChatServerEndpoints:
     """Test suite for chat server endpoints."""
+
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
 
     @pytest.fixture
     def chat_server(self) -> ChatServer:
@@ -326,6 +337,11 @@ class TestChatServerEndpoints:
 
 class TestChatServerStreaming:
     """Test suite for streaming chat functionality."""
+
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
 
     @pytest.fixture
     def chat_server(self) -> ChatServer:
@@ -485,6 +501,11 @@ class TestChatServerCORS:
 class TestChatServerIntegration:
     """Integration tests for the chat server."""
 
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
+
     @pytest.fixture
     def chat_server(self) -> ChatServer:
         """Create chat server instance."""
@@ -549,6 +570,11 @@ class TestChatServerIntegration:
 
 class TestChatServerStateful:
     """Test suite to verify stateful behavior."""
+
+    @pytest.fixture(autouse=True)
+    def setup_env(self, mock_env_vars: Any) -> None:
+        """Setup environment variables for all tests in this class."""
+        pass
 
     @pytest.fixture
     def chat_server(self) -> ChatServer:
