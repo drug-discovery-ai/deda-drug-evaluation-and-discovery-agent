@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:python\" \"npm run dev:electron\"",
-    "dev:python": "cd .. && source venv/bin/activate && PYTHONPATH=src python -m drug_discovery_agent.chat_server --port 8080",
-    "dev:electron": "electron . --inspect=5858",
+    "dev:python": "node scripts/start-python-backend.js",
+    "dev:electron": "node scripts/start-electron-dev.js",
     "build": "npm run build:python && npm run build:electron",
     "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=biopython --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
     "build:electron": "electron-builder",
