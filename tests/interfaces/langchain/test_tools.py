@@ -427,13 +427,12 @@ class TestCreateBioinformaticsTools:
 
         # Map tool names to expected schema types
         from drug_discovery_agent.interfaces.langchain.models import (
+            EBIDiseaseInput,
+            OpenTargetOntologyInput,
             PDBIdInput,
             ProteinVariantInput,
             RawSequenceInput,
             UniProtCodeInput,
-            EBIDiseaseInput,
-            OpenTargetOntologyInput
-
         )
 
         expected_schemas = {
