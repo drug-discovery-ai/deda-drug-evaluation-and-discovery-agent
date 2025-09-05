@@ -10,29 +10,20 @@ class OpenTargetsClient:
         self.ontology_id = ontology_id
         self.limit = limit
 
-    async def fetch_target_associated_drugs(
-        self, target_id: str, limit: int = 50
-    ) -> list[dict[str, Any]]:
-        """Fetch drugs linked to a given target (via mechanisms of action)."""
+    # Disease
+    async def fetch_disease_details(self) -> dict[str, Any] | None:
+        """Fetch Disease metadata from OpenTargets GraphQL API."""
+
         query = """
-        query targetDrugs($ensemblId: String!, $size: Int!) {
-          target(ensemblId: $ensemblId) {
+        query diseaseTargets($efoId: String!) {
+          disease(efoId: $efoId) {
             id
-            approvedSymbol
-            drugs(page: {size: $size, index: 0}) {
-              rows {
-                drug {
-                  id
-                  name
-                }
-                mechanismOfAction
-                phase
-              }
-            }
+            name
+            description
           }
         }
         """
-        variables = {"ensemblId": target_id, "size": limit}
+        variables = {"efoId": self.ontology_id, "size": self.limit}
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -42,22 +33,12 @@ class OpenTargetsClient:
             )
             response.raise_for_status()
             raw: dict[str, Any] = response.json()
-            rows = raw["data"]["target"]["drugs"]["rows"]
+            return cast(dict[str, Any], raw["data"])
 
-        results: list[dict[str, Any]] = []
-        for row in rows:
-            results.append(
-                {
-                    "drug_id": row["drug"]["id"],
-                    "drug_name": row["drug"]["name"],
-                    "mechanism": row.get("mechanismOfAction"),
-                    "phase": row.get("phase"),
-                }
-            )
-        return results
+        return None
 
-    async def fetch_target_disease_association_for_opentarget(self) -> dict[str, Any]:
-        """Fetch raw disease + target data from OpenTargets GraphQL API."""
+    async def fetch_disease_to_target_association(self) -> dict[str, Any] | None:
+        """Find the targets on human body associated with the disease (ontology_id) from OpenTargets GraphQL API."""
         query = """
         query diseaseTargets($efoId: String!, $size: Int!) {
           disease(efoId: $efoId) {
@@ -89,68 +70,153 @@ class OpenTargetsClient:
             raw: dict[str, Any] = response.json()
             return cast(dict[str, Any], raw["data"])
 
-    async def fetch_disease_associated_target(self) -> list[dict[str, Any]]:
+        return None
+
+    async def fetch_disease_associated_target_details(self) -> list[dict[str, Any]]:
         """Extract clean target info for given disease ontology_id."""
-        data: dict[
-            str, Any
-        ] = await self.fetch_target_disease_association_for_opentarget()
+        data: dict[str, Any] | None = await self.fetch_disease_to_target_association()
+
+        if data is None:
+            return []
         rows = data["disease"]["associatedTargets"]["rows"]
 
         results: list[dict[str, Any]] = []
         for row in rows:
+            # Fetch details for Target
+
+            target_info = await self.fetch_target_details_info(row["target"]["id"])
             results.append(
                 {
                     "approved_symbol": row["target"]["approvedSymbol"],
                     "target_id": row["target"]["id"],
                     "description": row["target"]["functionDescriptions"],
                     "score": row["score"],
+                    "target_details": target_info,
                 }
             )
+
         return results
 
-    async def disease_with_targets(self) -> dict[str, Any]:
-        """Return a merged object: disease metadata + all associated targets."""
-        data: dict[
-            str, Any
-        ] = await self.fetch_target_disease_association_for_opentarget()
+    # Target, input target_id, retrieved from fetch_disease_associated_target_details/fetch_disease_to_target_association
+    async def fetch_target_details_info(self, target_id: str) -> dict[str, Any] | None:
+        """
+        Fetch basic information for a target using Ensembl ID.
+        """
+        query = """
+        query targetInfo($ensemblId: String!) {
+          target(ensemblId: $ensemblId) {
+            id
+            approvedSymbol
+            approvedName
+            biotype
+            functionDescriptions
+            geneticConstraint{
+                exp
+                constraintType
+                oeLower
+                upperBin6
+                score
+                obs
+                upperRank
+            }
+            tractability{
+                modality
+                label
+                value
+            }
+            proteinIds{
+                source
+                id
+            }
+            knownDrugs{
+                count
+                rows{
+                    targetId
+                    drugId
+                    drugType
+                    approvedName
+                }
+            }
+          }
+        }
+        """
+        variables = {"ensemblId": target_id}
+
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    self.BASE_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                raw: dict[str, Any] = response.json()
+            except Exception as e:
+                print(f"Request failed: {e}")
+                return None
+
+        if "errors" in raw:
+            print(f"GraphQL error: {raw['errors']}")
+            return None
+
+        target = raw.get("data", {}).get("target")
+        return target if target else None
+
+    # Drug , takes input drugID, retrieved from fetch_target_details_info
+    async def fetch_drug_details_info(self, drug_id: str) -> dict[str, Any] | None:
+        """
+        Fetch basic information for a drug using its ChEMBL ID.
+        """
+        query = """
+        query drugInfo($chemblId: String!) {
+          drug(chemblId: $chemblId) {
+            description
+            drugType
+            isApproved
+            crossReferences{
+                ids
+                source
+            }
+          }
+        }
+        """
+        variables = {"chemblId": drug_id}
+
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    self.BASE_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                raw: dict[str, Any] = response.json()
+            except Exception as e:
+                print(f"Request failed for drug {drug_id}: {e}")
+                return None
+
+        if "errors" in raw:
+            print(f"GraphQL error for drug {drug_id}: {raw['errors']}")
+            return None
+
+        drug = raw.get("data", {}).get("drug")
+        return drug if drug else None
+
+    ############### Pipelines ############################
+
+    # Disease -> Target -> knownDrugs
+    async def disease_target_knowndrug_pipeline(self) -> dict[str, Any]:
+        """Return a merged object: disease metadata + all associated targets details"""
+        data: dict[str, Any] | None = await self.fetch_disease_details()
+
+        if data is None:
+            return {}
         disease_meta = {
             "id": data["disease"]["id"],
             "name": data["disease"]["name"],
             "description": data["disease"]["description"],
         }
 
-        targets = await self.fetch_disease_associated_target()
+        # target details
+        targets = await self.fetch_disease_associated_target_details()
         return {"disease": disease_meta, "targets": targets}
-
-    async def disease_pipeline(self, efo_id: str, limit: int = 20) -> dict[str, Any]:
-        """Disease → Targets → Drugs"""
-        disease = await self.fetch_target_attributes_for_opentarget()
-        targets = await self.fetch_disease_associated_target()
-        enriched = []
-        for t in targets:
-            drugs = await self.fetch_target_associated_drugs(
-                t["target_id"], limit=limit
-            )
-            enriched.append({**t, "drugs": drugs})
-        return {"disease": disease["disease"], "targets": enriched}
-
-    async def drug_pipeline(self, chembl_id: str, limit: int = 20) -> dict[str, Any]:
-        """Drug → Targets → Diseases"""
-        drug = await self.fetch_drug_associated_targets(chembl_id, limit=limit)
-        enriched = []
-        for m in drug["mechanisms"]:
-            target_id = m["targetId"]
-            diseases = await self.fetch_target_associated_diseases(
-                target_id, limit=limit
-            )
-            enriched.append({**m, "diseases": diseases})
-        return {
-            "drug": {"id": drug["drug_id"], "name": drug["drug_name"]},
-            "targets": enriched,
-        }
-
-    async def target_pipeline(self, ensembl_id: str, limit: int = 20) -> dict[str, Any]:
-        """Target → Diseases → Drugs"""
-        diseases = await self.fetch_target_associated_diseases(ensembl_id, limit=limit)
-        drugs = await self.fetch_target_associated_drugs(ensembl_id, limit=limit)
-        return {"target": ensembl_id, "diseases": diseases, "drugs": drugs}
