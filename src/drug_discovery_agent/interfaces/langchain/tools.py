@@ -100,7 +100,7 @@ class GetDiseaseListTool(BioinformaticsToolBase):
     def _run(
         self, disease_name: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> list[dict[str, Any]]:
-        """Retrieve FASTA sequence synchronously."""
+        """Retrieve possible diseases from the disease input synchronously"""
         return asyncio.run(self.ebi_client.fetch_all_ontology_ids(disease_name))
 
     async def _arun(
@@ -108,7 +108,7 @@ class GetDiseaseListTool(BioinformaticsToolBase):
         disease_name: str,
         run_manager: AsyncCallbackManagerForToolRun | None = None,
     ) -> list[dict[str, Any]]:
-        """Retrieve FASTA sequence asynchronously."""
+        """Retrieve possible diseases from the disease input asynchronously"""
         return await self.ebi_client.fetch_all_ontology_ids(disease_name)
 
 
@@ -136,7 +136,7 @@ class GetDiseaseTargetTool(BioinformaticsToolBase):
     def _run(
         self, ontology_id: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> dict[str, Any]:
-        """Retrieve FASTA sequence synchronously."""
+        """Retrieve disease associated target synchronously."""
         return asyncio.run(
             self.opentarget_client.disease_target_knowndrug_pipeline(ontology_id)
         )
@@ -146,7 +146,7 @@ class GetDiseaseTargetTool(BioinformaticsToolBase):
         ontology_id: str,
         run_manager: AsyncCallbackManagerForToolRun | None = None,
     ) -> dict[str, Any]:
-        """Retrieve FASTA sequence asynchronously."""
+        """Retrieve disease associated target asynchronously."""
         return await self.opentarget_client.disease_target_knowndrug_pipeline(
             ontology_id
         )
