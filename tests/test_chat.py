@@ -474,6 +474,8 @@ class TestChatIntegration:
             # Test that tools were created properly
             tool_names = {tool.name for tool in client.tools}
             expected_tool_names = {
+                "get_possible_diseases",
+                "get_disease_targets",
                 "get_protein_fasta",
                 "get_protein_details",
                 "analyze_sequence_properties",

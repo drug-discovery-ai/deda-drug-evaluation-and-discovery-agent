@@ -354,7 +354,7 @@ class TestCreateBioinformaticsTools:
         """Test creating tools with default clients."""
         tools = create_bioinformatics_tools()
 
-        assert len(tools) == 8  # All tool classes
+        assert len(tools) == 10  # All tool classes
         assert isinstance(tools, list)
 
         # Check that all tools are BioinformaticsToolBase instances
@@ -364,6 +364,8 @@ class TestCreateBioinformaticsTools:
         # Check that all expected tool types are present
         tool_names = {tool.name for tool in tools}
         expected_names = {
+            "get_possible_diseases",
+            "get_disease_targets",
             "get_protein_fasta",
             "get_protein_details",
             "analyze_sequence_properties",
@@ -388,7 +390,7 @@ class TestCreateBioinformaticsTools:
             sequence_analyzer=mock_analyzer,
         )
 
-        assert len(tools) == 8
+        assert len(tools) == 10
 
         # Check that all tools use the same client instances
         for tool in tools:
@@ -406,7 +408,7 @@ class TestCreateBioinformaticsTools:
 
         tools = create_bioinformatics_tools(uniprot_client=mock_uniprot)
 
-        assert len(tools) == 8
+        assert len(tools) == 10
 
         # Check that custom client is used
         for tool in tools:
@@ -429,9 +431,14 @@ class TestCreateBioinformaticsTools:
             ProteinVariantInput,
             RawSequenceInput,
             UniProtCodeInput,
+            EBIDiseaseInput,
+            OpenTargetOntologyInput
+
         )
 
         expected_schemas = {
+            "get_possible_diseases": EBIDiseaseInput,
+            "get_disease_targets": OpenTargetOntologyInput,
             "get_protein_fasta": UniProtCodeInput,
             "get_protein_details": UniProtCodeInput,
             "analyze_sequence_properties": UniProtCodeInput,
