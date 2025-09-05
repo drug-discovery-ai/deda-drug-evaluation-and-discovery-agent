@@ -9,9 +9,13 @@ from langchain_core.tools import BaseTool
 from pydantic import BaseModel
 
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
+from drug_discovery_agent.core.ebi import EBIClient
+from drug_discovery_agent.core.opentarget import OpenTargetsClient
 from drug_discovery_agent.core.pdb import PDBClient
 from drug_discovery_agent.core.uniprot import UniProtClient
 from drug_discovery_agent.interfaces.langchain.models import (
+    EBIDiseaseInput,
+    OpenTargetOntologyInput,
     PDBIdInput,
     ProteinVariantInput,
     RawSequenceInput,
@@ -41,11 +45,25 @@ class BioinformaticsToolBase(BaseTool):
         super().__init__(**kwargs)
 
         # Initialize clients - create defaults if not provided
+        self._ebi_client = EBIClient()
+
+        self._opentarget_client = OpenTargetsClient()
+
         self._uniprot_client = uniprot_client or UniProtClient()
         self._pdb_client = pdb_client or PDBClient(self._uniprot_client)
         self._sequence_analyzer = sequence_analyzer or SequenceAnalyzer(
             self._uniprot_client
         )
+
+    @property
+    def ebi_client(self) -> EBIClient:
+        """Access to UniProt client instance."""
+        return self._ebi_client
+
+    @property
+    def opentarget_client(self) -> OpenTargetsClient:
+        """Access to UniProt client instance."""
+        return self._opentarget_client
 
     @property
     def uniprot_client(self) -> UniProtClient:
@@ -61,6 +79,77 @@ class BioinformaticsToolBase(BaseTool):
     def sequence_analyzer(self) -> SequenceAnalyzer:
         """Access to sequence analyzer instance."""
         return self._sequence_analyzer
+
+
+class GetDiseaseListTool(BioinformaticsToolBase):
+    """Tool for retrieving Ontology ID from European Bioinformatics Institute API."""
+
+    name: str = "get_possible_diseases"
+    description: str = (
+        "Use this tool when a user provides a disease name. "
+        "It queries the European Bioinformatics Institute REST API and returns a list of possible ontology IDs (EFO terms). "
+        "If multiple matches are found, ask the user to clarify which one they mean before proceeding. "
+        "Once the correct ontology ID is chosen, pass it to `get_disease_targets` for target details."
+    )
+    args_schema: type[BaseModel] = EBIDiseaseInput
+
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
+    def _run(
+        self, disease_name: str, run_manager: CallbackManagerForToolRun | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve FASTA sequence synchronously."""
+        return asyncio.run(self.ebi_client.fetch_all_ontology_ids(disease_name))
+
+    async def _arun(
+        self,
+        disease_name: str,
+        run_manager: AsyncCallbackManagerForToolRun | None = None,
+    ) -> list[dict[str, Any]]:
+        """Retrieve FASTA sequence asynchronously."""
+        return await self.ebi_client.fetch_all_ontology_ids(disease_name)
+
+
+class GetDiseaseTargetTool(BioinformaticsToolBase):
+    """Tool for retrieving Ontology ID from European Bioinformatics Institute API."""
+
+    name: str = "get_disease_targets"
+    description: str = (
+        "Use this tool when a disease ontology ID (EFO term) is already known. "
+        "It queries the OpenTargets API to retrieve genes and proteins (targets) "
+        "that are associated with the disease. "
+        "The results include each target’s approved name, functional descriptions, "
+        "tractability information, and known drug associations for the disease. "
+        "Invoke `get_protein_details`, `get_top_pdb_ids_for_uniprot`, "
+        "`analyze_sequence_properties`, or any other available tools "
+        "to explore the details of the target protein."
+    )
+
+    args_schema: type[BaseModel] = OpenTargetOntologyInput
+
+    # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+
+    def _run(
+        self, ontology_id: str, run_manager: CallbackManagerForToolRun | None = None
+    ) -> dict[str, Any]:
+        """Retrieve FASTA sequence synchronously."""
+        return asyncio.run(
+            self.opentarget_client.disease_target_knowndrug_pipeline(ontology_id)
+        )
+
+    async def _arun(
+        self,
+        ontology_id: str,
+        run_manager: AsyncCallbackManagerForToolRun | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve FASTA sequence asynchronously."""
+        return await self.opentarget_client.disease_target_knowndrug_pipeline(
+            ontology_id
+        )
 
 
 class GetProteinFastaTool(BioinformaticsToolBase):
@@ -202,7 +291,8 @@ class GetTopPDBIdsTool(BioinformaticsToolBase):
 
     name: str = "get_top_pdb_ids_for_uniprot"
     description: str = (
-        "Fetch top 10 representative PDB entries from UniProt cross-references"
+        "Fetches up to 10 representative PDB entries from UniProt cross-references "
+        "for a given UniProt accession code."
     )
     args_schema: type[BaseModel] = UniProtCodeInput
 
@@ -300,6 +390,16 @@ def create_bioinformatics_tools(
         sequence_analyzer = SequenceAnalyzer(uniprot_client)
 
     return [
+        GetDiseaseListTool(
+            uniprot_client=uniprot_client,
+            pdb_client=pdb_client,
+            sequence_analyzer=sequence_analyzer,
+        ),
+        GetDiseaseTargetTool(
+            uniprot_client=uniprot_client,
+            pdb_client=pdb_client,
+            sequence_analyzer=sequence_analyzer,
+        ),
         GetProteinFastaTool(
             uniprot_client=uniprot_client,
             pdb_client=pdb_client,
@@ -347,6 +447,7 @@ def create_bioinformatics_tools(
 __all__ = [
     # Tool classes
     "BioinformaticsToolBase",
+    "GetDiseaseListTool",
     "GetProteinFastaTool",
     "GetProteinDetailsTool",
     "AnalyzeSequencePropertiesTool",
