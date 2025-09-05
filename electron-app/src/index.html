@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' http://127.0.0.1:8080 http://localhost:8080;">
+    <title>Bioinformatics Chat Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="app-title">
+                    <h1>🧬 Bioinformatics Chat Assistant</h1>
+                    <span class="app-subtitle">AI-Powered Research Companion</span>
+                </div>
+                <div class="header-controls">
+                    <div class="connection-status" id="connection-status">
+                        <span class="status-indicator" id="status-indicator"></span>
+                        <span class="status-text" id="status-text">Connecting...</span>
+                    </div>
+                    <button class="icon-button" id="settings-button" title="Settings">
+                        ⚙️
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Chat Interface -->
+        <main class="chat-container">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcome-screen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">🧬</div>
+                    <h2>Welcome to Bioinformatics Chat Assistant</h2>
+                    <p>Your AI-powered research companion for bioinformatics analysis</p>
+                    <div class="welcome-features">
+                        <div class="feature">
+                            <span class="feature-icon">🔍</span>
+                            <span>Protein Structure Analysis</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🧪</span>
+                            <span>UniProt Database Queries</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">📊</span>
+                            <span>Sequence Analysis Tools</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">💡</span>
+                            <span>Research Insights</span>
+                        </div>
+                    </div>
+                    <div class="welcome-prompt">
+                        <p>Start by asking a question about proteins, sequences, or molecular structures!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be dynamically added here -->
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-content">
+                    <div class="avatar">🤖</div>
+                    <div class="typing-animation">
+                        <span class="typing-text">AI Assistant is thinking</span>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Section -->
+        <footer class="chat-input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="message-input" 
+                    placeholder="Ask about proteins, sequences, molecular structures, or any bioinformatics question..."
+                    rows="1"
+                    maxlength="2000"
+                ></textarea>
+                <div class="input-controls">
+                    <div class="input-info">
+                        <span class="char-counter" id="char-counter">0/2000</span>
+                    </div>
+                    <button id="send-button" class="send-button" disabled>
+                        <span class="send-icon">📤</span>
+                        <span class="send-text">Send</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Error Toast -->
+        <div class="toast toast-error" id="error-toast">
+            <div class="toast-content">
+                <span class="toast-icon">⚠️</span>
+                <span class="toast-message" id="error-message"></span>
+                <button class="toast-close" id="error-close">×</button>
+            </div>
+        </div>
+
+        <!-- Success Toast -->
+        <div class="toast toast-success" id="success-toast">
+            <div class="toast-content">
+                <span class="toast-icon">✅</span>
+                <span class="toast-message" id="success-message"></span>
+                <button class="toast-close" id="success-close">×</button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settings-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="modal-close" id="settings-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <label for="server-info">Backend Server</label>
+                        <div class="server-info" id="server-info">
+                            <div class="info-item">
+                                <span class="info-label">Status:</span>
+                                <span class="info-value" id="server-status-detail">Unknown</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Host:</span>
+                                <span class="info-value" id="server-host">localhost</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Port:</span>
+                                <span class="info-value" id="server-port">8080</span>
+                            </div>
+                        </div>
+                        <button class="button button-secondary" id="restart-backend-button">
+                            🔄 Restart Backend
+                        </button>
+                    </div>
+                    <div class="setting-group">
+                        <label for="app-info">Application Info</label>
+                        <div class="app-info" id="app-info">
+                            <div class="info-item">
+                                <span class="info-label">Version:</span>
+                                <span class="info-value" id="app-version">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Platform:</span>
+                                <span class="info-value" id="app-platform">Unknown</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Initializing Bioinformatics Assistant...</div>
+                <div class="loading-subtext">Please wait while we start the backend server</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

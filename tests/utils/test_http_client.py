@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from drug_discovery_agent.utils.http_client import make_api_request, make_fasta_request
+from tests.fixtures.mock_http_server import with_mock_http_server
 
 
 class TestHttpClient:
@@ -193,11 +194,46 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIH""",
         )
 
     @pytest.mark.integration
-    @pytest.mark.slow
+    @with_mock_http_server(
+        (
+            "GET",
+            "https://httpbin.org/json",
+            {
+                "slideshow": {
+                    "author": "Test Author",
+                    "date": "2024-01-01",
+                    "slides": [
+                        {"title": "Test Slide 1", "type": "all"},
+                        {
+                            "title": "Test Slide 2",
+                            "type": "all",
+                            "items": ["Item 1", "Item 2"],
+                        },
+                    ],
+                    "title": "Test Slideshow",
+                }
+            },
+        )
+    )
+    async def test_make_api_request_real_request(self) -> None:
+        result = await make_api_request("https://httpbin.org/json", timeout=10.0)
+
+        assert result is not None
+        assert isinstance(result, dict)
+        assert "slideshow" in result
+        assert result["slideshow"]["author"] == "Test Author"  # type: ignore[index]
+
+    @pytest.mark.integration
+    @with_mock_http_server(
+        (
+            "GET",
+            "https://httpbin.org/robots.txt",
+            "User-agent: *\nDisallow: /deny\nAllow: /\n",
+        )
+    )
     async def test_make_fasta_request_real_request(self) -> None:
-        """Integration test with real FASTA request."""
-        # Test with a simple text endpoint
         result = await make_fasta_request("https://httpbin.org/robots.txt")
 
         assert result is not None
         assert isinstance(result, str)
+        assert "User-agent: *" in result
