@@ -2,16 +2,17 @@ from typing import Any, cast
 
 import httpx
 
+from drug_discovery_agent.utils.constants import OPENTARGET_ENDPOINT
+
 
 class OpenTargetsClient:
-    BASE_URL = "https://api.platform.opentargets.org/api/v4/graphql"
+    BASE_URL = OPENTARGET_ENDPOINT
 
-    def __init__(self, ontology_id: str, limit: int = 100) -> None:
-        self.ontology_id = ontology_id
-        self.limit = limit
+    def __init__(self) -> None:
+        self.limit = 10
 
     # Disease
-    async def fetch_disease_details(self) -> dict[str, Any] | None:
+    async def fetch_disease_details(self, ontology_id: str) -> dict[str, Any] | None:
         """Fetch Disease metadata from OpenTargets GraphQL API."""
 
         query = """
@@ -23,7 +24,7 @@ class OpenTargetsClient:
           }
         }
         """
-        variables = {"efoId": self.ontology_id, "size": self.limit}
+        variables = {"efoId": ontology_id, "size": self.limit}
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -37,7 +38,9 @@ class OpenTargetsClient:
 
         return None
 
-    async def fetch_disease_to_target_association(self) -> dict[str, Any] | None:
+    async def fetch_disease_to_target_association(
+        self, ontology_id: str
+    ) -> dict[str, Any] | None:
         """Find the targets on human body associated with the disease (ontology_id) from OpenTargets GraphQL API."""
         query = """
         query diseaseTargets($efoId: String!, $size: Int!) {
@@ -58,7 +61,7 @@ class OpenTargetsClient:
           }
         }
         """
-        variables = {"efoId": self.ontology_id, "size": self.limit}
+        variables = {"efoId": ontology_id, "size": self.limit}
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -72,9 +75,14 @@ class OpenTargetsClient:
 
         return None
 
-    async def fetch_disease_associated_target_details(self) -> list[dict[str, Any]]:
+    async def fetch_disease_associated_target_details(
+        self, ontology_id: str
+    ) -> list[dict[str, Any]]:
         """Extract clean target info for given disease ontology_id."""
-        data: dict[str, Any] | None = await self.fetch_disease_to_target_association()
+
+        data: dict[str, Any] | None = await self.fetch_disease_to_target_association(
+            ontology_id
+        )
 
         if data is None:
             return []
@@ -205,9 +213,11 @@ class OpenTargetsClient:
     ############### Pipelines ############################
 
     # Disease -> Target -> knownDrugs
-    async def disease_target_knowndrug_pipeline(self) -> dict[str, Any]:
+    async def disease_target_knowndrug_pipeline(
+        self, ontology_id: str
+    ) -> dict[str, Any]:
         """Return a merged object: disease metadata + all associated targets details"""
-        data: dict[str, Any] | None = await self.fetch_disease_details()
+        data: dict[str, Any] | None = await self.fetch_disease_details(ontology_id)
 
         if data is None:
             return {}
@@ -218,5 +228,5 @@ class OpenTargetsClient:
         }
 
         # target details
-        targets = await self.fetch_disease_associated_target_details()
+        targets = await self.fetch_disease_associated_target_details(ontology_id)
         return {"disease": disease_meta, "targets": targets}

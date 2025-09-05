@@ -1,8 +1,24 @@
 from pydantic import BaseModel, Field
 
 
+class EBIDiseaseInput(BaseModel):
+    """Input schema for disease search operations."""
+
+    disease_name: str = Field(
+        description="Disease name (e.g., 'Covid', 'brain tumor', 'chicken pox')"
+    )
+
+
+class OpenTargetOntologyInput(BaseModel):
+    """Input schema for disease associated target details operations."""
+
+    ontology_id: str = Field(
+        description="Disease standard name (e.g., 'EFO_0007204', is ontology_id for one variant of chicken pox)"
+    )
+
+
 class UniProtCodeInput(BaseModel):
-    """Input schema for UniProt code operations."""
+    """Input schema for UniProt code operations corresponds to the disease target"""
 
     uniprot_code: str = Field(description="The UniProt accession code (e.g., 'P0DTC2')")
 
@@ -27,7 +43,8 @@ class ProteinVariantInput(BaseModel):
 
 
 __all__ = [
-    "UniProtCodeInput",
+    "EBIDiseaseInput",
+    "OpenTargetOntologyInput",
     "PDBIdInput",
     "RawSequenceInput",
     "ProteinVariantInput",

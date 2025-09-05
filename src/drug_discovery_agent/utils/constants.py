@@ -4,7 +4,7 @@
 VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
 RCSB_DB_ENDPOINT = "https://data.rcsb.org/rest/v1/core/entry"
 EBI_ENDPOINT = "https://www.ebi.ac.uk/ols/api/search"
-
+OPENTARGET_ENDPOINT = "https://api.platform.opentargets.org/api/v4/graphql"
 GENEINFO_ENDPOINT = "https://mygene.info/v3"
 
 # HTTP configuration
