@@ -448,6 +448,7 @@ __all__ = [
     # Tool classes
     "BioinformaticsToolBase",
     "GetDiseaseListTool",
+    "GetDiseaseTargetTool",
     "GetProteinFastaTool",
     "GetProteinDetailsTool",
     "AnalyzeSequencePropertiesTool",

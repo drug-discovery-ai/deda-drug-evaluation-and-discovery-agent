@@ -27,16 +27,18 @@ class OpenTargetsClient:
         variables = {"efoId": ontology_id, "size": self.limit}
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(
-                self.BASE_URL,
-                json={"query": query, "variables": variables},
-                timeout=15.0,
-            )
-            response.raise_for_status()
-            raw: dict[str, Any] = response.json()
-            return cast(dict[str, Any], raw["data"])
-
-        return None
+            try:
+                response = await client.post(
+                    self.BASE_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                raw: dict[str, Any] = response.json()
+                return cast(dict[str, Any], raw["data"])
+            except Exception as e:
+                print(f"Request failed: {e}")
+                return None
 
     async def fetch_disease_to_target_association(
         self, ontology_id: str
@@ -64,16 +66,18 @@ class OpenTargetsClient:
         variables = {"efoId": ontology_id, "size": self.limit}
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(
-                self.BASE_URL,
-                json={"query": query, "variables": variables},
-                timeout=15.0,
-            )
-            response.raise_for_status()
-            raw: dict[str, Any] = response.json()
-            return cast(dict[str, Any], raw["data"])
-
-        return None
+            try:
+                response = await client.post(
+                    self.BASE_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                raw: dict[str, Any] = response.json()
+                return cast(dict[str, Any], raw["data"])
+            except Exception as e:
+                print(f"Request failed: {e}")
+                return None
 
     async def fetch_disease_associated_target_details(
         self, ontology_id: str

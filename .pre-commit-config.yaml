@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest --testmon -m "not integration and not slow"
+        entry: pytest --testmon -m "not integration and not slow" --no-cov
         language: system
         files: \.py$
         types: [python]
