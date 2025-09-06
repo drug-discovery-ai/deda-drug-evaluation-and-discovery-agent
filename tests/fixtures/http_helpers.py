@@ -66,6 +66,7 @@ class HttpMockHelpers:
         response_data: Any,
         status_code: int = 200,
         side_effect: Any | None = None,
+        method: str = "get",
     ) -> AsyncMock:
         """Helper method to set up httpx client mocking."""
         mock_response_obj = AsyncMock()
@@ -73,14 +74,20 @@ class HttpMockHelpers:
 
         if side_effect:
             mock_async_client = AsyncMock()
-            mock_async_client.get.side_effect = side_effect
+            if method.lower() == "post":
+                mock_async_client.post.side_effect = side_effect
+            else:
+                mock_async_client.get.side_effect = side_effect
         else:
             mock_response_obj.json = lambda: response_data
             if status_code == 200:
                 mock_response_obj.raise_for_status = AsyncMock()
 
             mock_async_client = AsyncMock()
-            mock_async_client.get.return_value = mock_response_obj
+            if method.lower() == "post":
+                mock_async_client.post.return_value = mock_response_obj
+            else:
+                mock_async_client.get.return_value = mock_response_obj
 
         mock_client_cls.return_value.__aenter__.return_value = mock_async_client
         return mock_async_client

@@ -1,7 +1,7 @@
 """Tests for langchain tools functionality."""
 
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -13,6 +13,8 @@ from drug_discovery_agent.interfaces.langchain.tools import (
     AnalyzeSequencePropertiesTool,
     BioinformaticsToolBase,
     CompareProteinVariantTool,
+    GetDiseaseListTool,
+    GetDiseaseTargetTool,
     GetLigandSmilesTool,
     GetProteinDetailsTool,
     GetProteinFastaTool,
@@ -89,6 +91,8 @@ class TestBioinformaticsToolBase:
 @pytest.mark.parametrize(
     "tool_class,expected_name,expected_desc_contains",
     [
+        (GetDiseaseListTool, "get_possible_diseases", "disease"),
+        (GetDiseaseTargetTool, "get_disease_targets", "targets"),
         (GetProteinFastaTool, "get_protein_fasta", "FASTA"),
         (GetProteinDetailsTool, "get_protein_details", "metadata"),
         (AnalyzeSequencePropertiesTool, "analyze_sequence_properties", "properties"),
@@ -346,6 +350,181 @@ class TestGetLigandSmilesTool:
         )
 
 
+class TestGetDiseaseListTool:
+    """Test suite for GetDiseaseListTool."""
+
+    @pytest.fixture
+    def disease_list_tool(
+        self,
+        mock_uniprot_client: Any,
+        mock_pdb_client: Any,
+        mock_sequence_analyzer: Any,
+    ) -> GetDiseaseListTool:
+        """Create disease list tool with mock clients."""
+        return GetDiseaseListTool(
+            uniprot_client=mock_uniprot_client,
+            pdb_client=mock_pdb_client,
+            sequence_analyzer=mock_sequence_analyzer,
+        )
+
+    @pytest.mark.unit
+    @patch("httpx.AsyncClient")
+    async def test_async_run(
+        self,
+        mock_client_cls: Any,
+        disease_list_tool: GetDiseaseListTool,
+        http_mock_helpers: Any,
+    ) -> None:
+        """Test asynchronous execution."""
+        expected_diseases = [
+            {
+                "label": "Alzheimer disease",
+                "iri": "http://www.ebi.ac.uk/efo/EFO_0000249",
+                "ontology": "efo",
+                "ontology_id": "EFO_0000249",
+                "description": ["A neurodegenerative disease"],
+            },
+            {
+                "label": "Early-onset Alzheimer disease",
+                "iri": "http://www.ebi.ac.uk/efo/EFO_0009636",
+                "ontology": "efo",
+                "ontology_id": "EFO_0009636",
+                "description": ["Early onset form of Alzheimer disease"],
+            },
+        ]
+
+        mock_response = {
+            "response": {
+                "docs": [
+                    {
+                        "label": "Alzheimer disease",
+                        "iri": "http://www.ebi.ac.uk/efo/EFO_0000249",
+                        "ontology_name": "efo",
+                        "short_form": "EFO_0000249",
+                        "description": ["A neurodegenerative disease"],
+                    },
+                    {
+                        "label": "Early-onset Alzheimer disease",
+                        "iri": "http://www.ebi.ac.uk/efo/EFO_0009636",
+                        "ontology_name": "efo",
+                        "short_form": "EFO_0009636",
+                        "description": ["Early onset form of Alzheimer disease"],
+                    },
+                ]
+            }
+        }
+
+        http_mock_helpers.setup_httpx_mock(mock_client_cls, mock_response)
+
+        result = await disease_list_tool._arun("alzheimer")
+
+        assert result == expected_diseases
+
+
+class TestGetDiseaseTargetTool:
+    """Test suite for GetDiseaseTargetTool."""
+
+    @pytest.fixture
+    def disease_target_tool(
+        self,
+        mock_uniprot_client: Any,
+        mock_pdb_client: Any,
+        mock_sequence_analyzer: Any,
+    ) -> GetDiseaseTargetTool:
+        """Create disease target tool with mock clients."""
+        return GetDiseaseTargetTool(
+            uniprot_client=mock_uniprot_client,
+            pdb_client=mock_pdb_client,
+            sequence_analyzer=mock_sequence_analyzer,
+        )
+
+    @pytest.mark.unit
+    @patch("httpx.AsyncClient")
+    async def test_async_run(
+        self,
+        mock_client_cls: Any,
+        disease_target_tool: GetDiseaseTargetTool,
+        http_mock_helpers: Any,
+    ) -> None:
+        """Test asynchronous execution."""
+
+        # Mock the GraphQL response for disease details (first call)
+        disease_details_response = {
+            "data": {
+                "disease": {
+                    "id": "EFO_0000249",
+                    "name": "Alzheimer disease",
+                    "description": "A neurodegenerative disease",
+                }
+            }
+        }
+
+        # Mock the GraphQL response for disease-target association (second call)
+        disease_target_response = {
+            "data": {
+                "disease": {
+                    "id": "EFO_0000249",
+                    "name": "Alzheimer disease",
+                    "description": "A neurodegenerative disease",
+                    "associatedTargets": {
+                        "rows": [
+                            {
+                                "target": {
+                                    "approvedSymbol": "APP",
+                                    "id": "ENSG00000142192",
+                                    "functionDescriptions": [
+                                        "Amyloid beta precursor protein"
+                                    ],
+                                },
+                                "score": 0.95,
+                            }
+                        ]
+                    },
+                }
+            }
+        }
+
+        # Mock the target details response (third call)
+        target_details_response = {
+            "data": {
+                "target": {
+                    "id": "ENSG00000142192",
+                    "approvedSymbol": "APP",
+                    "approvedName": "amyloid beta precursor protein",
+                    "biotype": "protein_coding",
+                    "functionDescriptions": ["Amyloid beta precursor protein"],
+                    "knownDrugs": {"count": 5, "rows": []},
+                }
+            }
+        }
+
+        # Set up sequential responses for the multiple HTTP calls
+        mock_async_client = http_mock_helpers.setup_httpx_mock(
+            mock_client_cls, disease_details_response
+        )
+
+        # Configure the mock to return different responses for each call
+        mock_async_client.post.side_effect = [
+            # First call: disease details
+            http_mock_helpers.create_mock_http_response(disease_details_response),
+            # Second call: disease-target association
+            http_mock_helpers.create_mock_http_response(disease_target_response),
+            # Third call: target details
+            http_mock_helpers.create_mock_http_response(target_details_response),
+        ]
+
+        result = await disease_target_tool._arun("EFO_0000249")
+
+        # Verify the structure matches what the pipeline returns
+        assert "disease" in result
+        assert "targets" in result
+        assert result["disease"]["id"] == "EFO_0000249"
+        assert result["disease"]["name"] == "Alzheimer disease"
+        assert len(result["targets"]) == 1
+        assert result["targets"][0]["approved_symbol"] == "APP"
+        assert result["targets"][0]["target_id"] == "ENSG00000142192"
+
+
 class TestCreateBioinformaticsTools:
     """Test suite for create_bioinformatics_tools factory function."""
 
@@ -461,6 +640,8 @@ class TestCreateBioinformaticsTools:
 
         expected_exports = [
             "BioinformaticsToolBase",
+            "GetDiseaseListTool",
+            "GetDiseaseTargetTool",
             "GetProteinFastaTool",
             "GetProteinDetailsTool",
             "AnalyzeSequencePropertiesTool",
