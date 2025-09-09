@@ -7,11 +7,6 @@ from drug_discovery_agent.utils.constants import EBI_ENDPOINT
 
 class EBIClient:
     def __init__(self) -> None:
-        """Initialize EBIClient with a disease name.
-
-        Args:
-            disease_name (str): The disease name to look up.
-        """
         self.ontology_matches: list[dict[str, Any]] = []  # store all matches
 
     async def fetch_all_ontology_ids(self, disease_name: str) -> list[dict[str, Any]]:
@@ -37,6 +32,20 @@ class EBIClient:
             return []
 
         data: dict[str, Any] = response.json()
+        return self._process_response_data(data, disease_name)
+
+    def _process_response_data(
+        self, data: dict[str, Any], disease_name: str
+    ) -> list[dict[str, Any]]:
+        """Process API response data and extract ontology matches.
+
+        Args:
+            data: Raw API response data
+            disease_name: Disease name for logging
+
+        Returns:
+            List of processed ontology matches
+        """
         docs: list[dict[str, Any]] = data.get("response", {}).get("docs", [])
         if not docs:
             print(f"No EFO IDs found for {disease_name}")

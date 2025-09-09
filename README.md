@@ -163,10 +163,37 @@ Run type checking:
 mypy .                # Run type checking on all files
 ```
 
-## Run tests
+## Testing
+
+The project includes a unified snapshot testing system for reliable, fast API testing:
+
+### Run Tests
+
 ```bash
+# Run all tests (uses snapshots by default - fast, no network calls)
 pytest
+
+# Run only unit tests (uses mocks)
+pytest -k "unit"
+
+# Run only integration tests (uses snapshots)  
+pytest -k "integration"
+
+# Update snapshots from live APIs (when APIs change)
+pytest --update-snapshots
+
+# Validate existing snapshots against live APIs
+pytest --validate-snapshots
 ```
+
+### Test Architecture
+
+- **Unit tests**: Use `@patch` decorators for fast, isolated testing
+- **Integration tests**: Use `@pytest.mark.integration` with automatic snapshot/recording
+- **Snapshots**: Real API responses captured for realistic testing without network calls
+- **HTTP Interception**: Transparent to application code - no changes needed to API clients
+
+See `snapshots/README.md` for detailed information about the snapshot testing system.
 
 # Run the AI assistant using Docker
 

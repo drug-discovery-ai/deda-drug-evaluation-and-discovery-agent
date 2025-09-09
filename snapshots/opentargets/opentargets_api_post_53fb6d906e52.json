@@ -1,0 +1,520 @@
+{
+  "metadata": {
+    "created_at": "2025-09-09T08:31:57.634038",
+    "updated_at": "2025-09-09T08:31:57.634052",
+    "key": "opentargets_api_post_53fb6d906e52",
+    "url": "https://api.platform.opentargets.org/api/v4/graphql",
+    "method": "POST",
+    "status_code": 200,
+    "content_type": "application/json",
+    "request_params": null,
+    "request_json": {
+      "query": "\n        query targetInfo($ensemblId: String!) {\n          target(ensemblId: $ensemblId) {\n            id\n            approvedSymbol\n            approvedName\n            biotype\n            functionDescriptions\n            geneticConstraint{\n                exp\n                constraintType\n                oeLower\n                upperBin6\n                score\n                obs\n                upperRank\n            }\n            tractability{\n                modality\n                label\n                value\n            }\n            proteinIds{\n                source\n                id\n            }\n            knownDrugs{\n                count\n                rows{\n                    targetId\n                    drugId\n                    drugType\n                    approvedName\n                }\n            }\n          }\n        }\n        ",
+      "variables": {
+        "ensemblId": "ENSG00000142192"
+      }
+    },
+    "checksum": "5a33256c56859b7e2a05c8ad6327fa6e3439acee51e431c32e19b10448c831de"
+  },
+  "response": {
+    "data": {
+      "target": {
+        "id": "ENSG00000142192",
+        "approvedSymbol": "APP",
+        "approvedName": "amyloid beta precursor protein",
+        "biotype": "protein_coding",
+        "functionDescriptions": [
+          "Functions as a cell surface receptor and performs physiological functions on the surface of neurons relevant to neurite growth, neuronal adhesion and axonogenesis. Interaction between APP molecules on neighboring cells promotes synaptogenesis (PubMed:25122912). Involved in cell mobility and transcription regulation through protein-protein interactions. Can promote transcription activation through binding to APBB1-KAT5 and inhibits Notch signaling through interaction with Numb. Couples to apoptosis- inducing pathways such as those mediated by G(o) and JIP. Inhibits G(o) alpha ATPase activity (By similarity). Acts as a kinesin I membrane receptor, mediating the axonal transport of beta-secretase and presenilin 1 (By similarity). By acting as a kinesin I membrane receptor, plays a role in axonal anterograde transport of cargo towards synapses in axons (PubMed:17062754, PubMed:23011729). Involved in copper homeostasis/oxidative stress through copper ion reduction. In vitro, copper-metallated APP induces neuronal death directly or is potentiated through Cu(2+)-mediated low-density lipoprotein oxidation. Can regulate neurite outgrowth through binding to components of the extracellular matrix such as heparin and collagen I and IV. The splice isoforms that contain the BPTI domain possess protease inhibitor activity. Induces a AGER-dependent pathway that involves activation of p38 MAPK, resulting in internalization of amyloid-beta peptide and leading to mitochondrial dysfunction in cultured cortical neurons. Provides Cu(2+) ions for GPC1 which are required for release of nitric oxide (NO) and subsequent degradation of the heparan sulfate chains on GPC1. {ECO:0000250, ECO:0000250|UniProtKB:P12023, ECO:0000269|PubMed:17062754, ECO:0000269|PubMed:23011729, ECO:0000269|PubMed:25122912}.",
+          "Amyloid-beta peptides are lipophilic metal chelators with metal-reducing activity. Bind transient metals such as copper, zinc and iron. In vitro, can reduce Cu(2+) and Fe(3+) to Cu(+) and Fe(2+), respectively. Amyloid-beta peptides bind to lipoproteins and apolipoproteins E and J in the CSF and to HDL particles in plasma, inhibiting metal-catalyzed oxidation of lipoproteins. Promotes both tau aggregation and TPK II-mediated phosphorylation. Interaction with overexpressed HADH2 leads to oxidative stress and neurotoxicity. Also binds GPC1 in lipid rafts.",
+          "[Amyloid-beta protein 42]: More effective reductant than amyloid-beta protein 40. May activate mononuclear phagocytes in the brain and elicit inflammatory responses.",
+          "Appicans elicit adhesion of neural cells to the extracellular matrix and may regulate neurite outgrowth in the brain. .",
+          "The gamma-CTF peptides as well as the caspase-cleaved peptides, including C31, are potent enhancers of neuronal apoptosis."
+        ],
+        "geneticConstraint": [
+          {
+            "exp": 171.35000610351562,
+            "constraintType": "syn",
+            "oeLower": 0.9459999799728394,
+            "upperBin6": null,
+            "score": -0.6998400092124939,
+            "obs": 183,
+            "upperRank": null
+          },
+          {
+            "exp": 452.3800048828125,
+            "constraintType": "mis",
+            "oeLower": 0.7480000257492065,
+            "upperBin6": null,
+            "score": 1.3931000232696533,
+            "obs": 369,
+            "upperRank": null
+          },
+          {
+            "exp": 46.388999938964844,
+            "constraintType": "lof",
+            "oeLower": 0.16500000655651093,
+            "upperBin6": 1,
+            "score": 0.04654400050640106,
+            "obs": 12,
+            "upperRank": 3810
+          }
+        ],
+        "tractability": [
+          {
+            "modality": "SM",
+            "label": "Approved Drug",
+            "value": false
+          },
+          {
+            "modality": "SM",
+            "label": "Advanced Clinical",
+            "value": true
+          },
+          {
+            "modality": "SM",
+            "label": "Phase 1 Clinical",
+            "value": false
+          },
+          {
+            "modality": "SM",
+            "label": "Structure with Ligand",
+            "value": true
+          },
+          {
+            "modality": "SM",
+            "label": "High-Quality Ligand",
+            "value": true
+          },
+          {
+            "modality": "SM",
+            "label": "High-Quality Pocket",
+            "value": true
+          },
+          {
+            "modality": "SM",
+            "label": "Med-Quality Pocket",
+            "value": false
+          },
+          {
+            "modality": "SM",
+            "label": "Druggable Family",
+            "value": true
+          },
+          {
+            "modality": "AB",
+            "label": "Approved Drug",
+            "value": true
+          },
+          {
+            "modality": "AB",
+            "label": "Advanced Clinical",
+            "value": false
+          },
+          {
+            "modality": "AB",
+            "label": "Phase 1 Clinical",
+            "value": false
+          },
+          {
+            "modality": "AB",
+            "label": "UniProt loc high conf",
+            "value": true
+          },
+          {
+            "modality": "AB",
+            "label": "GO CC high conf",
+            "value": true
+          },
+          {
+            "modality": "AB",
+            "label": "UniProt loc med conf",
+            "value": false
+          },
+          {
+            "modality": "AB",
+            "label": "UniProt SigP or TMHMM",
+            "value": true
+          },
+          {
+            "modality": "AB",
+            "label": "GO CC med conf",
+            "value": false
+          },
+          {
+            "modality": "AB",
+            "label": "Human Protein Atlas loc",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "Approved Drug",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "Advanced Clinical",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "Phase 1 Clinical",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "Literature",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "UniProt Ubiquitination",
+            "value": true
+          },
+          {
+            "modality": "PR",
+            "label": "Database Ubiquitination",
+            "value": true
+          },
+          {
+            "modality": "PR",
+            "label": "Half-life Data",
+            "value": false
+          },
+          {
+            "modality": "PR",
+            "label": "Small Molecule Binder",
+            "value": true
+          },
+          {
+            "modality": "OC",
+            "label": "Approved Drug",
+            "value": false
+          },
+          {
+            "modality": "OC",
+            "label": "Advanced Clinical",
+            "value": true
+          },
+          {
+            "modality": "OC",
+            "label": "Phase 1 Clinical",
+            "value": false
+          }
+        ],
+        "proteinIds": [
+          {
+            "source": "uniprot_swissprot",
+            "id": "P05067"
+          },
+          {
+            "source": "uniprot_trembl",
+            "id": "A0A0A0MRG2"
+          },
+          {
+            "source": "uniprot_trembl",
+            "id": "A0A140VJC8"
+          },
+          {
+            "source": "uniprot_trembl",
+            "id": "E9PG40"
+          },
+          {
+            "source": "uniprot_trembl",
+            "id": "H7C0V9"
+          },
+          {
+            "source": "uniprot_trembl",
+            "id": "H7C2L2"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000284981"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000345463"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000346129"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000350578"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000351796"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000352760"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000387483"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000396923"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000398879"
+          },
+          {
+            "source": "ensembl_PRO",
+            "id": "ENSP00000406539"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "B2R5V1"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "B4DII8"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "D3DSD1"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "D3DSD2"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "D3DSD3"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "P09000"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "P78438"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q13764"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q13778"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q13793"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q16011"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q16014"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q16019"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q16020"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q6GSC0"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q8WZ99"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9BT38"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UC33"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UCA9"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UCB6"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UCC8"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UCD1"
+          },
+          {
+            "source": "uniprot_obsolete",
+            "id": "Q9UQ58"
+          }
+        ],
+        "knownDrugs": {
+          "count": 49,
+          "rows": [
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3039540",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3039540",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3833321",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743072",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL149082",
+              "drugType": "Small molecule",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743004",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743025",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743025",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL2108576",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743072",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743072",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL2108576",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3039540",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3039540",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3833321",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL3833321",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL4297245",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL4297245",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL4650301",
+              "drugType": "Small molecule",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL4650301",
+              "drugType": "Small molecule",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL149082",
+              "drugType": "Small molecule",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743058",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL2109300",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743025",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            },
+            {
+              "targetId": "ENSG00000142192",
+              "drugId": "CHEMBL1743072",
+              "drugType": "Antibody",
+              "approvedName": "amyloid beta precursor protein"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

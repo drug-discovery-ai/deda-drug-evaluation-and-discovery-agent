@@ -3,11 +3,49 @@ from typing import Any
 import httpx
 
 from drug_discovery_agent.utils.constants import VIRUS_UNIPROT_REST_API_BASE
-from drug_discovery_agent.utils.http_client import make_fasta_request
 
 
 class UniProtClient:
     """Client for UniProt database operations."""
+
+    def __init__(self) -> None:
+        """Initialize UniProt client."""
+        pass
+
+    async def _make_request(self, url: str, expected_format: str = "json") -> Any:
+        """Make an HTTP request (HTTP interceptor handles snapshots/mocks transparently).
+
+        Args:
+            url: URL to request
+            expected_format: Expected response format ("json" or "text")
+
+        Returns:
+            Response data or None if failed
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=10)
+
+                if response.status_code != 200:
+                    if expected_format == "json":
+                        return {
+                            "error": f"Could not retrieve data from {url}",
+                            "status_code": response.status_code,
+                        }
+                    else:
+                        return ""
+
+                response.raise_for_status()
+
+                # Extract data based on format
+                if expected_format == "text":
+                    return response.text
+                else:
+                    return response.json()
+
+        except Exception as e:
+            print(f"Request failed for {url}: {e}")
+            return "" if expected_format == "text" else {}
 
     async def get_fasta_sequence(self, uniprot_code: str) -> str:
         """Fetch FASTA sequence from UniProt.
@@ -19,7 +57,7 @@ class UniProtClient:
             A string containing the protein sequence in FASTA format.
         """
         url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.fasta"
-        data = await make_fasta_request(url)
+        data = await self._make_request(url, expected_format="text")
         return data or ""
 
     async def get_details(self, uniprot_code: str) -> dict[str, Any]:
@@ -33,16 +71,11 @@ class UniProtClient:
         """
         url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.json"
 
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
+        entry = await self._make_request(url, expected_format="json")
 
-        if response.status_code != 200:
-            return {
-                "error": f"Could not retrieve data for UniProt code '{uniprot_code}'.",
-                "status_code": response.status_code,
-            }
-
-        entry = response.json()
+        # Handle error responses
+        if isinstance(entry, dict) and "error" in entry:
+            return entry
 
         # Extract useful details
         result = {
@@ -106,12 +139,11 @@ class UniProtClient:
             list[str]: Up to 10 unique PDB IDs linked to the protein.
         """
         url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_id}.json"
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, timeout=10)
-                response.raise_for_status()
-                data = response.json()
-        except Exception:
+
+        data = await self._make_request(url, expected_format="json")
+
+        # Handle error responses or empty data
+        if not isinstance(data, dict) or "error" in data:
             return []
 
         pdb_ids = [

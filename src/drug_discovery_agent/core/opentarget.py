@@ -11,6 +11,25 @@ class OpenTargetsClient:
     def __init__(self) -> None:
         self.limit = 10
 
+    async def _make_graphql_request(
+        self, query: str, variables: dict
+    ) -> dict[str, Any] | None:
+        """Make a GraphQL request."""
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    self.BASE_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                data: dict[str, Any] = response.json()
+                return data
+
+            except Exception as e:
+                print(f"Request failed: {e}")
+                return None
+
     # Disease
     async def fetch_disease_details(self, ontology_id: str) -> dict[str, Any] | None:
         """Fetch Disease metadata from OpenTargets GraphQL API."""
@@ -26,19 +45,10 @@ class OpenTargetsClient:
         """
         variables = {"efoId": ontology_id, "size": self.limit}
 
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.post(
-                    self.BASE_URL,
-                    json={"query": query, "variables": variables},
-                    timeout=15.0,
-                )
-                response.raise_for_status()
-                raw: dict[str, Any] = response.json()
-                return cast(dict[str, Any], raw["data"])
-            except Exception as e:
-                print(f"Request failed: {e}")
-                return None
+        raw = await self._make_graphql_request(query, variables)
+        if raw and "data" in raw:
+            return cast(dict[str, Any], raw["data"])
+        return None
 
     async def fetch_disease_to_target_association(
         self, ontology_id: str
@@ -65,19 +75,10 @@ class OpenTargetsClient:
         """
         variables = {"efoId": ontology_id, "size": self.limit}
 
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.post(
-                    self.BASE_URL,
-                    json={"query": query, "variables": variables},
-                    timeout=15.0,
-                )
-                response.raise_for_status()
-                raw: dict[str, Any] = response.json()
-                return cast(dict[str, Any], raw["data"])
-            except Exception as e:
-                print(f"Request failed: {e}")
-                return None
+        raw = await self._make_graphql_request(query, variables)
+        if raw and "data" in raw:
+            return cast(dict[str, Any], raw["data"])
+        return None
 
     async def fetch_disease_associated_target_details(
         self, ontology_id: str
@@ -154,18 +155,9 @@ class OpenTargetsClient:
         """
         variables = {"ensemblId": target_id}
 
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.post(
-                    self.BASE_URL,
-                    json={"query": query, "variables": variables},
-                    timeout=15.0,
-                )
-                response.raise_for_status()
-                raw: dict[str, Any] = response.json()
-            except Exception as e:
-                print(f"Request failed: {e}")
-                return None
+        raw = await self._make_graphql_request(query, variables)
+        if not raw:
+            return None
 
         if "errors" in raw:
             print(f"GraphQL error: {raw['errors']}")
@@ -194,18 +186,9 @@ class OpenTargetsClient:
         """
         variables = {"chemblId": drug_id}
 
-        async with httpx.AsyncClient() as client:
-            try:
-                response = await client.post(
-                    self.BASE_URL,
-                    json={"query": query, "variables": variables},
-                    timeout=15.0,
-                )
-                response.raise_for_status()
-                raw: dict[str, Any] = response.json()
-            except Exception as e:
-                print(f"Request failed for drug {drug_id}: {e}")
-                return None
+        raw = await self._make_graphql_request(query, variables)
+        if not raw:
+            return None
 
         if "errors" in raw:
             print(f"GraphQL error for drug {drug_id}: {raw['errors']}")
@@ -223,12 +206,13 @@ class OpenTargetsClient:
         """Return a merged object: disease metadata + all associated targets details"""
         data: dict[str, Any] | None = await self.fetch_disease_details(ontology_id)
 
-        if data is None:
+        if data is None or data.get("disease") is None:
             return {}
+        disease_data = data["disease"]
         disease_meta = {
-            "id": data["disease"]["id"],
-            "name": data["disease"]["name"],
-            "description": data["disease"]["description"],
+            "id": disease_data["id"],
+            "name": disease_data["name"],
+            "description": disease_data["description"],
         }
 
         # target details

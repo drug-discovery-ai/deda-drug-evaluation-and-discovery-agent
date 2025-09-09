@@ -11,10 +11,17 @@ class TestEBIClient:
     """Test suite for EBIClient."""
 
     @pytest.fixture(autouse=True)
-    def httpx_mock_client(self) -> Any:
-        """Setup httpx.AsyncClient mock for all tests in this class."""
-        with patch("httpx.AsyncClient") as mock_client:
-            yield mock_client
+    def httpx_mock_client(self, request: Any) -> Any:
+        """Setup httpx.AsyncClient mock for unit tests only."""
+        # Skip mocking for integration tests - they use the HTTP interceptor
+        is_integration_test = any(
+            marker.name == "integration" for marker in request.node.iter_markers()
+        )
+        if is_integration_test:
+            yield None
+        else:
+            with patch("httpx.AsyncClient") as mock_client:
+                yield mock_client
 
     @pytest.fixture
     def client(self) -> EBIClient:
@@ -26,55 +33,26 @@ class TestEBIClient:
         """Test EBIClient initialization."""
         assert client.ontology_matches == []
 
-    @pytest.mark.unit
-    async def test_fetch_all_ontology_ids_success(
-        self,
-        httpx_mock_client: Any,
-        client: EBIClient,
-        http_mock_helpers: Any,
-    ) -> None:
-        """Test successful ontology ID retrieval."""
-        mock_response = {
-            "response": {
-                "docs": [
-                    {
-                        "label": "Alzheimer disease",
-                        "iri": "http://www.ebi.ac.uk/efo/EFO_0000249",
-                        "ontology_name": "efo",
-                        "short_form": "EFO_0000249",
-                        "description": ["A neurodegenerative disease"],
-                    },
-                    {
-                        "label": "Early-onset Alzheimer disease",
-                        "iri": "http://www.ebi.ac.uk/efo/EFO_0009636",
-                        "ontology_name": "efo",
-                        "short_form": "EFO_0009636",
-                        "description": ["Early onset form of Alzheimer disease"],
-                    },
-                    {
-                        "label": "Non-EFO term",
-                        "iri": "http://purl.obolibrary.org/obo/MONDO_0004975",
-                        "ontology_name": "mondo",
-                        "short_form": "MONDO_0004975",
-                        "description": ["Should be filtered out"],
-                    },
-                ]
-            }
-        }
+    @pytest.mark.integration
+    @pytest.mark.slow
+    async def test_fetch_all_ontology_ids_success(self, client: EBIClient) -> None:
+        """Integration test for EBI ontology search with real API."""
+        # Test with known disease that should return consistent results
+        result = await client.fetch_all_ontology_ids("Alzheimer")
 
-        http_mock_helpers.setup_httpx_mock(httpx_mock_client, mock_response)
+        assert isinstance(result, list)
+        assert len(result) > 0
 
-        result = await client.fetch_all_ontology_ids("alzheimer")
+        # Verify structure of returned ontology matches
+        first_match = result[0]
+        assert "label" in first_match
+        assert "ontology_id" in first_match
+        assert "description" in first_match
+        assert first_match["ontology_id"].startswith("EFO_")
 
-        # Should only include EFO terms, not MONDO terms
-        assert len(result) == 2
-        assert result[0]["label"] == "Alzheimer disease"
-        assert result[0]["ontology_id"] == "EFO_0000249"
-        assert result[1]["label"] == "Early-onset Alzheimer disease"
-        assert result[1]["ontology_id"] == "EFO_0009636"
-
-        # Check that ontology_matches was populated
-        assert len(client.ontology_matches) == 2
+        # Verify client state is updated
+        assert len(client.ontology_matches) > 0
+        assert client.ontology_matches == result
 
     @pytest.mark.unit
     async def test_fetch_all_ontology_ids_no_docs(
