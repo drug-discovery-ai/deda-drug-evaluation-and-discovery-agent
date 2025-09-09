@@ -21,7 +21,7 @@ class ElectronApp {
             minHeight: 600,
             icon: this.getAppIcon(),
             show: true, // Show window immediately
-            titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+            titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
             webPreferences: {
                 nodeIntegration: false, // Security: disable node integration
                 contextIsolation: true, // Security: enable context isolation
@@ -72,11 +72,11 @@ class ElectronApp {
     getAppIcon() {
         // Return platform-specific icon path
         if (process.platform === 'win32') {
-            return path.join(__dirname, 'build', 'icon.ico');
+            return path.join(__dirname, '..', 'assets', 'icon.ico');
         } else if (process.platform === 'darwin') {
-            return path.join(__dirname, 'build', 'icon.icns');
+            return path.join(__dirname, '..', 'assets', 'icon.icns');
         } else {
-            return path.join(__dirname, 'build', 'icon.png');
+            return path.join(__dirname, '..', 'assets', 'icon.png');
         }
     }
 

@@ -113,7 +113,7 @@
           "arch": ["x64", "ia32"]
         }
       ],
-      "icon": "build/icon.ico"
+      "icon": "../assets/icon.ico"
     },
     "linux": {
       "target": [
@@ -123,7 +123,7 @@
         }
       ],
       "category": "Science",
-      "icon": "build/icon.png"
+      "icon": "../assets/icon.png"
     },
     "nsis": {
       "oneClick": false,

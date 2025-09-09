@@ -1,5 +1,9 @@
 # Bio-informatics AI agent for Drug discovery Research
 
+<p align="center">
+  <img src="assets/logo.png" alt="Drug Discovery AI Agent Logo" width="200"/>
+</p>
+
 Follow our wiki pages for more insight: https://github.com/drug-discovery-ai/train-a-model/wiki
 
 ## Overview
