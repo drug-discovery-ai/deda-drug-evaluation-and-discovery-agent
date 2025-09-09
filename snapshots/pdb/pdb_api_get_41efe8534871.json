@@ -1,0 +1,1170 @@
+{
+  "metadata": {
+    "created_at": "2025-09-09T08:31:58.284365",
+    "updated_at": "2025-09-09T08:31:58.284376",
+    "key": "pdb_api_get_41efe8534871",
+    "url": "https://data.rcsb.org/rest/v1/core/entry/6VSB",
+    "method": "GET",
+    "status_code": 200,
+    "content_type": "application/json;charset=utf-8",
+    "request_params": null,
+    "checksum": "20fa66a00d18b2c1aa06c35172b323198e35ecd18ac1d36adb97d7b23debb9e8"
+  },
+  "response": {
+    "audit_author": [
+      {
+        "name": "Wrapp, D.",
+        "pdbx_ordinal": 1
+      },
+      {
+        "name": "Wang, N.",
+        "pdbx_ordinal": 2
+      },
+      {
+        "name": "Corbett, K.S.",
+        "pdbx_ordinal": 3
+      },
+      {
+        "name": "Goldsmith, J.A.",
+        "pdbx_ordinal": 4
+      },
+      {
+        "name": "Hsieh, C.",
+        "pdbx_ordinal": 5
+      },
+      {
+        "name": "Abiona, O.",
+        "pdbx_ordinal": 6
+      },
+      {
+        "name": "Graham, B.S.",
+        "pdbx_ordinal": 7
+      },
+      {
+        "name": "McLellan, J.S.",
+        "pdbx_ordinal": 8
+      }
+    ],
+    "citation": [
+      {
+        "country": "US",
+        "id": "primary",
+        "journal_abbrev": "Science",
+        "journal_id_astm": "SCIEAS",
+        "journal_id_csd": "0038",
+        "journal_id_issn": "1095-9203",
+        "journal_volume": "367",
+        "page_first": "1260",
+        "page_last": "1263",
+        "pdbx_database_id_doi": "10.1126/science.abb2507",
+        "pdbx_database_id_pub_med": 32075877,
+        "rcsb_authors": [
+          "Wrapp, D.",
+          "Wang, N.",
+          "Corbett, K.S.",
+          "Goldsmith, J.A.",
+          "Hsieh, C.L.",
+          "Abiona, O.",
+          "Graham, B.S.",
+          "McLellan, J.S."
+        ],
+        "rcsb_is_primary": "Y",
+        "rcsb_journal_abbrev": "Science",
+        "title": "Cryo-EM structure of the 2019-nCoV spike in the prefusion conformation.",
+        "year": 2020
+      }
+    ],
+    "database2": [
+      {
+        "database_code": "6VSB",
+        "database_id": "PDB",
+        "pdbx_doi": "10.2210/pdb6vsb/pdb",
+        "pdbx_database_accession": "pdb_00006vsb"
+      },
+      {
+        "database_code": "D_1000246985",
+        "database_id": "WWPDB"
+      },
+      {
+        "database_code": "EMD-21375",
+        "database_id": "EMDB"
+      }
+    ],
+    "em3d_fitting": [
+      {
+        "id": "1"
+      }
+    ],
+    "em3d_reconstruction": [
+      {
+        "id": "1",
+        "image_processing_id": "1",
+        "num_particles": 120001,
+        "resolution": 3.46,
+        "resolution_method": "FSC 0.143 CUT-OFF",
+        "symmetry_type": "POINT"
+      }
+    ],
+    "em_ctf_correction": [
+      {
+        "em_image_processing_id": "1",
+        "id": "1",
+        "type": "PHASE FLIPPING AND AMPLITUDE CORRECTION"
+      }
+    ],
+    "em_entity_assembly": [
+      {
+        "entity_id_list": [
+          "1"
+        ],
+        "id": "1",
+        "name": "SARS-CoV-2 spike glycoprotein",
+        "parent_id": 0,
+        "source": "RECOMBINANT",
+        "type": "COMPLEX"
+      }
+    ],
+    "em_experiment": {
+      "aggregation_state": "PARTICLE",
+      "entity_assembly_id": "1",
+      "id": "1",
+      "reconstruction_method": "SINGLE PARTICLE"
+    },
+    "em_image_recording": [
+      {
+        "avg_electron_dose_per_image": 37.8,
+        "film_or_detector_model": "GATAN K3 (6k x 4k)",
+        "id": "1",
+        "imaging_id": "1"
+      }
+    ],
+    "em_imaging": [
+      {
+        "accelerating_voltage": 300,
+        "electron_source": "FIELD EMISSION GUN",
+        "id": "1",
+        "illumination_mode": "FLOOD BEAM",
+        "microscope_model": "FEI TITAN KRIOS",
+        "mode": "BRIGHT FIELD",
+        "specimen_id": "1"
+      }
+    ],
+    "em_single_particle_entity": [
+      {
+        "id": 1,
+        "image_processing_id": "1",
+        "point_symmetry": "C1"
+      }
+    ],
+    "em_software": [
+      {
+        "category": "CRYSTALLOGRAPHY MERGING",
+        "fitting_id": "1",
+        "id": "1",
+        "image_processing_id": "1",
+        "imaging_id": "1"
+      },
+      {
+        "category": "IMAGE ACQUISITION",
+        "id": "2",
+        "imaging_id": "1",
+        "name": "Leginon"
+      },
+      {
+        "category": "MASKING",
+        "id": "3"
+      },
+      {
+        "category": "CTF CORRECTION",
+        "id": "4",
+        "image_processing_id": "1",
+        "name": "Warp"
+      },
+      {
+        "category": "LAYERLINE INDEXING",
+        "id": "5"
+      },
+      {
+        "category": "DIFFRACTION INDEXING",
+        "id": "6"
+      },
+      {
+        "category": "MODEL FITTING",
+        "id": "7"
+      },
+      {
+        "category": "MODEL REFINEMENT",
+        "id": "8"
+      },
+      {
+        "category": "OTHER",
+        "id": "9"
+      },
+      {
+        "category": "INITIAL EULER ASSIGNMENT",
+        "id": "10",
+        "image_processing_id": "1",
+        "name": "cryoSPARC"
+      },
+      {
+        "category": "FINAL EULER ASSIGNMENT",
+        "id": "11",
+        "image_processing_id": "1",
+        "name": "cryoSPARC"
+      },
+      {
+        "category": "CLASSIFICATION",
+        "id": "12",
+        "image_processing_id": "1"
+      },
+      {
+        "category": "RECONSTRUCTION",
+        "id": "13",
+        "image_processing_id": "1",
+        "name": "cryoSPARC"
+      }
+    ],
+    "em_specimen": [
+      {
+        "concentration": 0.35,
+        "embedding_applied": "NO",
+        "experiment_id": "1",
+        "id": "1",
+        "shadowing_applied": "NO",
+        "staining_applied": "NO",
+        "vitrification_applied": "YES"
+      }
+    ],
+    "em_vitrification": [
+      {
+        "chamber_temperature": 277.15,
+        "cryogen_name": "ETHANE",
+        "humidity": 100.0,
+        "id": "1",
+        "instrument": "FEI VITROBOT MARK IV",
+        "specimen_id": "1"
+      }
+    ],
+    "entry": {
+      "id": "6VSB"
+    },
+    "exptl": [
+      {
+        "method": "ELECTRON MICROSCOPY"
+      }
+    ],
+    "pdbx_audit_revision_category": [
+      {
+        "category": "citation",
+        "data_content_type": "Structure model",
+        "ordinal": 1,
+        "revision_ordinal": 2
+      },
+      {
+        "category": "citation_author",
+        "data_content_type": "Structure model",
+        "ordinal": 2,
+        "revision_ordinal": 2
+      },
+      {
+        "category": "citation",
+        "data_content_type": "Structure model",
+        "ordinal": 3,
+        "revision_ordinal": 3
+      },
+      {
+        "category": "em_entity_assembly",
+        "data_content_type": "Structure model",
+        "ordinal": 4,
+        "revision_ordinal": 4
+      },
+      {
+        "category": "em_entity_assembly_naturalsource",
+        "data_content_type": "Structure model",
+        "ordinal": 5,
+        "revision_ordinal": 4
+      },
+      {
+        "category": "entity",
+        "data_content_type": "Structure model",
+        "ordinal": 6,
+        "revision_ordinal": 4
+      },
+      {
+        "category": "entity_src_gen",
+        "data_content_type": "Structure model",
+        "ordinal": 7,
+        "revision_ordinal": 4
+      },
+      {
+        "category": "entity_name_com",
+        "data_content_type": "Structure model",
+        "ordinal": 8,
+        "revision_ordinal": 5
+      },
+      {
+        "category": "entity_src_gen",
+        "data_content_type": "Structure model",
+        "ordinal": 9,
+        "revision_ordinal": 5
+      },
+      {
+        "category": "struct_ref",
+        "data_content_type": "Structure model",
+        "ordinal": 10,
+        "revision_ordinal": 5
+      },
+      {
+        "category": "struct_ref_seq",
+        "data_content_type": "Structure model",
+        "ordinal": 11,
+        "revision_ordinal": 5
+      },
+      {
+        "category": "struct_ref_seq_dif",
+        "data_content_type": "Structure model",
+        "ordinal": 12,
+        "revision_ordinal": 5
+      },
+      {
+        "category": "atom_site",
+        "data_content_type": "Structure model",
+        "ordinal": 13,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "chem_comp",
+        "data_content_type": "Structure model",
+        "ordinal": 14,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "entity",
+        "data_content_type": "Structure model",
+        "ordinal": 15,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_branch_scheme",
+        "data_content_type": "Structure model",
+        "ordinal": 16,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_chem_comp_identifier",
+        "data_content_type": "Structure model",
+        "ordinal": 17,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_entity_branch",
+        "data_content_type": "Structure model",
+        "ordinal": 18,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_entity_branch_descriptor",
+        "data_content_type": "Structure model",
+        "ordinal": 19,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_entity_branch_link",
+        "data_content_type": "Structure model",
+        "ordinal": 20,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_entity_branch_list",
+        "data_content_type": "Structure model",
+        "ordinal": 21,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_entity_nonpoly",
+        "data_content_type": "Structure model",
+        "ordinal": 22,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_nonpoly_scheme",
+        "data_content_type": "Structure model",
+        "ordinal": 23,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_struct_assembly_gen",
+        "data_content_type": "Structure model",
+        "ordinal": 24,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "pdbx_validate_close_contact",
+        "data_content_type": "Structure model",
+        "ordinal": 25,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "struct_asym",
+        "data_content_type": "Structure model",
+        "ordinal": 26,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "struct_conn",
+        "data_content_type": "Structure model",
+        "ordinal": 27,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "struct_site",
+        "data_content_type": "Structure model",
+        "ordinal": 28,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "struct_site_gen",
+        "data_content_type": "Structure model",
+        "ordinal": 29,
+        "revision_ordinal": 6
+      },
+      {
+        "category": "entity",
+        "data_content_type": "Structure model",
+        "ordinal": 30,
+        "revision_ordinal": 7
+      },
+      {
+        "category": "entity_name_com",
+        "data_content_type": "Structure model",
+        "ordinal": 31,
+        "revision_ordinal": 7
+      },
+      {
+        "category": "chem_comp_atom",
+        "data_content_type": "Structure model",
+        "ordinal": 32,
+        "revision_ordinal": 8
+      },
+      {
+        "category": "chem_comp_bond",
+        "data_content_type": "Structure model",
+        "ordinal": 33,
+        "revision_ordinal": 8
+      },
+      {
+        "category": "database_2",
+        "data_content_type": "Structure model",
+        "ordinal": 34,
+        "revision_ordinal": 8
+      },
+      {
+        "category": "em_admin",
+        "data_content_type": "Structure model",
+        "ordinal": 35,
+        "revision_ordinal": 8
+      },
+      {
+        "category": "pdbx_entry_details",
+        "data_content_type": "Structure model",
+        "ordinal": 36,
+        "revision_ordinal": 8
+      },
+      {
+        "category": "pdbx_modification_feature",
+        "data_content_type": "Structure model",
+        "ordinal": 37,
+        "revision_ordinal": 8
+      }
+    ],
+    "pdbx_audit_revision_details": [
+      {
+        "data_content_type": "Structure model",
+        "ordinal": 1,
+        "provider": "repository",
+        "revision_ordinal": 1,
+        "type": "Initial release"
+      },
+      {
+        "data_content_type": "Structure model",
+        "description": "Carbohydrate remediation",
+        "ordinal": 2,
+        "provider": "repository",
+        "revision_ordinal": 6,
+        "type": "Remediation"
+      }
+    ],
+    "pdbx_audit_revision_group": [
+      {
+        "data_content_type": "Structure model",
+        "group": "Database references",
+        "ordinal": 1,
+        "revision_ordinal": 2
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Database references",
+        "ordinal": 2,
+        "revision_ordinal": 3
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Source and taxonomy",
+        "ordinal": 3,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Structure summary",
+        "ordinal": 4,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Database references",
+        "ordinal": 5,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Source and taxonomy",
+        "ordinal": 6,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Structure summary",
+        "ordinal": 7,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Advisory",
+        "ordinal": 8,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Atomic model",
+        "ordinal": 9,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Data collection",
+        "ordinal": 10,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Derived calculations",
+        "ordinal": 11,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Structure summary",
+        "ordinal": 12,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Structure summary",
+        "ordinal": 13,
+        "revision_ordinal": 7
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Data collection",
+        "ordinal": 14,
+        "revision_ordinal": 8
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Database references",
+        "ordinal": 15,
+        "revision_ordinal": 8
+      },
+      {
+        "data_content_type": "Structure model",
+        "group": "Structure summary",
+        "ordinal": 16,
+        "revision_ordinal": 8
+      }
+    ],
+    "pdbx_audit_revision_history": [
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 1,
+        "minor_revision": 0,
+        "ordinal": 1,
+        "revision_date": "2020-02-26T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 1,
+        "minor_revision": 1,
+        "ordinal": 2,
+        "revision_date": "2020-03-04T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 1,
+        "minor_revision": 2,
+        "ordinal": 3,
+        "revision_date": "2020-03-25T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 1,
+        "minor_revision": 3,
+        "ordinal": 4,
+        "revision_date": "2020-04-01T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 1,
+        "minor_revision": 4,
+        "ordinal": 5,
+        "revision_date": "2020-05-06T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 2,
+        "minor_revision": 0,
+        "ordinal": 6,
+        "revision_date": "2020-07-29T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 2,
+        "minor_revision": 1,
+        "ordinal": 7,
+        "revision_date": "2021-01-27T00:00:00+0000"
+      },
+      {
+        "data_content_type": "Structure model",
+        "major_revision": 2,
+        "minor_revision": 2,
+        "ordinal": 8,
+        "revision_date": "2024-10-23T00:00:00+0000"
+      }
+    ],
+    "pdbx_audit_revision_item": [
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation.pdbx_database_id_PubMed",
+        "ordinal": 1,
+        "revision_ordinal": 2
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation.title",
+        "ordinal": 2,
+        "revision_ordinal": 2
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation_author.name",
+        "ordinal": 3,
+        "revision_ordinal": 2
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation.journal_volume",
+        "ordinal": 4,
+        "revision_ordinal": 3
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation.page_first",
+        "ordinal": 5,
+        "revision_ordinal": 3
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_citation.page_last",
+        "ordinal": 6,
+        "revision_ordinal": 3
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_em_entity_assembly.name",
+        "ordinal": 7,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_em_entity_assembly_naturalsource.organism",
+        "ordinal": 8,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity.pdbx_description",
+        "ordinal": 9,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity_src_gen.gene_src_common_name",
+        "ordinal": 10,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity_src_gen.pdbx_gene_src_scientific_name",
+        "ordinal": 11,
+        "revision_ordinal": 4
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity_src_gen.gene_src_common_name",
+        "ordinal": 12,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity_src_gen.pdbx_gene_src_gene",
+        "ordinal": 13,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref.db_code",
+        "ordinal": 14,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref.db_name",
+        "ordinal": 15,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref.pdbx_db_accession",
+        "ordinal": 16,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref.pdbx_seq_one_letter_code",
+        "ordinal": 17,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref_seq.db_align_end",
+        "ordinal": 18,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref_seq.pdbx_auth_seq_align_end",
+        "ordinal": 19,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref_seq.pdbx_db_accession",
+        "ordinal": 20,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_ref_seq.seq_align_end",
+        "ordinal": 21,
+        "revision_ordinal": 5
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.B_iso_or_equiv",
+        "ordinal": 22,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.Cartn_x",
+        "ordinal": 23,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.Cartn_y",
+        "ordinal": 24,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.Cartn_z",
+        "ordinal": 25,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.auth_asym_id",
+        "ordinal": 26,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.auth_seq_id",
+        "ordinal": 27,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.label_asym_id",
+        "ordinal": 28,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_atom_site.label_entity_id",
+        "ordinal": 29,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_chem_comp.name",
+        "ordinal": 30,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_entity_nonpoly.entity_id",
+        "ordinal": 31,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_entity_nonpoly.name",
+        "ordinal": 32,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_struct_assembly_gen.asym_id_list",
+        "ordinal": 33,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_validate_close_contact.auth_asym_id_1",
+        "ordinal": 34,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_validate_close_contact.auth_asym_id_2",
+        "ordinal": 35,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_validate_close_contact.auth_seq_id_1",
+        "ordinal": 36,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_validate_close_contact.auth_seq_id_2",
+        "ordinal": 37,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.pdbx_role",
+        "ordinal": 38,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr1_auth_asym_id",
+        "ordinal": 39,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr1_auth_seq_id",
+        "ordinal": 40,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr1_label_asym_id",
+        "ordinal": 41,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr2_auth_asym_id",
+        "ordinal": 42,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr2_auth_seq_id",
+        "ordinal": 43,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_struct_conn.ptnr2_label_asym_id",
+        "ordinal": 44,
+        "revision_ordinal": 6
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity.pdbx_description",
+        "ordinal": 45,
+        "revision_ordinal": 7
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_entity_name_com.name",
+        "ordinal": 46,
+        "revision_ordinal": 7
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_database_2.pdbx_DOI",
+        "ordinal": 47,
+        "revision_ordinal": 8
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_database_2.pdbx_database_accession",
+        "ordinal": 48,
+        "revision_ordinal": 8
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_em_admin.last_update",
+        "ordinal": 49,
+        "revision_ordinal": 8
+      },
+      {
+        "data_content_type": "Structure model",
+        "item": "_pdbx_entry_details.has_protein_modification",
+        "ordinal": 50,
+        "revision_ordinal": 8
+      }
+    ],
+    "pdbx_audit_support": [
+      {
+        "country": "United States",
+        "funding_organization": "National Institutes of Health/National Institute Of Allergy and Infectious Diseases (NIH/NIAID)",
+        "grant_number": "R01-AI127521",
+        "ordinal": 1
+      }
+    ],
+    "pdbx_database_related": [
+      {
+        "content_type": "associated EM volume",
+        "db_id": "EMD-21375",
+        "db_name": "EMDB",
+        "details": "Prefusion 2019-nCoV spike glycoprotein with a single receptor-binding domain up"
+      },
+      {
+        "content_type": "other EM volume",
+        "db_id": "EMD-21374",
+        "db_name": "EMDB"
+      }
+    ],
+    "pdbx_database_status": {
+      "deposit_site": "RCSB",
+      "pdb_format_compatible": "Y",
+      "process_site": "RCSB",
+      "recvd_initial_deposition_date": "2020-02-10T00:00:00+0000",
+      "status_code": "REL",
+      "sgentry": "N"
+    },
+    "pdbx_vrpt_summary": {
+      "attempted_validation_steps": "visualanalysis,molprobity,validation-pack,mogul,buster-report,percentiles,writexml,writecif,writepdf",
+      "ligands_for_buster_report": "N",
+      "report_creation_date": "2024-10-14T03:56:00+0000"
+    },
+    "pdbx_vrpt_summary_em": [
+      {
+        "atom_inclusion_all_atoms": 0.794,
+        "atom_inclusion_backbone": 0.909,
+        "author_provided_fsc_resolution_by_cutoff_halfbit": 3.51,
+        "author_provided_fsc_resolution_by_cutoff_onebit": 3.69,
+        "author_provided_fsc_resolution_by_cutoff_pt143": 3.46,
+        "author_provided_fsc_resolution_by_cutoff_pt333": 3.69,
+        "author_provided_fsc_resolution_by_cutoff_pt5": 3.87,
+        "author_provided_fsc_resolution_by_cutoff_threesigma": 3.09,
+        "calculated_fsc_resolution_by_cutoff_halfbit": 7.07,
+        "calculated_fsc_resolution_by_cutoff_onebit": 8.16,
+        "calculated_fsc_resolution_by_cutoff_pt143": 6.44,
+        "calculated_fsc_resolution_by_cutoff_pt333": 8.12,
+        "calculated_fsc_resolution_by_cutoff_pt5": 8.97,
+        "calculated_fsc_resolution_by_cutoff_threesigma": 3.75,
+        "contour_level_primary_map": 0.19,
+        "exp_method": "electron microscopy",
+        "qscore": 0.433
+      }
+    ],
+    "pdbx_vrpt_summary_geometry": [
+      {
+        "angles_rmsz": 0.55,
+        "bonds_rmsz": 0.31,
+        "clashscore": 13.53,
+        "num_hreduce": 21713,
+        "num_angles_rmsz": 30630,
+        "num_bonds_rmsz": 22468,
+        "percent_ramachandran_outliers": 0.18,
+        "percent_rotamer_outliers": 0.47
+      }
+    ],
+    "rcsb_accession_info": {
+      "deposit_date": "2020-02-10T00:00:00+0000",
+      "has_released_experimental_data": "Y",
+      "initial_release_date": "2020-02-26T00:00:00+0000",
+      "major_revision": 2,
+      "minor_revision": 2,
+      "revision_date": "2024-10-23T00:00:00+0000",
+      "status_code": "REL"
+    },
+    "rcsb_entry_container_identifiers": {
+      "assembly_ids": [
+        "1"
+      ],
+      "branched_entity_ids": [
+        "2"
+      ],
+      "emdb_ids": [
+        "EMD-21375"
+      ],
+      "entity_ids": [
+        "1",
+        "2",
+        "3"
+      ],
+      "entry_id": "6VSB",
+      "model_ids": [
+        1
+      ],
+      "non_polymer_entity_ids": [
+        "3"
+      ],
+      "polymer_entity_ids": [
+        "1"
+      ],
+      "pubmed_id": 32075877,
+      "rcsb_id": "6VSB",
+      "related_emdb_ids": [
+        "EMD-21374"
+      ]
+    },
+    "rcsb_entry_info": {
+      "assembly_count": 1,
+      "branched_entity_count": 1,
+      "branched_molecular_weight_maximum": 0.42,
+      "branched_molecular_weight_minimum": 0.42,
+      "cis_peptide_count": 0,
+      "deposited_atom_count": 22854,
+      "deposited_deuterated_water_count": 0,
+      "deposited_hydrogen_atom_count": 0,
+      "deposited_model_count": 1,
+      "deposited_modeled_polymer_monomer_count": 2905,
+      "deposited_nonpolymer_entity_instance_count": 27,
+      "deposited_polymer_entity_instance_count": 3,
+      "deposited_polymer_monomer_count": 3864,
+      "deposited_solvent_atom_count": 0,
+      "deposited_unmodeled_polymer_monomer_count": 959,
+      "disulfide_bond_count": 35,
+      "entity_count": 3,
+      "experimental_method": "EM",
+      "experimental_method_count": 1,
+      "inter_mol_covalent_bond_count": 61,
+      "inter_mol_metalic_bond_count": 0,
+      "molecular_weight": 440.39,
+      "na_polymer_entity_types": "Other",
+      "nonpolymer_bound_components": [
+        "NAG"
+      ],
+      "nonpolymer_entity_count": 1,
+      "nonpolymer_molecular_weight_maximum": 0.22,
+      "nonpolymer_molecular_weight_minimum": 0.22,
+      "polymer_composition": "protein/oligosaccharide",
+      "polymer_entity_count": 1,
+      "polymer_entity_count_dna": 0,
+      "polymer_entity_count_rna": 0,
+      "polymer_entity_count_nucleic_acid": 0,
+      "polymer_entity_count_nucleic_acid_hybrid": 0,
+      "polymer_entity_count_protein": 1,
+      "polymer_entity_taxonomy_count": 1,
+      "polymer_molecular_weight_maximum": 142.4,
+      "polymer_molecular_weight_minimum": 142.4,
+      "polymer_monomer_count_maximum": 1288,
+      "polymer_monomer_count_minimum": 1288,
+      "resolution_combined": [
+        3.46
+      ],
+      "selected_polymer_entity_types": "Protein/Oligosaccharide",
+      "software_programs_combined": [
+        "CRYOSPARC",
+        "LEGINON",
+        "WARP"
+      ],
+      "solvent_entity_count": 0,
+      "structure_determination_methodology": "experimental",
+      "structure_determination_methodology_priority": 10
+    },
+    "rcsb_primary_citation": {
+      "country": "US",
+      "id": "primary",
+      "journal_abbrev": "Science",
+      "journal_id_astm": "SCIEAS",
+      "journal_id_csd": "0038",
+      "journal_id_issn": "1095-9203",
+      "journal_volume": "367",
+      "page_first": "1260",
+      "page_last": "1263",
+      "pdbx_database_id_doi": "10.1126/science.abb2507",
+      "pdbx_database_id_pub_med": 32075877,
+      "rcsb_orcididentifiers": [
+        "?",
+        "?",
+        "?",
+        "?",
+        "?",
+        "?",
+        "?",
+        "?"
+      ],
+      "rcsb_authors": [
+        "Wrapp, D.",
+        "Wang, N.",
+        "Corbett, K.S.",
+        "Goldsmith, J.A.",
+        "Hsieh, C.L.",
+        "Abiona, O.",
+        "Graham, B.S.",
+        "McLellan, J.S."
+      ],
+      "rcsb_journal_abbrev": "Science",
+      "title": "Cryo-EM structure of the 2019-nCoV spike in the prefusion conformation.",
+      "year": 2020
+    },
+    "struct": {
+      "pdbx_caspflag": "N",
+      "title": "Prefusion 2019-nCoV spike glycoprotein with a single receptor-binding domain up"
+    },
+    "struct_keywords": {
+      "pdbx_keywords": "VIRAL PROTEIN",
+      "text": "Spike, Fusion glycoprotein, Coronavirus, VIRAL PROTEIN"
+    },
+    "rcsb_id": "6VSB",
+    "rcsb_external_references": [
+      {
+        "id": "EMD-21375",
+        "type": "EM DATA RESOURCE",
+        "link": "https://www.emdataresource.org/EMD-21375"
+      }
+    ]
+  }
+}

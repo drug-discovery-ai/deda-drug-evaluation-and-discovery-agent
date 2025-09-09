@@ -1,0 +1,156 @@
+{
+  "version": "1.0",
+  "created_at": "2025-01-08T00:00:00Z",
+  "description": "API response snapshots for drug discovery agent tests",
+  "apis": {
+    "ebi": {
+      "name": "EBI Ontology Lookup Service",
+      "base_url": "https://www.ebi.ac.uk/ols/api",
+      "description": "Disease ontology data from EBI OLS"
+    },
+    "opentargets": {
+      "name": "OpenTargets Platform API",
+      "base_url": "https://api.platform.opentargets.org/api/v4",
+      "description": "Disease-target-drug associations"
+    },
+    "uniprot": {
+      "name": "UniProt REST API",
+      "base_url": "https://rest.uniprot.org",
+      "description": "Protein sequences and annotations"
+    },
+    "pdb": {
+      "name": "RCSB PDB Data API",
+      "base_url": "https://data.rcsb.org/rest/v1",
+      "description": "Protein structure information"
+    }
+  },
+  "snapshots": {
+    "ebi_api_search_alzheimer_efo_c2904af23e4dfef7": {
+      "file": "ebi/ebi_api_search_alzheimer_efo_c2904af23e4dfef7.json",
+      "created_at": "2025-09-08T13:39:46.196522",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "44835b39857c3c87d47095eb0f94561dae65241b5cb1786d48edda798cbab0b7"
+    },
+    "ebi_api_search_covid19_efo_3498a319ac253bdd": {
+      "file": "ebi/ebi_api_search_covid19_efo_3498a319ac253bdd.json",
+      "created_at": "2025-09-08T13:39:46.196861",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "5711493aa4f49ccaa40bf176992ef25e2b460033da0bc193abc23da584485049"
+    },
+    "ebi_api_search_cancer_efo_4388b04c60fbea10": {
+      "file": "ebi/ebi_api_search_cancer_efo_4388b04c60fbea10.json",
+      "created_at": "2025-09-08T13:39:46.197110",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "bec6cbb09e4aec541594c7134bf98d6e440c4cbb4ee814b18547e40e94ab0c12"
+    },
+    "ebi_api_search_COVID-19_efo_fd8c5f7a76aed047": {
+      "file": "ebi/ebi_api_search_COVID-19_efo_fd8c5f7a76aed047.json",
+      "created_at": "2025-09-08T13:49:42.688606",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "5711493aa4f49ccaa40bf176992ef25e2b460033da0bc193abc23da584485049"
+    },
+    "ebi_api_search_diabetesm_efo_64e9c1d6b62b2708": {
+      "file": "ebi/ebi_api_search_diabetesm_efo_64e9c1d6b62b2708.json",
+      "created_at": "2025-09-08T13:50:25.627056",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "b43e0d7bc1e140e5af463acbf92d1c5dab2d8cbc4a57f80eeb8bc6e39ff4643b"
+    },
+    "ebi_api_search_Parkinson_efo_4183c3c098f4eeff": {
+      "file": "ebi/ebi_api_search_Parkinson_efo_4183c3c098f4eeff.json",
+      "created_at": "2025-09-08T13:50:25.627629",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "139cd3cc8cef1276f5b34bb237e2741a5c84f013b5653bc19231c943da2295e1"
+    },
+    "ebi_api_search_test_disea_efo_a94dd378a2a06f78": {
+      "file": "ebi/ebi_api_search_test_disea_efo_a94dd378a2a06f78.json",
+      "created_at": "2025-09-08T13:53:33.619942",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "15257cb2ecbd02cdf22924e793a2739cdcd478701681801cadec05c89f88e0af"
+    },
+    "misc_api_get_c37a1d123b6a": {
+      "file": "misc/misc_api_get_c37a1d123b6a.json",
+      "created_at": "2025-09-09T08:32:02.848693",
+      "api_service": "misc",
+      "url": "https://httpbin.org/json",
+      "checksum": "459d635d6e29b90bb04558597efc819d34cd0f0bed936a49793029b119677914"
+    },
+    "misc_api_get_250ccde16e2b": {
+      "file": "misc/misc_api_get_250ccde16e2b.txt",
+      "created_at": "2025-09-09T08:32:04.689253",
+      "api_service": "misc",
+      "url": "https://httpbin.org/robots.txt",
+      "checksum": "9ebe4d8a0d97a3b4c331ac853b003e5696b1ee8f5d48a707f7512ef258055493"
+    },
+    "uniprot_api_get_29f7824e851a": {
+      "file": "uniprot/uniprot_api_get_29f7824e851a.txt",
+      "created_at": "2025-09-09T08:31:59.249683",
+      "api_service": "uniprot",
+      "url": "https://rest.uniprot.org/uniprotkb/P0DTC2.fasta",
+      "checksum": "a4652c71600e7b08cbd7f0f82cf5f4cc1d615214df7fb2cf12579e7c3a3a25d9"
+    },
+    "pdb_api_get_41efe8534871": {
+      "file": "pdb/pdb_api_get_41efe8534871.json",
+      "created_at": "2025-09-09T08:31:58.284365",
+      "api_service": "pdb",
+      "url": "https://data.rcsb.org/rest/v1/core/entry/6VSB",
+      "checksum": "20fa66a00d18b2c1aa06c35172b323198e35ecd18ac1d36adb97d7b23debb9e8"
+    },
+    "pdb_api_get_3076f01ba35c": {
+      "file": "pdb/pdb_api_get_3076f01ba35c.json",
+      "created_at": "2025-09-09T08:31:58.701122",
+      "api_service": "pdb",
+      "url": "https://data.rcsb.org/rest/v1/core/entry/INVALID",
+      "checksum": "ff8c5f25edc5f2801df3fb0852a32a8832195884d0354884ce0a1dba26b449be"
+    },
+    "uniprot_api_get_79ca7940593c": {
+      "file": "uniprot/uniprot_api_get_79ca7940593c.json",
+      "created_at": "2025-09-09T08:32:00.568721",
+      "api_service": "uniprot",
+      "url": "https://rest.uniprot.org/uniprotkb/P0DTC2.json",
+      "checksum": "18ae2b092c822823261742a03e462947d8e199e3b174ebaa0cccafe9afa2e61f"
+    },
+    "ebi_api_search_Alzheimer_efo_8af4364aaa25b8da": {
+      "file": "ebi/ebi_api_search_Alzheimer_efo_8af4364aaa25b8da.json",
+      "created_at": "2025-09-09T08:31:57.183147",
+      "api_service": "ebi",
+      "url": "https://www.ebi.ac.uk/ols/api/search",
+      "checksum": "2e3213f8c11905c0da090da0a75bc132e43624f43f64e7415ab21a9a459b7639"
+    },
+    "opentargets_api_post_5ec967fcc117": {
+      "file": "opentargets/opentargets_api_post_5ec967fcc117.json",
+      "created_at": "2025-09-09T08:31:57.872218",
+      "api_service": "opentargets",
+      "url": "https://api.platform.opentargets.org/api/v4/graphql",
+      "checksum": "5ae3d8bdaf3d7a75a4228fcdc40b2b71b06ae24b78ce7c21576b38e92cdb8e58"
+    },
+    "opentargets_api_post_9a85278ce6ee": {
+      "file": "opentargets/opentargets_api_post_9a85278ce6ee.json",
+      "created_at": "2025-09-09T08:31:57.513893",
+      "api_service": "opentargets",
+      "url": "https://api.platform.opentargets.org/api/v4/graphql",
+      "checksum": "5ae3d8bdaf3d7a75a4228fcdc40b2b71b06ae24b78ce7c21576b38e92cdb8e58"
+    },
+    "opentargets_api_post_53fb6d906e52": {
+      "file": "opentargets/opentargets_api_post_53fb6d906e52.json",
+      "created_at": "2025-09-09T08:31:57.634038",
+      "api_service": "opentargets",
+      "url": "https://api.platform.opentargets.org/api/v4/graphql",
+      "checksum": "5a33256c56859b7e2a05c8ad6327fa6e3439acee51e431c32e19b10448c831de"
+    },
+    "opentargets_api_post_c1c69d8019ae": {
+      "file": "opentargets/opentargets_api_post_c1c69d8019ae.json",
+      "created_at": "2025-09-09T08:31:57.757077",
+      "api_service": "opentargets",
+      "url": "https://api.platform.opentargets.org/api/v4/graphql",
+      "checksum": "8a432b34b154275dfb6af663c54c7e06fc31d349e677d5dc57bb6f0794dc22df"
+    }
+  },
+  "updated_at": "2025-09-09T08:32:04.690036"
+}

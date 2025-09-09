@@ -15,34 +15,37 @@ class TestUniProtClient:
         return UniProtClient()
 
     @pytest.mark.unit
-    @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
-    async def test_get_fasta_sequence_success(
-        self, mock_request: Any, client: UniProtClient
-    ) -> None:
+    async def test_get_fasta_sequence_success(self, client: UniProtClient) -> None:
         """Test successful FASTA sequence retrieval."""
         expected_fasta = """>sp|P0DTC2|SPIKE_SARS2 Spike glycoprotein
 MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT"""
 
-        mock_request.return_value = expected_fasta
+        # Mock the _make_request method instead
+        with patch.object(
+            client, "_make_request", return_value=expected_fasta
+        ) as mock_request:
+            result = await client.get_fasta_sequence("P0DTC2")
 
-        result = await client.get_fasta_sequence("P0DTC2")
-
-        assert result == expected_fasta
-        mock_request.assert_called_once_with(
-            "https://rest.uniprot.org/uniprotkb/P0DTC2.fasta"
-        )
+            assert result == expected_fasta
+            mock_request.assert_called_once_with(
+                "https://rest.uniprot.org/uniprotkb/P0DTC2.fasta",
+                expected_format="text",
+            )
 
     @pytest.mark.unit
-    @patch("drug_discovery_agent.core.uniprot.make_fasta_request")
     async def test_get_fasta_sequence_empty_response(
-        self, mock_request: Any, client: UniProtClient
+        self, client: UniProtClient
     ) -> None:
         """Test FASTA sequence retrieval with empty response."""
-        mock_request.return_value = None
+        # Mock the _make_request method to return None/empty
+        with patch.object(client, "_make_request", return_value="") as mock_request:
+            result = await client.get_fasta_sequence("INVALID")
 
-        result = await client.get_fasta_sequence("INVALID")
-
-        assert result == ""
+            assert result == ""
+            mock_request.assert_called_once_with(
+                "https://rest.uniprot.org/uniprotkb/INVALID.fasta",
+                expected_format="text",
+            )
 
     @pytest.mark.unit
     @patch("httpx.AsyncClient")

@@ -11,6 +11,15 @@ import respx
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
 from drug_discovery_agent.core.pdb import PDBClient
 from drug_discovery_agent.core.uniprot import UniProtClient
+
+# Import HTTP interceptor for unified snapshot testing
+from snapshots.http_interceptor import (
+    HTTPBackend,
+    HTTPInterceptor,
+    SnapshotHTTPBackend,
+    SnapshotRecordingBackend,
+    SnapshotValidationBackend,
+)
 from tests.fixtures.env_helpers import (
     empty_env,
     mock_env_vars,
@@ -202,3 +211,83 @@ def sample_sequences() -> dict[str, str]:
         "short_protein": "MKTVRQERLKSIVRILERSKEPVSGAQLARKVP",
         "invalid_sequence": "MKTVRQERLXZ",
     }
+
+
+# Global HTTP interceptor setup
+_http_interceptor = None
+_pytest_config = None
+
+
+def pytest_addoption(parser: Any) -> None:
+    """Add custom command line options for snapshot testing."""
+    parser.addoption(
+        "--update-snapshots",
+        action="store_true",
+        default=False,
+        help="Record new API responses as snapshots",
+    )
+    parser.addoption(
+        "--validate-snapshots",
+        action="store_true",
+        default=False,
+        help="Validate existing snapshots against live API responses",
+    )
+
+
+def pytest_configure(config: Any) -> None:
+    """Configure pytest with HTTP interceptor."""
+    # Store config for later use in fixtures
+    global _pytest_config
+    _pytest_config = config
+
+
+def pytest_unconfigure(config: Any) -> None:
+    """Clean up HTTP interceptor."""
+    pass
+
+
+@pytest.fixture(scope="function", autouse=True)
+def http_interceptor_for_integration(request: Any) -> Any:
+    """Activate HTTP interceptor only for integration tests."""
+    global _http_interceptor, _pytest_config
+
+    # Check if this test is marked as integration
+    is_integration_test = False
+    for marker in request.node.iter_markers():
+        if marker.name == "integration":
+            is_integration_test = True
+            break
+
+    if is_integration_test and _pytest_config:
+        # Determine backend based on command line options
+        backend: HTTPBackend
+        if _pytest_config.getoption("--update-snapshots"):
+            backend = SnapshotRecordingBackend()
+        elif _pytest_config.getoption("--validate-snapshots"):
+            backend = SnapshotValidationBackend()
+        else:
+            # Default behavior: use snapshots
+            backend = SnapshotHTTPBackend()
+
+        # Set up HTTP interception for this test
+        interceptor = HTTPInterceptor(backend)
+        interceptor.__enter__()
+
+        yield
+
+        # Clean up HTTP interception after test
+        interceptor.__exit__(None, None, None)
+    else:
+        # No interception for unit tests - let mocks work normally
+        yield
+
+
+@pytest.fixture(scope="session")
+def http_backend_info(pytestconfig: Any) -> dict[str, str]:
+    """Provide information about current HTTP backend for tests."""
+    if pytestconfig.getoption("--update-snapshots"):
+        return {"type": "record", "description": "Recording new snapshots"}
+    elif pytestconfig.getoption("--validate-snapshots"):
+        return {"type": "validate", "description": "Validating snapshots"}
+    else:
+        return {"type": "snapshots", "description": "Using saved snapshots (default)"}

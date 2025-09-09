@@ -206,12 +206,13 @@ class OpenTargetsClient:
         """Return a merged object: disease metadata + all associated targets details"""
         data: dict[str, Any] | None = await self.fetch_disease_details(ontology_id)
 
-        if data is None:
+        if data is None or data.get("disease") is None:
             return {}
+        disease_data = data["disease"]
         disease_meta = {
-            "id": data["disease"]["id"],
-            "name": data["disease"]["name"],
-            "description": data["disease"]["description"],
+            "id": disease_data["id"],
+            "name": disease_data["name"],
+            "description": disease_data["description"],
         }
 
         # target details
