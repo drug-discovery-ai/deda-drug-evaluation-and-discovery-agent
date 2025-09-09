@@ -20,7 +20,7 @@ class ElectronApp {
             minWidth: 800,
             minHeight: 600,
             icon: this.getAppIcon(),
-            show: false, // Don't show until ready-to-show
+            show: true, // Show window immediately
             titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
             webPreferences: {
                 nodeIntegration: false, // Security: disable node integration
@@ -37,9 +37,7 @@ class ElectronApp {
 
         // Show window when ready to prevent visual flash
         this.mainWindow.once('ready-to-show', () => {
-            this.mainWindow.show();
-            
-            // Focus on input field after window is shown
+            // Focus on input field after window is ready
             this.mainWindow.webContents.executeJavaScript(`
                 const messageInput = document.getElementById('message-input');
                 if (messageInput) messageInput.focus();
@@ -119,9 +117,25 @@ class ElectronApp {
                 console.log('Python Backend:', output);
                 
                 // Check if server started successfully
-                if (output.includes('Bioinformatics Chat Server starting')) {
-                    // Wait a moment for server to be fully ready
-                    setTimeout(() => resolve(), 2000);
+                if (output.includes('Bioinformatics Chat Server starting') || 
+                    output.includes('Ready for stateful Electron frontend connections!')) {
+                    // Wait a moment for server to be fully ready, then verify with health check
+                    setTimeout(async () => {
+                        const isHealthy = await this.healthCheck();
+                        if (isHealthy) {
+                            resolve();
+                        } else {
+                            // If health check fails, wait a bit more and try again
+                            setTimeout(async () => {
+                                const isHealthyRetry = await this.healthCheck();
+                                if (isHealthyRetry) {
+                                    resolve();
+                                } else {
+                                    reject(new Error('Backend started but health check failed'));
+                                }
+                            }, 3000);
+                        }
+                    }, 2000);
                 }
             });
 
@@ -164,11 +178,11 @@ class ElectronApp {
         
         switch (process.platform) {
             case 'win32':
-                return path.join(resourcesPath, 'python-backend', 'server.exe');
+                return path.join(resourcesPath, 'python-backend', '__main__.exe');
             case 'darwin':
-                return path.join(resourcesPath, 'python-backend', 'server');
+                return path.join(resourcesPath, 'python-backend', '__main__');
             case 'linux':
-                return path.join(resourcesPath, 'python-backend', 'server');
+                return path.join(resourcesPath, 'python-backend', '__main__');
             default:
                 throw new Error(`Unsupported platform: ${process.platform}`);
         }
@@ -257,14 +271,14 @@ class ElectronApp {
             // Set up IPC handlers
             this.setupIPC();
 
-            // Start Python backend
+            // Create main window first so user sees something immediately
+            await this.createWindow();
+            console.log('Electron window created');
+
+            // Start Python backend in parallel
             console.log('Starting Python backend server...');
             await this.startPythonBackend();
             console.log('Python backend started successfully');
-
-            // Create main window
-            await this.createWindow();
-            console.log('Electron window created');
 
             // Verify backend is healthy
             const isHealthy = await this.healthCheck();
@@ -285,16 +299,43 @@ class ElectronApp {
 // Create application instance
 const electronApp = new ElectronApp();
 
-// App event handlers
-app.whenReady().then(() => {
-    electronApp.initialize();
+// Ensure single instance
+const gotTheLock = app.requestSingleInstanceLock();
 
-    app.on('activate', () => {
-        // On macOS, re-create window when dock icon is clicked
-        if (BrowserWindow.getAllWindows().length === 0) {
-            electronApp.createWindow();
+if (!gotTheLock) {
+    // Another instance is already running, quit this one
+    app.quit();
+} else {
+    // Handle second instance attempts
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, focus our window instead
+        if (electronApp.mainWindow) {
+            if (electronApp.mainWindow.isMinimized()) {
+                electronApp.mainWindow.restore();
+            }
+            electronApp.mainWindow.focus();
         }
     });
+}
+
+// App event handlers (outside the single instance check)
+app.whenReady().then(() => {
+    electronApp.initialize();
+});
+
+app.on('activate', () => {
+    // On macOS, show and focus existing window when dock icon is clicked
+    if (electronApp.mainWindow && !electronApp.mainWindow.isDestroyed()) {
+        // Existing window - show and focus it
+        if (!electronApp.mainWindow.isVisible()) {
+            electronApp.mainWindow.show();
+        }
+        electronApp.mainWindow.focus();
+    } else if (BrowserWindow.getAllWindows().length === 0) {
+        // No windows at all - create new one
+        electronApp.createWindow();
+    }
+    // If windows exist but mainWindow is null, do nothing (edge case)
 });
 
 app.on('window-all-closed', () => {

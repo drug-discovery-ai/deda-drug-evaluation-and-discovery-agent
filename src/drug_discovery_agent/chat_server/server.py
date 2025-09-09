@@ -1,19 +1,20 @@
 """Stateful HTTP chat server for bioinformatics queries with session management."""
 
 import argparse
+import asyncio
 import json
+import signal
 from collections.abc import AsyncIterator
 from typing import Any
 
 import uvicorn
-from dotenv import load_dotenv
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 from starlette.routing import Route
 
-from .models import (
+from drug_discovery_agent.chat_server.models import (
     ChatRequest,
     ChatResponse,
     CreateSessionRequest,
@@ -21,9 +22,10 @@ from .models import (
     HealthResponse,
     SessionInfoResponse,
 )
-from .session_manager import SessionManager
+from drug_discovery_agent.chat_server.session_manager import SessionManager
 
-load_dotenv()  # Load environment variables from .env
+# Load environment variables from .env file
+from drug_discovery_agent.utils.env import load_env_for_bundle
 
 
 class ChatServer:
@@ -229,6 +231,7 @@ class ChatServer:
 
 def main() -> None:
     """Main entry point for the chat server."""
+    load_env_for_bundle()
     parser = argparse.ArgumentParser(
         description="Stateful Bioinformatics Chat Server - HTTP API for Electron frontend"
     )
@@ -257,10 +260,6 @@ def main() -> None:
     print("   POST /api/chat/stream - Streaming chat (requires session_id)")
     print("   GET /health - Health check with session metrics")
     print("🚀 Ready for stateful Electron frontend connections!")
-
-    # Setup graceful shutdown
-    import asyncio
-    import signal
 
     def signal_handler(sig: int, frame: Any) -> None:
         print("\n🛑 Shutting down server...")

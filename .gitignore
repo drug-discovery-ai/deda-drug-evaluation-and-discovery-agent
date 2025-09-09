@@ -8,3 +8,8 @@ venv/
 *.egg-info/
 .coverage
 .testmondata
+build/
+dist/
+
+# PyInstaller auto-generated spec files
+*.spec

@@ -4,7 +4,6 @@ import argparse
 import asyncio
 import os
 
-from dotenv import load_dotenv
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, trim_messages
@@ -17,8 +16,7 @@ from drug_discovery_agent.core.uniprot import UniProtClient
 
 # Local imports
 from drug_discovery_agent.interfaces.langchain.tools import create_bioinformatics_tools
-
-load_dotenv()  # Load environment variables from .env
+from drug_discovery_agent.utils.env import load_env_for_bundle
 
 
 class BioinformaticsChatClient:
@@ -269,6 +267,7 @@ async def async_main(verbose: bool = False) -> None:
 
 def main() -> None:
     """Synchronous entry point that runs the async main function."""
+    load_env_for_bundle()
     parser = argparse.ArgumentParser(
         description="Bioinformatics Assistant - Interactive chat interface for protein analysis"
     )

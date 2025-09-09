@@ -8,7 +8,7 @@
     "dev:python": "node scripts/start-python-backend.js",
     "dev:electron": "node scripts/start-electron-dev.js",
     "build": "npm run build:python && npm run build:electron",
-    "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=biopython --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
+    "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=Bio --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
@@ -52,7 +52,7 @@
   },
   "build": {
     "appId": "com.drugdiscovery.biochat",
-    "productName": "Bioinformatics Chat Assistant",
+    "productName": "Drug Evaluation and Discovery Agent",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -70,6 +70,10 @@
         "from": "../dist/",
         "to": "python-backend/",
         "filter": ["**/*"]
+      },
+      {
+        "from": "../.env",
+        "to": ".env"
       }
     ],
     "mac": {
@@ -79,8 +83,28 @@
           "target": "dmg",
           "arch": ["x64", "arm64"]
         }
-      ],
-      "icon": "build/icon.icns"
+      ]
+    },
+    "dmg": {
+      "title": "Drug Evaluation and Discovery Agent Installer",
+      "background": "build/dmg-background.png",
+      "window": {
+        "width": 700,
+        "height": 500
+      },
+      "contents": [
+        {
+          "x": 175,
+          "y": 280,
+          "type": "file"
+        },
+        {
+          "x": 525,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "win": {
       "target": [

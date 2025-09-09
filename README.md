@@ -134,6 +134,26 @@ The desktop app provides:
 - Cross-platform support (Windows, macOS, Linux)
 - Integrated backend server management
 
+#### Creating Distribution Installers
+
+To create installable packages for distribution:
+
+**📦 [See detailed installer creation guide →](electron-app/README.md#-creating-distribution-installers)**
+
+Quick installer build:
+```bash
+# Navigate to electron-app directory
+cd electron-app
+
+# Build Python backend first
+npm run build:python
+
+# Then build Electron installer
+npm run build:mac    # or build:win, build:linux
+```
+
+Supports creating native installers for Windows (.exe), macOS (.dmg), and Linux (.AppImage) with automatic environment configuration and backend bundling.
+
 # Development
 
 ## Code Quality
