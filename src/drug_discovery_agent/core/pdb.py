@@ -17,6 +17,25 @@ class PDBClient:
         """
         self.uniprot_client = uniprot_client or UniProtClient()
 
+    async def _make_request(self, url: str) -> dict[str, Any]:
+        """Make an HTTP request (HTTP interceptor handles snapshots/mocks transparently)."""
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=10)
+                response.raise_for_status()
+                data: dict[str, Any] = response.json()
+                return data
+
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                # Extract PDB ID from URL for user-friendly error message
+                pdb_id = url.split("/")[-1] if "/" in url else "unknown"
+                return {"error": f"No entry found for PDB ID: {pdb_id}"}
+            else:
+                return {"error": f"HTTP {e.response.status_code} error for {url}"}
+        except Exception as e:
+            return {"error": f"Request failed: {str(e)}"}
+
     async def get_structure_details(self, pdb_id: str) -> dict[str, Any]:
         """Get experimental structure details from RCSB PDB.
 
@@ -28,15 +47,11 @@ class PDBClient:
         """
         url = f"{RCSB_DB_ENDPOINT}/{pdb_id}"
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, timeout=10)
-                response.raise_for_status()
-                entry = response.json()
-        except httpx.HTTPStatusError:
-            return {"error": f"No entry found for PDB ID: {pdb_id}"}
-        except Exception as e:
-            return {"error": f"Request failed: {str(e)}"}
+        entry = await self._make_request(url)
+
+        # Handle error responses
+        if "error" in entry:
+            return entry
 
         return {
             "pdb_id": pdb_id.upper(),
