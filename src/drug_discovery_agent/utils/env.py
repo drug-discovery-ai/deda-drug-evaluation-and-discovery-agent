@@ -1,5 +1,6 @@
 """Environment variable loading utilities for bundled and development environments."""
 
+import os
 import sys
 from pathlib import Path
 
@@ -11,7 +12,11 @@ def load_env_for_bundle() -> None:
 
     For bundled applications (PyInstaller), searches in the executable directory
     and Resources directory. For development, uses standard dotenv loading.
+    Also sets up UTF-8 encoding environment variables for Windows compatibility.
     """
+    # Set UTF-8 encoding environment variables to prevent Unicode issues on Windows
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    os.environ.setdefault("PYTHONUTF8", "1")
     if getattr(sys, "frozen", False):
         # Running in a PyInstaller bundle
         bundle_dir = Path(sys.executable).parent

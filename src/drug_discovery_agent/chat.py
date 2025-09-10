@@ -160,7 +160,7 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
         """Display comprehensive help information."""
         print(
             """
-🧬 Bioinformatics Assistant - Help
+Bioinformatics Assistant - Help
 
 CHAT EXAMPLES:
   Basic Queries:
@@ -203,9 +203,9 @@ TIPS:
 
     async def chat_loop(self) -> None:
         """Run interactive langchain loop with proper error handling."""
-        print("🧬 Bioinformatics Assistant")
+        print("Bioinformatics Assistant")
         print("💡 Type '/help' for examples and commands, or '/quit' to exit")
-        print("🔬 Ready to help with protein analysis and molecular data!\n")
+        print("Ready to help with protein analysis and molecular data!\n")
 
         while True:
             try:
@@ -228,7 +228,7 @@ TIPS:
                 # Process langchain query with loading indicator
                 print("🤔 Analyzing...", end="", flush=True)
                 response = await self.chat(user_input)
-                print(f"\r🧬 Assistant: {response}\n")
+                print(f"\rAssistant: {response}\n")
 
             except KeyboardInterrupt:
                 print("\n\n👋 Goodbye! Happy researching!")

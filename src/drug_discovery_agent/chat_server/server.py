@@ -250,16 +250,16 @@ def main() -> None:
     app = chat_server.create_app()
 
     print(
-        f"🧬 Stateful Bioinformatics Chat Server starting on http://{args.host}:{args.port}"
+        f"Stateful Bioinformatics Chat Server starting on http://{args.host}:{args.port}"
     )
-    print("📡 Endpoints:")
+    print("Endpoints:")
     print("   POST /api/sessions - Create new session")
     print("   DELETE /api/sessions/{id} - Delete session")
     print("   POST /api/sessions/{id}/clear - Clear conversation")
     print("   POST /api/chat - Send message (requires session_id)")
     print("   POST /api/chat/stream - Streaming chat (requires session_id)")
     print("   GET /health - Health check with session metrics")
-    print("🚀 Ready for stateful Electron frontend connections!")
+    print("Ready for stateful Electron frontend connections!")
 
     def signal_handler(sig: int, frame: Any) -> None:
         print("\n🛑 Shutting down server...")
