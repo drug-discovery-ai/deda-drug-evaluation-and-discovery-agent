@@ -1,25 +1,27 @@
 import asyncio
 import json
 
-from drug_discovery_agent.core.ebi import EBIClient
-from drug_discovery_agent.core.opentarget import OpenTargetsClient
+from drug_discovery_agent.core.alphafold import AlphaFoldClient
 
 
 async def main() -> None:
-    disease = EBIClient()
-    disease_result = await disease.fetch_all_ontology_ids("chcicken pox")
+    aplhafold_instance = AlphaFoldClient()
 
-    print(disease_result[0]["ontology_id"])
+    response = await aplhafold_instance.fetch_alphafold_prediction("P42336")
+    # disease = EBIClient()
+    # disease_result = await disease.fetch_all_ontology_ids("chcicken pox")
 
-    # choose one candidate randomly
+    # print(disease_result[0]["ontology_id"])
 
-    ot_client = OpenTargetsClient()
+    # # choose one candidate randomly
 
-    result = await ot_client.disease_target_knowndrug_pipeline(
-        disease_result[0]["ontology_id"]
-    )
+    # ot_client = OpenTargetsClient()
 
-    print(json.dumps(result, indent=2))
+    # result = await ot_client.disease_target_knowndrug_pipeline(
+    #     disease_result[0]["ontology_id"]
+    # )
+
+    print(json.dumps(response, indent=2))
 
 
 if __name__ == "__main__":

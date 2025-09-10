@@ -8,6 +8,7 @@ from langchain_core.callbacks import (
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
 
+from drug_discovery_agent.core.alphafold import AlphaFoldClient
 from drug_discovery_agent.core.analysis import SequenceAnalyzer
 from drug_discovery_agent.core.ebi import EBIClient
 from drug_discovery_agent.core.opentarget import OpenTargetsClient
@@ -49,6 +50,8 @@ class BioinformaticsToolBase(BaseTool):
 
         self._opentarget_client = OpenTargetsClient()
 
+        self._alphafold_client = AlphaFoldClient()
+
         self._uniprot_client = uniprot_client or UniProtClient()
         self._pdb_client = pdb_client or PDBClient(self._uniprot_client)
         self._sequence_analyzer = sequence_analyzer or SequenceAnalyzer(
@@ -74,6 +77,11 @@ class BioinformaticsToolBase(BaseTool):
     def pdb_client(self) -> PDBClient:
         """Access to PDB client instance."""
         return self._pdb_client
+
+    @property
+    def alphafold_client(self) -> AlphaFoldClient:
+        """Access to PDB client instance."""
+        return self._alphafold_client
 
     @property
     def sequence_analyzer(self) -> SequenceAnalyzer:
