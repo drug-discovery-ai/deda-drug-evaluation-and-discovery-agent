@@ -9,3 +9,7 @@ GENEINFO_ENDPOINT = "https://mygene.info/v3"
 
 # HTTP configuration
 USER_AGENT = "FASTA-app/1.0"
+
+# Cache configuration
+OPENTARGET_CACHE_DIR = "/tmp/opentarget_cache"
+UNIPROT_CACHE_DIR = "/tmp/uniprot_cache"

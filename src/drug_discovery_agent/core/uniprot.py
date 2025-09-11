@@ -1,16 +1,43 @@
-from typing import Any
+import json
+from pathlib import Path
+from typing import Any, cast
 
+import aiofiles  # type: ignore
 import httpx
 
-from drug_discovery_agent.utils.constants import VIRUS_UNIPROT_REST_API_BASE
+from drug_discovery_agent.core.common import make_hash
+from drug_discovery_agent.utils.constants import (
+    UNIPROT_CACHE_DIR,
+    VIRUS_UNIPROT_REST_API_BASE,
+)
 
 
 class UniProtClient:
     """Client for UniProt database operations."""
 
+    CACHE_DIR = Path(UNIPROT_CACHE_DIR)
+
     def __init__(self) -> None:
         """Initialize UniProt client."""
-        pass
+        self.CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+    def cache_hit(self, uniprot_code: str) -> bool:
+        hit = False
+        cache_file = self.CACHE_DIR / f"{make_hash(uniprot_code)}.json"
+        if cache_file.exists():
+            print(f"Cache hit: {cache_file}")
+            hit = True
+
+        return hit
+
+    def delete_cache(self, uniprot_code: str) -> None:
+        """Delete cached file for a UniProt code if it exists."""
+        cache_file = self.CACHE_DIR / f"{make_hash(uniprot_code)}.json"
+        if cache_file.exists():
+            cache_file.unlink()
+            print(f"Deleted cache file: {cache_file}")
+        else:
+            print(f"No cache file found for {uniprot_code}")
 
     async def _make_request(self, url: str, expected_format: str = "json") -> Any:
         """Make an HTTP request (HTTP interceptor handles snapshots/mocks transparently).
@@ -69,6 +96,15 @@ class UniProtClient:
         Returns:
             dict: Contains organism, scientific name, lineage, function, reference URL, etc.
         """
+        # cache check
+        hit = self.cache_hit(uniprot_code)
+        cache_file = self.CACHE_DIR / f"{make_hash(uniprot_code)}.json"
+
+        if hit:
+            async with aiofiles.open(cache_file) as f:
+                data = await f.read()
+            return cast(dict[str, Any], data)
+
         url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_code}.json"
 
         entry = await self._make_request(url, expected_format="json")
@@ -127,16 +163,22 @@ class UniProtClient:
         # Reference url
         reference = VIRUS_UNIPROT_REST_API_BASE + "/" + uniprot_code
         result["Reference"] = reference
+
+        # Cache miss, Save to cache (async)
+        async with aiofiles.open(cache_file, "w") as f:
+            await f.write(json.dumps(result, indent=2))
+        print(f"Saved result to {cache_file}")
+
         return result
 
     async def get_pdb_ids(self, uniprot_id: str) -> list[str]:
-        """Fetch top 10 representative PDB entries from UniProt cross-references.
+        """Fetch top representative PDB entries from UniProt cross-references.
 
         Args:
             uniprot_id: A valid UniProt accession (e.g., 'P0DTC2').
 
         Returns:
-            list[str]: Up to 10 unique PDB IDs linked to the protein.
+            list[str]: unique PDB IDs linked to the protein.
         """
         url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_id}.json"
 
@@ -152,4 +194,4 @@ class UniProtClient:
             if xref.get("database") == "PDB"
         ]
 
-        return sorted(set(pdb_ids))[:10]
+        return sorted(set(pdb_ids))

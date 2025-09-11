@@ -1,15 +1,25 @@
+import json
+from pathlib import Path
 from typing import Any, cast
 
+import aiofiles  # type: ignore
 import httpx
 
-from drug_discovery_agent.utils.constants import OPENTARGET_ENDPOINT
+from drug_discovery_agent.core.common import make_hash
+from drug_discovery_agent.utils.constants import (
+    OPENTARGET_CACHE_DIR,
+    OPENTARGET_ENDPOINT,
+)
 
 
 class OpenTargetsClient:
     BASE_URL = OPENTARGET_ENDPOINT
 
+    CACHE_DIR = Path(OPENTARGET_CACHE_DIR)
+
     def __init__(self) -> None:
         self.limit = 10
+        self.CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     async def _make_graphql_request(
         self, query: str, variables: dict
@@ -204,6 +214,17 @@ class OpenTargetsClient:
         self, ontology_id: str
     ) -> dict[str, Any]:
         """Return a merged object: disease metadata + all associated targets details"""
+
+        # First check if cache hit
+
+        cache_file = self.CACHE_DIR / f"{make_hash(ontology_id)}.json"
+
+        if cache_file.exists():
+            print(f"Cache hit: {cache_file}")
+            async with aiofiles.open(cache_file) as f:
+                data_cache = await f.read()
+                return cast(dict[str, Any], json.loads(data_cache))
+
         data: dict[str, Any] | None = await self.fetch_disease_details(ontology_id)
 
         if data is None or data.get("disease") is None:
@@ -217,4 +238,15 @@ class OpenTargetsClient:
 
         # target details
         targets = await self.fetch_disease_associated_target_details(ontology_id)
-        return {"disease": disease_meta, "targets": targets}
+
+        result: dict[str, Any] = {}
+
+        result["disease"] = disease_meta
+        result["targets"] = targets
+
+        # Save to cache (async)
+        async with aiofiles.open(cache_file, "w") as f:
+            await f.write(json.dumps(result, indent=2))
+        print(f"Saved result to {cache_file}")
+
+        return result
