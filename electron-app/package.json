@@ -8,7 +8,7 @@
     "dev:python": "node scripts/start-python-backend.js",
     "dev:electron": "node scripts/start-electron-dev.js",
     "build": "npm run build:python && npm run build:electron",
-    "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=Bio --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
+    "build:python": "cd .. && pyinstaller --onefile --clean --noconfirm --noconsole --log-level=INFO --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=Bio --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib --exclude-module=numpy.testing --exclude-module=pytest --exclude-module=setuptools src/drug_discovery_agent/chat_server/__main__.py",
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
