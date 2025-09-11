@@ -29,6 +29,12 @@ class PDBIdInput(BaseModel):
     pdb_id: str = Field(description="The 4-character PDB ID (e.g., '4HHB')")
 
 
+class AlphaFoldIdInput(BaseModel):
+    """Input schema for PDB ID operations."""
+
+    uniprot_code: str = Field(description="The UniProt accession code (e.g., 'P0DTC2')")
+
+
 class RawSequenceInput(BaseModel):
     """Input schema for raw sequence analysis."""
 
