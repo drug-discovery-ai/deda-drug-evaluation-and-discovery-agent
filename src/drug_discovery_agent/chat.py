@@ -204,7 +204,7 @@ TIPS:
     async def chat_loop(self) -> None:
         """Run interactive langchain loop with proper error handling."""
         print("Bioinformatics Assistant")
-        print("💡 Type '/help' for examples and commands, or '/quit' to exit")
+        print("💡 Type '/help' for tools and commands, or '/quit' to exit")
         print("Ready to help with protein analysis and molecular data!\n")
 
         while True:
@@ -238,7 +238,7 @@ TIPS:
                 break
             except Exception as e:
                 print(f"\n⚠️  Unexpected error: {str(e)}")
-                print("💡 Try '/help' for usage examples or '/quit' to exit\n")
+                print("💡 Try '/help' for usage tools or '/quit' to exit\n")
 
 
 async def async_main(verbose: bool = False) -> None:
