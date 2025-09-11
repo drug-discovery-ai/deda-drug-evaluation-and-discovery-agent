@@ -8,7 +8,7 @@
     "dev:python": "node scripts/start-python-backend.js",
     "dev:electron": "node scripts/start-electron-dev.js",
     "build": "npm run build:python && npm run build:electron",
-    "build:python": "cd .. && pyinstaller --onefile --noconsole --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=biopython --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib src/drug_discovery_agent/chat_server/__main__.py",
+    "build:python": "cd .. && pyinstaller --onefile --clean --noconfirm --noconsole --log-level=INFO --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=Bio --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib --exclude-module=numpy.testing --exclude-module=pytest --exclude-module=setuptools src/drug_discovery_agent/chat_server/__main__.py",
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
@@ -41,7 +41,7 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "concurrently": "^8.2.2",
-    "electron": "^38.0.0",
+    "electron": "^27.0.0",
     "electron-builder": "^24.6.4",
     "eslint": "^8.50.0",
     "jest": "^29.7.0"
@@ -52,7 +52,7 @@
   },
   "build": {
     "appId": "com.drugdiscovery.biochat",
-    "productName": "Bioinformatics Chat Assistant",
+    "productName": "Drug Evaluation and Discovery Agent",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -69,9 +69,11 @@
       {
         "from": "../dist/",
         "to": "python-backend/",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../.env",
+        "to": ".env"
       }
     ],
     "mac": {
@@ -79,37 +81,49 @@
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
-      ],
-      "icon": "build/icon.icns"
+      ]
+    },
+    "dmg": {
+      "title": "Drug Evaluation and Discovery Agent Installer",
+      "background": "build/dmg-background.png",
+      "window": {
+        "width": 700,
+        "height": 500
+      },
+      "contents": [
+        {
+          "x": 175,
+          "y": 280,
+          "type": "file"
+        },
+        {
+          "x": 525,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": ["x64", "ia32"]
         }
       ],
-      "icon": "build/icon.ico"
+      "icon": "../assets/icon.ico"
     },
     "linux": {
       "target": [
         {
           "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ],
       "category": "Science",
-      "icon": "build/icon.png"
+      "icon": "../assets/icon.png"
     },
     "nsis": {
       "oneClick": false,

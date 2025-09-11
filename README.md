@@ -1,5 +1,9 @@
 # Bio-informatics AI agent for Drug discovery Research
 
+<p align="center">
+  <img src="assets/logo.png" alt="Drug Discovery AI Agent Logo" width="200"/>
+</p>
+
 Follow our wiki pages for more insight: https://github.com/drug-discovery-ai/train-a-model/wiki
 
 ## Overview
@@ -133,6 +137,26 @@ The desktop app provides:
 - Session management and conversation persistence
 - Cross-platform support (Windows, macOS, Linux)
 - Integrated backend server management
+
+#### Creating Distribution Installers
+
+To create installable packages for distribution:
+
+**📦 [See detailed installer creation guide →](electron-app/README.md#-creating-distribution-installers)**
+
+Quick installer build:
+```bash
+# Navigate to electron-app directory
+cd electron-app
+
+# Build Python backend first
+npm run build:python
+
+# Then build Electron installer
+npm run build:mac    # or build:win, build:linux
+```
+
+Supports creating native installers for Windows (.exe), macOS (.dmg), and Linux (.AppImage) with automatic environment configuration and backend bundling.
 
 # Development
 

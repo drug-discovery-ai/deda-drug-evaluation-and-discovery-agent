@@ -30,6 +30,7 @@ body {
     padding: 12px 20px;
     border-bottom: 1px solid #34495e;
     flex-shrink: 0;
+    -webkit-app-region: drag;
 }
 
 /* macOS traffic light button spacing */
@@ -59,6 +60,7 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
+    -webkit-app-region: no-drag;
 }
 
 .connection-status {
@@ -93,6 +95,7 @@ body {
     cursor: pointer;
     font-size: 1.1em;
     transition: background 0.2s;
+    -webkit-app-region: no-drag;
 }
 
 .icon-button:hover {
