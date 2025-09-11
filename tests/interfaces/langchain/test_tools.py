@@ -533,7 +533,7 @@ class TestCreateBioinformaticsTools:
         """Test creating tools with default clients."""
         tools = create_bioinformatics_tools()
 
-        assert len(tools) == 10  # All tool classes
+        assert len(tools) == 11  # All tool classes
         assert isinstance(tools, list)
 
         # Check that all tools are BioinformaticsToolBase instances
@@ -553,6 +553,7 @@ class TestCreateBioinformaticsTools:
             "get_top_pdb_ids_for_uniprot",
             "get_structure_details",
             "get_ligand_smiles_from_uniprot",
+            "get_alphafold_structure_prediction_from_uniprot",
         }
         assert tool_names == expected_names
 
@@ -569,7 +570,7 @@ class TestCreateBioinformaticsTools:
             sequence_analyzer=mock_analyzer,
         )
 
-        assert len(tools) == 10
+        assert len(tools) == 11
 
         # Check that all tools use the same client instances
         for tool in tools:
@@ -587,7 +588,7 @@ class TestCreateBioinformaticsTools:
 
         tools = create_bioinformatics_tools(uniprot_client=mock_uniprot)
 
-        assert len(tools) == 10
+        assert len(tools) == 11
 
         # Check that custom client is used
         for tool in tools:
@@ -606,6 +607,7 @@ class TestCreateBioinformaticsTools:
 
         # Map tool names to expected schema types
         from drug_discovery_agent.interfaces.langchain.models import (
+            AlphaFoldIdInput,
             EBIDiseaseInput,
             OpenTargetOntologyInput,
             PDBIdInput,
@@ -625,6 +627,7 @@ class TestCreateBioinformaticsTools:
             "get_top_pdb_ids_for_uniprot": UniProtCodeInput,
             "get_structure_details": PDBIdInput,
             "get_ligand_smiles_from_uniprot": UniProtCodeInput,
+            "get_alphafold_structure_prediction_from_uniprot": AlphaFoldIdInput,
         }
 
         for tool in tools:
@@ -650,6 +653,7 @@ class TestCreateBioinformaticsTools:
             "GetTopPDBIdsTool",
             "GetStructureDetailsTool",
             "GetLigandSmilesTool",
+            "GetAlphaFoldPredictionTool",
             "create_bioinformatics_tools",
         ]
 

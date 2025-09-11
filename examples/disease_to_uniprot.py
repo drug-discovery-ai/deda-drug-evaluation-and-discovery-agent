@@ -8,6 +8,7 @@
 
 # from drug_discovery_agent.core.ebi import EBIClient
 # from drug_discovery_agent.core.opentarget import OpenTargetsClient
+# from drug_discovery_agent.core.alphafold import AlphaFoldClient
 
 # CACHE_DIR = Path("/tmp/opentarget_cache")
 # CACHE_DIR.mkdir(parents=True, exist_ok=True)

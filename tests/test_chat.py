@@ -484,6 +484,7 @@ class TestChatIntegration:
                 "get_top_pdb_ids_for_uniprot",
                 "get_structure_details",
                 "get_ligand_smiles_from_uniprot",
+                "get_alphafold_structure_prediction_from_uniprot",
             }
 
             assert tool_names == expected_tool_names
