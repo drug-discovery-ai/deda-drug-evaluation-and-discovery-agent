@@ -4,7 +4,7 @@
   <img src="assets/logo.png" alt="Drug Discovery AI Agent Logo" width="333"/>
 </p>
 
-Follow our wiki pages for more insight: https://github.com/drug-discovery-ai/train-a-model/wiki
+Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki) for more insight.
 
 ## Overview
 
