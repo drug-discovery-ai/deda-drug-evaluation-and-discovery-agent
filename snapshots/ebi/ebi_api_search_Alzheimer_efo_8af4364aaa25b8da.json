@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "created_at": "2025-09-10T15:06:00.543425",
-    "updated_at": "2025-09-10T15:06:00.543446",
+    "created_at": "2025-09-09T08:31:57.183147",
+    "updated_at": "2025-09-09T08:31:57.183162",
     "key": "ebi_api_search_Alzheimer_efo_8af4364aaa25b8da",
     "url": "https://www.ebi.ac.uk/ols/api/search",
     "method": "GET",
@@ -11,7 +11,7 @@
       "q": "Alzheimer",
       "ontology": "efo"
     },
-    "checksum": "4dcb4026177bad6e3ec6bb11204f24cdc4e55bea5f2a4d24fb2762e2a5ab49fa"
+    "checksum": "2e3213f8c11905c0da090da0a75bc132e43624f43f64e7415ab21a9a459b7639"
   },
   "response": {
     "response": {
@@ -53,6 +53,18 @@
           "type": "class"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/MONDO_0100087",
+          "ontology_name": "efo",
+          "ontology_prefix": "EFO",
+          "short_form": "MONDO_0100087",
+          "description": [
+            "A degenerative disease of the brain that causes gradual loss of memory, judgment, and the ability to function socially. About 25% of all Alzheimer disease is familial (more than 2 people in a family have AD). When Alzheimer disease begins before 60 or 65 years of age (early-onset AD) about 60% of the cases are familial (also known as Early-onset familial AD). These cases appear to be inherited in an autosomal dominant manner."
+          ],
+          "label": "familial Alzheimer disease",
+          "obo_id": "MONDO:0100087",
+          "type": "class"
+        },
+        {
           "iri": "http://purl.obolibrary.org/obo/MONDO_0014265",
           "ontology_name": "efo",
           "ontology_prefix": "EFO",
@@ -77,18 +89,6 @@
           "type": "class"
         },
         {
-          "iri": "http://purl.obolibrary.org/obo/MONDO_0100087",
-          "ontology_name": "efo",
-          "ontology_prefix": "EFO",
-          "short_form": "MONDO_0100087",
-          "description": [
-            "A degenerative disease of the brain that causes gradual loss of memory, judgment, and the ability to function socially. About 25% of all Alzheimer disease is familial (more than 2 people in a family have AD). When Alzheimer disease begins before 60 or 65 years of age (early-onset AD) about 60% of the cases are familial (also known as Early-onset familial AD). These cases appear to be inherited in an autosomal dominant manner."
-          ],
-          "label": "familial Alzheimer disease",
-          "obo_id": "MONDO:0100087",
-          "type": "class"
-        },
-        {
           "iri": "http://purl.obolibrary.org/obo/MONDO_0007088",
           "ontology_name": "efo",
           "ontology_prefix": "EFO",
@@ -96,18 +96,6 @@
           "description": [],
           "label": "Alzheimer disease type 1",
           "obo_id": "MONDO:0007088",
-          "type": "class"
-        },
-        {
-          "iri": "http://purl.obolibrary.org/obo/OBA_2001000",
-          "ontology_name": "efo",
-          "ontology_prefix": "EFO",
-          "short_form": "OBA_2001000",
-          "description": [
-            "The age at which Alzheimer disease manifestations first appear."
-          ],
-          "label": "age of onset of Alzheimer disease",
-          "obo_id": "OBA:2001000",
           "type": "class"
         },
         {
@@ -120,6 +108,18 @@
           ],
           "label": "early-onset autosomal dominant Alzheimer disease",
           "obo_id": "MONDO:0015140",
+          "type": "class"
+        },
+        {
+          "iri": "http://purl.obolibrary.org/obo/OBA_2001000",
+          "ontology_name": "efo",
+          "ontology_prefix": "EFO",
+          "short_form": "OBA_2001000",
+          "description": [
+            "The age at which Alzheimer disease manifestations first appear."
+          ],
+          "label": "age of onset of Alzheimer disease",
+          "obo_id": "OBA:2001000",
           "type": "class"
         },
         {
@@ -139,7 +139,7 @@
       "start": 0
     },
     "responseHeader": {
-      "QTime": 5,
+      "QTime": 1,
       "status": 0
     },
     "facet_counts": {

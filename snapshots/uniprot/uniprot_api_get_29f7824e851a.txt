@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "created_at": "2025-09-10T15:06:03.473350",
-    "updated_at": "2025-09-10T15:06:03.473370",
+    "created_at": "2025-09-09T08:31:59.249683",
+    "updated_at": "2025-09-09T08:31:59.249690",
     "key": "uniprot_api_get_29f7824e851a",
     "url": "https://rest.uniprot.org/uniprotkb/P0DTC2.fasta",
     "method": "GET",

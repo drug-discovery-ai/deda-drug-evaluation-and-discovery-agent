@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "created_at": "2025-09-10T15:06:02.242732",
-    "updated_at": "2025-09-10T15:06:02.242753",
+    "created_at": "2025-09-09T08:31:57.872218",
+    "updated_at": "2025-09-09T08:31:57.872227",
     "key": "opentargets_api_post_5ec967fcc117",
     "url": "https://api.platform.opentargets.org/api/v4/graphql",
     "method": "POST",

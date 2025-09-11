@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "created_at": "2025-09-10T15:06:06.014479",
-    "updated_at": "2025-09-10T15:06:06.014493",
+    "created_at": "2025-09-09T08:32:00.568721",
+    "updated_at": "2025-09-09T08:32:00.568736",
     "key": "uniprot_api_get_79ca7940593c",
     "url": "https://rest.uniprot.org/uniprotkb/P0DTC2.json",
     "method": "GET",
