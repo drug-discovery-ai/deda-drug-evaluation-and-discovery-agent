@@ -21,6 +21,26 @@ class OpenTargetsClient:
         self.limit = 10
         self.CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
+    def cache_hit(self, ontology_id: str) -> bool:
+        hit = False
+        cache_file = self.CACHE_DIR / f"{make_hash(ontology_id)}.json"
+
+        print(cache_file)
+        if cache_file.exists():
+            print(f"Cache hit: {cache_file}")
+            hit = True
+
+        return hit
+
+    def delete_cache(self, ontology_id: str) -> None:
+        """Delete cached file for a UniProt code if it exists."""
+        cache_file = self.CACHE_DIR / f"{make_hash(ontology_id)}.json"
+        if cache_file.exists():
+            cache_file.unlink()
+            print(f"Deleted cache file: {cache_file}")
+        else:
+            print(f"No cache file found for {ontology_id}")
+
     async def _make_graphql_request(
         self, query: str, variables: dict
     ) -> dict[str, Any] | None:
@@ -219,7 +239,7 @@ class OpenTargetsClient:
 
         cache_file = self.CACHE_DIR / f"{make_hash(ontology_id)}.json"
 
-        if cache_file.exists():
+        if self.cache_hit(ontology_id):
             print(f"Cache hit: {cache_file}")
             async with aiofiles.open(cache_file) as f:
                 data_cache = await f.read()

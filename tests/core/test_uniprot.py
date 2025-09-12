@@ -182,6 +182,27 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
         assert result == []
 
+    @pytest.mark.unit
+    @patch("httpx.AsyncClient")
+    async def test_get_cache(
+        self,
+        mock_client_cls: Any,
+        client: UniProtClient,
+        mock_uniprot_details_response: Any,
+        http_mock_helpers: Any,
+    ) -> None:
+        """Test successful protein details retrieval."""
+        http_mock_helpers.setup_httpx_mock(
+            mock_client_cls, mock_uniprot_details_response
+        )
+
+        client.delete_cache("P0DTC2")
+        await client.get_details("P0DTC2")
+
+        assert client.cache_hit("P0DTC2")
+
+        client.delete_cache("P0DTC2")  # Safely Delete Cache
+
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_fasta_sequence_integration(self, client: UniProtClient) -> None:
