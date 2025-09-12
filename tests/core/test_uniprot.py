@@ -61,6 +61,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
             mock_client_cls, mock_uniprot_details_response
         )
 
+        client.delete_cache("P0DTC2")
         result = await client.get_details("P0DTC2")
 
         assert result["accession"] == "P0DTC2"
@@ -97,6 +98,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
         spike_protein_uniprot_id: str,
     ) -> None:
         """Test protein details retrieval with missing fields."""
+
+        client.delete_cache(spike_protein_uniprot_id)
         minimal_response = {"primaryAccession": spike_protein_uniprot_id}
         http_mock_helpers.setup_httpx_mock(mock_client_cls, minimal_response)
 
@@ -179,11 +182,33 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
 
         assert result == []
 
+    @pytest.mark.unit
+    @patch("httpx.AsyncClient")
+    async def test_get_cache(
+        self,
+        mock_client_cls: Any,
+        client: UniProtClient,
+        mock_uniprot_details_response: Any,
+        http_mock_helpers: Any,
+    ) -> None:
+        """Test successful protein details retrieval."""
+        http_mock_helpers.setup_httpx_mock(
+            mock_client_cls, mock_uniprot_details_response
+        )
+
+        client.delete_cache("P0DTC2")
+        await client.get_details("P0DTC2")
+
+        assert client.cache_hit("P0DTC2")
+
+        client.delete_cache("P0DTC2")  # Safely Delete Cache
+
     @pytest.mark.integration
     @pytest.mark.slow
     async def test_get_fasta_sequence_integration(self, client: UniProtClient) -> None:
         """Integration test for FASTA sequence retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
+        client.delete_cache("P0DTC2")
         result = await client.get_fasta_sequence("P0DTC2")
 
         assert result != ""
@@ -196,6 +221,7 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     async def test_get_details_integration(self, client: UniProtClient) -> None:
         """Integration test for protein details retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
+        client.delete_cache("P0DTC2")
         result = await client.get_details("P0DTC2")
 
         assert "error" not in result
@@ -214,6 +240,8 @@ MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFD
     ) -> None:
         """Integration test for PDB IDs retrieval with real API."""
         # Test with known SARS-CoV-2 spike protein
+
+        client.delete_cache(spike_protein_uniprot_id)
         result = await client.get_pdb_ids(spike_protein_uniprot_id)
 
         assert isinstance(result, list)

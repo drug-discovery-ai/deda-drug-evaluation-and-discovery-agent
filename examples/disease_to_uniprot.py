@@ -1,28 +1,65 @@
 import asyncio
+import hashlib
 import json
+import time
+from pathlib import Path
+from typing import Any
 
-from drug_discovery_agent.core.alphafold import AlphaFoldClient
+import aiofiles  # type: ignore
+
+from drug_discovery_agent.core.ebi import EBIClient
+from drug_discovery_agent.core.opentarget import OpenTargetsClient
+from drug_discovery_agent.utils.constants import OPENTARGET_CACHE_DIR
+
+CACHE_DIR = Path(OPENTARGET_CACHE_DIR)
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-async def main() -> None:
-    aplhafold_instance = AlphaFoldClient()
+def make_hash(value: str) -> str:
+    """Create a short hash from ontology ID or other string."""
+    return hashlib.sha256(value.encode()).hexdigest()[:16]
 
-    response = await aplhafold_instance.fetch_alphafold_prediction("P42336")
-    # disease = EBIClient()
-    # disease_result = await disease.fetch_all_ontology_ids("chcicken pox")
 
-    # print(disease_result[0]["ontology_id"])
+async def main() -> dict[str, Any] | Any:
+    disease = EBIClient()
+    ot_client = OpenTargetsClient()
 
-    # # choose one candidate randomly
+    # 1. Fetch ontology IDs
+    disease_result = await disease.fetch_all_ontology_ids("chicken pox")
+    if not disease_result:
+        print("No ontology IDs found.")
+        return None
 
-    # ot_client = OpenTargetsClient()
+    # 2. Pick one (2nd element in this case)
+    chosen = disease_result[1]
+    ontology_id = chosen["ontology_id"]
+    print("Chosen ontology_id:", ontology_id)
 
-    # result = await ot_client.disease_target_knowndrug_pipeline(
-    #     disease_result[0]["ontology_id"]
-    # )
+    # 3. Build cache path
+    cache_file = CACHE_DIR / f"{make_hash(ontology_id)}.json"
 
-    print(json.dumps(response, indent=2))
+    if cache_file.exists():
+        print(f"Cache hit: {cache_file}")
+        async with aiofiles.open(cache_file) as f:
+            data = await f.read()
+        return json.loads(data)
+
+    print("Cache miss, fetching from OpenTargets...")
+    result = await ot_client.disease_target_knowndrug_pipeline(ontology_id)
+
+    # Save to cache (async)
+    async with aiofiles.open(cache_file, "w") as f:
+        await f.write(json.dumps(result, indent=2))
+    print(f"Saved result to {cache_file}")
+
+    return result
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    start = time.perf_counter()
+    result = asyncio.run(main())
+    end = time.perf_counter()
+
+    if result is not None:
+        # print(json.dumps(result, indent=2))
+        print("Total latency:", f"{end - start:.3f} seconds")

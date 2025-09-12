@@ -1,5 +1,8 @@
 """Constants for API endpoints and configuration."""
 
+import tempfile
+from pathlib import Path
+
 # API endpoints
 VIRUS_UNIPROT_REST_API_BASE = "https://rest.uniprot.org/uniprotkb"
 RCSB_DB_ENDPOINT = "https://data.rcsb.org/rest/v1/core/entry"
@@ -9,3 +12,7 @@ ALPHAFOLD_ENDPOINT = "https://alphafold.ebi.ac.uk/api/prediction"
 
 # HTTP configuration
 USER_AGENT = "FASTA-app/1.0"
+
+# Cache configuration
+OPENTARGET_CACHE_DIR = Path(tempfile.gettempdir() + "/opentarget_cache")
+UNIPROT_CACHE_DIR = Path(tempfile.gettempdir() + "/uniprot_cache")
