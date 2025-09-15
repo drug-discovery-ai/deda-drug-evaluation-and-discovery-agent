@@ -48,7 +48,8 @@
   },
   "dependencies": {
     "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.4"
+    "electron-updater": "^6.1.4",
+    "uuid": "^13.0.0"
   },
   "build": {
     "appId": "com.drugdiscovery.biochat",
@@ -69,7 +70,9 @@
       {
         "from": "../dist/",
         "to": "python-backend/",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "../.env",
@@ -81,7 +84,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ]
     },
@@ -110,7 +116,10 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         }
       ],
       "icon": "../assets/icon.ico"
@@ -119,7 +128,9 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "category": "Science",

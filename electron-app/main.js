@@ -8,8 +8,10 @@ class ElectronApp {
         this.pythonProcess = null;
         this.mainWindow = null;
         this.serverPort = 8080;
-        this.serverHost = 'localhost';
+        this.serverHost = '127.0.0.1';
+        this.baseServerUrl = `http://${this.serverHost}:${this.serverPort}`;
         this.isQuitting = false;
+        this.isDevelopment = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
     }
 
     async createWindow() {
@@ -33,7 +35,7 @@ class ElectronApp {
         });
 
         // Load the app
-        this.mainWindow.loadFile('src/index.html');
+        this.mainWindow.loadFile('views/index.html');
 
         // Show window when ready to prevent visual flash
         this.mainWindow.once('ready-to-show', () => {
@@ -44,10 +46,7 @@ class ElectronApp {
             `);
         });
 
-        // Open DevTools in development
-        if (process.env.NODE_ENV === 'development') {
-            this.mainWindow.webContents.openDevTools();
-        }
+        // DevTools can be opened manually with Ctrl+Shift+I or Cmd+Option+I
 
         // Handle window closed
         this.mainWindow.on('closed', () => {
@@ -152,8 +151,9 @@ class ElectronApp {
 
             this.pythonProcess.on('close', (code) => {
                 console.log(`Python backend process exited with code ${code}`);
-                if (code !== 0 && !this.isQuitting) {
-                    this.showError('Backend Server Error', 
+                // Only show error dialog for unexpected crashes, not normal shutdowns or development restarts
+                if (code !== 0 && !this.isQuitting && !this.isDevelopment) {
+                    this.showError('Backend Server Error',
                         `The backend server crashed unexpectedly (code: ${code}). Please restart the application.`);
                 }
             });
@@ -194,7 +194,7 @@ class ElectronApp {
             // Try both localhost and 127.0.0.1 to handle IPv4/IPv6 issues
             let response;
             try {
-                response = await fetch(`http://127.0.0.1:${this.serverPort}/health`);
+                response = await fetch(`${this.baseServerUrl}/health`);
             } catch (e) {
                 response = await fetch(`http://${this.serverHost}:${this.serverPort}/health`);
             }
@@ -232,6 +232,22 @@ class ElectronApp {
                 return { success: false, error: error.message };
             }
         });
+
+        // Handle API key status check
+        ipcMain.handle('check-api-key-status', async () => {
+            try {
+                const response = await fetch(`${this.baseServerUrl}/api/key/status`);
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Failed to check API key status:', error);
+                return { has_key: false, source: 'none', error: error.message };
+            }
+        });
+
     }
 
     async stopPythonBackend() {
@@ -261,8 +277,13 @@ class ElectronApp {
     }
 
     showError(title, message) {
-        if (this.mainWindow) {
-            dialog.showErrorBox(title, message);
+        if (this.mainWindow && this.mainWindow.webContents) {
+            // Send error to renderer for toast notification instead of native dialog
+            this.mainWindow.webContents.send('show-error-notification', {
+                title,
+                message,
+                type: 'error'
+            });
         }
     }
 

@@ -19,7 +19,6 @@
                 <div class="header-controls">
                     <div class="connection-status" id="connection-status">
                         <span class="status-indicator" id="status-indicator"></span>
-                        <span class="status-text" id="status-text">Connecting...</span>
                     </div>
                     <button class="icon-button" id="settings-button" title="Settings">
                         ⚙️
@@ -36,24 +35,7 @@
                     <div class="welcome-icon">🧬</div>
                     <h2>Welcome to Bioinformatics Chat Assistant</h2>
                     <p>Your AI-powered research companion for bioinformatics analysis</p>
-                    <div class="welcome-features">
-                        <div class="feature">
-                            <span class="feature-icon">🔍</span>
-                            <span>Protein Structure Analysis</span>
-                        </div>
-                        <div class="feature">
-                            <span class="feature-icon">🧪</span>
-                            <span>UniProt Database Queries</span>
-                        </div>
-                        <div class="feature">
-                            <span class="feature-icon">📊</span>
-                            <span>Sequence Analysis Tools</span>
-                        </div>
-                        <div class="feature">
-                            <span class="feature-icon">💡</span>
-                            <span>Research Insights</span>
-                        </div>
-                    </div>
+
                     <div class="welcome-prompt">
                         <p>Start by asking a question about proteins, sequences, or molecular structures!</p>
                     </div>
@@ -174,6 +156,13 @@
             </div>
         </div>
     </div>
+
+    <!-- API Key Components -->
+    <script src="../api-key/toast-manager.js"></script>
+    <script src="../api-key/api-key-modal.js"></script>
+    <script src="../api-key/key-status.js"></script>
+    <script src="../settings-panel.js"></script>
+    <script src="../api-key/startup-flow.js"></script>
 
     <script src="renderer.js"></script>
 </body>

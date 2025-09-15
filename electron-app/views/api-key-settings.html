@@ -1,0 +1,118 @@
+<div class="setting-group api-key-group">
+    <div class="setting-header">
+        <label>🔐 API Key Management</label>
+        <div class="setting-description">
+            Manage your OpenAI API key for secure access to AI features
+        </div>
+    </div>
+
+    <div class="api-key-settings">
+        <!-- Current Key Status -->
+        <div class="current-key-status" id="settings-key-status">
+            <div class="status-row">
+                <div class="status-info">
+                    <div class="status-label">Status:</div>
+                    <div class="status-value" id="settings-status-value">
+                        <span class="status-indicator" id="settings-status-indicator">⏳</span>
+                        <span class="status-text" id="settings-status-text">Checking...</span>
+                    </div>
+                </div>
+                <div class="status-actions">
+                    <button class="button button-small button-secondary" id="refresh-key-status">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="status-details" id="settings-status-details">
+                <div class="detail-row">
+                    <span class="detail-label">Source:</span>
+                    <span class="detail-value" id="settings-source-value">-</span>
+                </div>
+                <div class="detail-row" id="settings-masked-key-row" style="display: none;">
+                    <span class="detail-label">Key:</span>
+                    <span class="detail-value masked-key" id="settings-masked-key" title="Click to copy">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Methods Status -->
+        <div class="storage-status" id="settings-storage-status">
+            <div class="storage-header">
+                <h4>Storage Methods</h4>
+                <div class="storage-description">Available secure storage options on your system</div>
+            </div>
+            <div class="storage-methods">
+                <div class="storage-method-item" id="keychain-method">
+                    <div class="method-info">
+                        <span class="method-icon">🔐</span>
+                        <div class="method-details">
+                            <div class="method-name">System Keychain</div>
+                            <div class="method-description">Most secure option using OS keychain</div>
+                        </div>
+                    </div>
+                    <div class="method-status">
+                        <span class="status-badge" id="keychain-status">Unknown</span>
+                    </div>
+                </div>
+
+                <div class="storage-method-item" id="file-method">
+                    <div class="method-info">
+                        <span class="method-icon">📁</span>
+                        <div class="method-details">
+                            <div class="method-name">Encrypted File</div>
+                            <div class="method-description">Fallback option with file encryption</div>
+                        </div>
+                    </div>
+                    <div class="method-status">
+                        <span class="status-badge" id="file-status">Unknown</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Key Actions -->
+        <div class="api-key-actions">
+            <div class="action-buttons">
+                <button class="button button-primary" id="add-update-key-btn">
+                    <span class="button-icon">🔑</span>
+                    <span class="button-text">Add API Key</span>
+                </button>
+                <button class="button button-secondary" id="test-key-btn" style="display: none;">
+                    <span class="button-icon">🧪</span>
+                    Test Key
+                </button>
+                <button class="button button-secondary" id="view-key-details-btn" style="display: none;">
+                    <span class="button-icon">👁️</span>
+                    View Details
+                </button>
+                <button class="button button-danger" id="delete-key-btn" style="display: none;">
+                    <span class="button-icon">🗑️</span>
+                    Delete Key
+                </button>
+            </div>
+
+            <div class="action-help">
+                <div class="help-text" id="api-key-help-text">
+                    No API key configured. Add your OpenAI API key to enable AI features.
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Information -->
+        <div class="security-info">
+            <div class="security-header">
+                <span class="security-icon">🔒</span>
+                <span class="security-title">Security Information</span>
+            </div>
+            <div class="security-details">
+                <ul>
+                    <li>API keys are stored using your system's secure storage</li>
+                    <li>Keys are never transmitted except to OpenAI's servers</li>
+                    <li>File storage uses strong encryption when keychain is unavailable</li>
+                    <li>You can update or delete your key at any time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
