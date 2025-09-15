@@ -1,1 +1,1 @@
-"""Tests for langchain interface modules."""
+"""Tests for LangChain interface modules."""

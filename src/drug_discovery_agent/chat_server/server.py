@@ -23,6 +23,8 @@ from drug_discovery_agent.chat_server.models import (
     SessionInfoResponse,
 )
 from drug_discovery_agent.chat_server.session_manager import SessionManager
+from drug_discovery_agent.key_storage.key_manager import APIKeyManager, StorageMethod
+from drug_discovery_agent.settings.api_key.settings import create_api_key_routes
 
 # Load environment variables from .env file
 from drug_discovery_agent.utils.env import load_env_for_bundle
@@ -184,33 +186,33 @@ class ChatServer:
         # Define routes
         routes = [
             # Session management
-            Route("/api/sessions", self.create_session_endpoint, methods=["POST"]),
+            Route("/sessions", self.create_session_endpoint, methods=["POST"]),
             Route(
-                "/api/sessions/{session_id}",
+                "/sessions/{session_id}",
                 self.delete_session_endpoint,
                 methods=["DELETE"],
             ),
             Route(
-                "/api/sessions/{session_id}/clear",
+                "/sessions/{session_id}/clear",
                 self.clear_session_endpoint,
                 methods=["POST"],
             ),
             Route(
-                "/api/sessions/{session_id}/info",
+                "/sessions/{session_id}/info",
                 self.get_session_info_endpoint,
                 methods=["GET"],
             ),
             # Chat endpoints
-            Route("/api/chat", self.chat_endpoint, methods=["POST"]),
-            Route("/api/chat/stream", self.chat_stream_endpoint, methods=["POST"]),
+            Route("/chat", self.chat_endpoint, methods=["POST"]),
+            Route("/chat/stream", self.chat_stream_endpoint, methods=["POST"]),
             # Health check
             Route("/health", self.health_check, methods=["GET"]),
         ]
 
-        # Create app
+        routes.extend(create_api_key_routes())
+
         app = Starlette(debug=True, routes=routes)
 
-        # Add CORS middleware for Electron frontend
         app.add_middleware(
             CORSMiddleware,
             allow_origins=[
@@ -218,7 +220,7 @@ class ChatServer:
                 "app://electron-app",
                 "http://127.0.0.1:3000",
             ],
-            allow_methods=["GET", "POST", "DELETE"],
+            allow_methods=["GET", "POST", "DELETE", "PUT"],
             allow_headers=["*"],
         )
 
@@ -227,6 +229,47 @@ class ChatServer:
     async def shutdown(self) -> None:
         """Clean shutdown of the chat server."""
         await self.session_manager.shutdown()
+
+
+def display_api_key_status() -> None:
+    """Display API key status information at startup."""
+    has_key, message, source = check_api_key_availability()
+
+    if has_key:
+        print(f"🔑 {message}")
+        if source == StorageMethod.ENVIRONMENT:
+            print("   Source: Environment variable")
+        elif source == StorageMethod.KEYCHAIN:
+            print("   Source: OS keychain (secure)")
+        elif source == StorageMethod.ENCRYPTED_FILE:
+            print("   Source: Encrypted file storage")
+    else:
+        print(f"⚠️  {message}")
+        print("   API keys can be configured through:")
+        print("   • Frontend settings page")
+        print("   • Environment variable (API_KEY)")
+        print("   • API endpoints (/api/key)")
+        print("   Note: Some features may require an API key to function properly")
+
+
+def check_api_key_availability() -> tuple[bool, str, StorageMethod]:
+    """Check if API key is available at startup.
+
+    Returns:
+        Tuple of (has_key, status_message, source)
+    """
+    key_manager = APIKeyManager()
+    api_key, source = key_manager.get_api_key()
+
+    if api_key:
+        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else "***"
+        return True, f"API key found from {source.value} ({masked_key})", source
+    else:
+        return (
+            False,
+            "No API key found in any storage location",
+            StorageMethod.NOT_FOUND,
+        )
 
 
 def main() -> None:
@@ -242,8 +285,18 @@ def main() -> None:
         action="store_true",
         help="Enable verbose output showing tool selection and execution details",
     )
+    parser.add_argument(
+        "--skip-key-check",
+        action="store_true",
+        help="Skip API key availability check at startup",
+    )
 
     args = parser.parse_args()
+
+    # Check API key availability at startup
+    if not args.skip_key_check:
+        display_api_key_status()
+        print()  # Add spacing
 
     # Create chat server
     chat_server = ChatServer(verbose=args.verbose)
@@ -253,12 +306,21 @@ def main() -> None:
         f"Stateful Bioinformatics Chat Server starting on http://{args.host}:{args.port}"
     )
     print("Endpoints:")
-    print("   POST /api/sessions - Create new session")
-    print("   DELETE /api/sessions/{id} - Delete session")
-    print("   POST /api/sessions/{id}/clear - Clear conversation")
-    print("   POST /api/chat - Send message (requires session_id)")
-    print("   POST /api/chat/stream - Streaming chat (requires session_id)")
-    print("   GET /health - Health check with session metrics")
+    print("   Session Management:")
+    print("     POST /sessions - Create new session")
+    print("     DELETE /sessions/{id} - Delete session")
+    print("     POST /sessions/{id}/clear - Clear conversation")
+    print("   Chat:")
+    print("     POST /chat - Send message (requires session_id)")
+    print("     POST /chat/stream - Streaming chat (requires session_id)")
+    print("   API Key Management:")
+    print("     POST /api/key - Store API key")
+    print("     GET /api/key/status - Get key status")
+    print("     PUT /api/key - Update API key")
+    print("     DELETE /api/key - Delete API key")
+    print("     POST /api/key/validate - Validate key format")
+    print("   Health:")
+    print("     GET /health - Health check with session metrics")
     print("Ready for stateful Electron frontend connections!")
 
     def signal_handler(sig: int, frame: Any) -> None:

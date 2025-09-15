@@ -11,7 +11,12 @@ import pytest
 def mock_env_vars() -> Generator[None, None, None]:
     """Mock environment variables for OpenAI."""
     with patch.dict(
-        os.environ, {"OPENAI_API_KEY": "test-key", "OPENAI_MODEL": "gpt-4o-mini"}
+        os.environ,
+        {
+            "API_KEY": "sk-test1234567890abcdef",
+            "OPENAI_API_KEY": "sk-test1234567890abcdef",
+            "OPENAI_MODEL": "gpt-4o-mini",
+        },
     ):
         yield
 

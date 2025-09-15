@@ -1,7 +1,9 @@
 Bio==1.8.0
 biopython==1.85
+cryptography>=41.0.0
 fastmcp>=2.0.0
 httpx==0.28.1
+keyring>=24.0.0
 langchain==0.3.27
 langchain_openai==0.3.32
 mcp>=1.13.1
