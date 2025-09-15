@@ -65,7 +65,7 @@ The Electron app communicates with a Python backend server running on `localhost
 
 1. **App Startup**: 
    - Electron launches Python backend server
-   - Frontend creates new session via `POST /api/sessions`
+   - Frontend creates new session via `POST /sessions`
    - Session ID stored for all subsequent requests
 
 2. **Chat Interaction**:
@@ -75,7 +75,7 @@ The Electron app communicates with a Python backend server running on `localhost
    - AI response displayed in chat interface
 
 3. **App Shutdown**:
-   - Session cleanup via `DELETE /api/sessions/{id}`
+   - Session cleanup via `DELETE /sessions/{id}`
    - Python backend server terminated gracefully
 
 ## 🛠️ Development Guide

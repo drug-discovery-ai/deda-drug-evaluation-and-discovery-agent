@@ -39,6 +39,7 @@ class BioinformaticsChatApp {
         try {
             this.bindElements();
             this.setupEventListeners();
+            this.setupIPCListeners();
             this.showLoadingOverlay('Initializing application...');
             
             await this.initializeApp();
@@ -75,17 +76,16 @@ class BioinformaticsChatApp {
             // Status elements
             connectionStatus: document.getElementById('connection-status'),
             statusIndicator: document.getElementById('status-indicator'),
-            statusText: document.getElementById('status-text'),
             
             // Typing indicator
             typingIndicator: document.getElementById('typing-indicator'),
             
-            // Toast notifications
+            // Toast notifications (using toast manager now)
             errorToast: document.getElementById('error-toast'),
-            successToast: document.getElementById('success-toast'),
             errorMessage: document.getElementById('error-message'),
-            successMessage: document.getElementById('success-message'),
             errorClose: document.getElementById('error-close'),
+            successToast: document.getElementById('success-toast'),
+            successMessage: document.getElementById('success-message'),
             successClose: document.getElementById('success-close'),
             
             // Settings modal
@@ -111,22 +111,57 @@ class BioinformaticsChatApp {
         this.elements.sendButton.addEventListener('click', () => this.sendMessage());
 
         // Toast close buttons
-        this.elements.errorClose.addEventListener('click', () => this.hideError());
-        this.elements.successClose.addEventListener('click', () => this.hideSuccess());
+        if (this.elements.errorClose) {
+            this.elements.errorClose.addEventListener('click', () => this.hideError());
+        }
+        if (this.elements.successClose) {
+            this.elements.successClose.addEventListener('click', () => this.hideSuccess());
+        }
 
         // Settings modal
-        this.elements.settingsButton.addEventListener('click', () => this.showSettings());
-        this.elements.settingsClose.addEventListener('click', () => this.hideSettings());
-        this.elements.restartBackendButton.addEventListener('click', () => this.restartBackend());
+        if (this.elements.settingsButton) {
+            this.elements.settingsButton.addEventListener('click', () => this.showSettings());
+        }
+
+        if (this.elements.settingsClose) {
+            this.elements.settingsClose.addEventListener('click', () => this.hideSettings());
+        }
+
+        if (this.elements.restartBackendButton) {
+            this.elements.restartBackendButton.addEventListener('click', () => this.restartBackend());
+        }
 
         // Modal overlay click to close
-        this.elements.settingsModal.addEventListener('click', (e) => {
-            if (e.target === this.elements.settingsModal) {
-                this.hideSettings();
-            }
-        });
+        if (this.elements.settingsModal) {
+            this.elements.settingsModal.addEventListener('click', (e) => {
+                if (e.target === this.elements.settingsModal) {
+                    this.hideSettings();
+                }
+            });
+        }
 
         // Note: Auto-hide timers are set when toasts are shown, not here
+    }
+
+    /**
+     * Setup IPC listeners for main process communication
+     */
+    setupIPCListeners() {
+        // Listen for error notifications from main process
+        if (window.electronAPI?.onErrorNotification) {
+            window.electronAPI.onErrorNotification((data) => {
+                // Use toast manager for error notifications instead of native dialogs
+                if (window.toastManager) {
+                    window.toastManager.error(`${data.title}: ${data.message}`, {
+                        duration: 8000,
+                        persistent: false // Make sure it auto-dismisses
+                    });
+                } else {
+                    // Fallback to basic error display
+                    this.showError(`${data.title}: ${data.message}`);
+                }
+            });
+        }
     }
 
     /**
@@ -139,12 +174,18 @@ class BioinformaticsChatApp {
             
             // Wait for backend to be ready
             await this.waitForBackend();
-            
-            // Create chat session
-            await this.createSession();
-            
-            // Update connection status
+
+            // Update connection status - backend is ready
             this.updateConnectionStatus(true);
+
+            // Try to create chat session (may fail if no API key)
+            try {
+                await this.createSession();
+            } catch (error) {
+                // Session creation failed (likely no API key), but backend is still connected
+                this.warn('Session creation failed:', error.message);
+                // Don't throw - let the app continue with just backend connection
+            }
             
             // Focus input
             this.elements.messageInput.focus();
@@ -178,6 +219,7 @@ class BioinformaticsChatApp {
      * Wait for backend server to be ready
      */
     async waitForBackend(maxAttempts = 30) {
+        this.setConnectingState();
         this.updateLoadingText('Waiting for backend server...');
         
         // Ensure httpClient is available
@@ -221,7 +263,7 @@ class BioinformaticsChatApp {
             };
             
             
-            const response = await window.httpClient.post(`${this.config.serverUrl}/api/sessions`, payload);
+            const response = await window.httpClient.post(`${this.config.serverUrl}/sessions`, payload);
             
             this.sessionId = response.session_id;
         } catch (error) {
@@ -334,7 +376,7 @@ class BioinformaticsChatApp {
     async sendMessageToBackend(message) {
         for (let attempt = 1; attempt <= this.config.maxRetries; attempt++) {
             try {
-                return await window.httpClient.post(`${this.config.serverUrl}/api/chat`, {
+                return await window.httpClient.post(`${this.config.serverUrl}/chat`, {
                     session_id: this.sessionId,
                     message: message
                 });
@@ -462,15 +504,70 @@ class BioinformaticsChatApp {
      */
     updateConnectionStatus(connected) {
         this.isConnected = connected;
-        
-        if (connected) {
-            this.elements.statusIndicator.className = 'status-indicator connected';
-            this.elements.statusText.textContent = 'Connected';
-            this.elements.serverStatusDetail.textContent = 'Healthy';
-        } else {
-            this.elements.statusIndicator.className = 'status-indicator error';
-            this.elements.statusText.textContent = 'Disconnected';
-            this.elements.serverStatusDetail.textContent = 'Disconnected';
+
+        // Check overall system status (connection + API key)
+        this.updateOverallStatus();
+    }
+
+    /**
+     * Update overall system status based on connection and API key
+     */
+    async updateOverallStatus() {
+        if (!this.isConnected) {
+            // If not connected, show red
+            this.elements.statusIndicator.className = 'status-indicator red';
+            this.elements.statusIndicator.textContent = '';
+            this.elements.connectionStatus.title = 'Disconnected';
+            if (this.elements.serverStatusDetail) this.elements.serverStatusDetail.textContent = 'Disconnected';
+            return;
+        }
+
+        // If connected, check API key status
+        try {
+            const apiKeyStatus = await window.httpClient.get(`${this.config.serverUrl}/api/key/status`);
+
+            if (apiKeyStatus.has_key) {
+                // Connected + API key = Green (fully ready)
+                this.elements.statusIndicator.className = 'status-indicator green';
+                this.elements.statusIndicator.textContent = '';
+                this.elements.connectionStatus.title = 'Ready';
+                if (this.elements.serverStatusDetail) this.elements.serverStatusDetail.textContent = 'Healthy';
+
+                // Clear any existing error toasts when system is fully ready
+                if (window.toastManager) {
+                    window.toastManager.clearByType('error');
+                }
+            } else {
+                // Connected but no API key = Yellow (partial)
+                this.elements.statusIndicator.className = 'status-indicator yellow';
+                this.elements.statusIndicator.textContent = '';
+                this.elements.connectionStatus.title = 'Connected - API Key Required';
+                if (this.elements.serverStatusDetail) this.elements.serverStatusDetail.textContent = 'API Key Missing';
+            }
+        } catch (error) {
+            // Connected but can't check API key = Yellow (partial)
+            this.elements.statusIndicator.className = 'status-indicator yellow';
+            this.elements.statusIndicator.textContent = '';
+            this.elements.connectionStatus.title = 'Connected - Status Unknown';
+            if (this.elements.serverStatusDetail) this.elements.serverStatusDetail.textContent = 'Status Check Failed';
+        }
+    }
+
+    /**
+     * Set connecting state
+     */
+    setConnectingState() {
+        this.elements.statusIndicator.className = 'status-indicator yellow';
+        this.elements.statusIndicator.textContent = '';
+        this.elements.connectionStatus.title = 'Connecting...';
+    }
+
+    /**
+     * Force refresh overall status (called when API key is updated)
+     */
+    async forceRefreshStatus() {
+        if (this.isConnected) {
+            await this.updateOverallStatus();
         }
     }
 
@@ -497,17 +594,18 @@ class BioinformaticsChatApp {
      * Show/hide error toast
      */
     showError(message) {
-        console.trace('Error toast called from:'); // Show stack trace
-        this.elements.errorMessage.textContent = message;
-        this.elements.errorToast.classList.add('show');
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => this.hideError(), 5000);
+        // Use toast manager for consistent error notifications
+        if (window.toastManager) {
+            window.toastManager.error(message, {
+                duration: 8000,
+                persistent: false // Make sure it auto-dismisses
+            });
+        } else {
+            // Fallback to console if toast manager isn't available
+            console.error('Error:', message);
+        }
     }
 
-    hideError() {
-        this.elements.errorToast.classList.remove('show');
-    }
 
     /**
      * Show/hide success toast
@@ -535,12 +633,43 @@ class BioinformaticsChatApp {
         } catch (error) {
             this.elements.serverStatusDetail.textContent = 'Error';
         }
-        
+
+        // Notify settings panel that modal is opening (to refresh API key status)
+        if (window.settingsPanel && typeof window.settingsPanel.onSettingsOpened === 'function') {
+            window.settingsPanel.onSettingsOpened();
+        }
+
         this.elements.settingsModal.classList.add('active');
     }
 
     hideSettings() {
         this.elements.settingsModal.classList.remove('active');
+    }
+
+    /**
+     * Show API key modal
+     */
+    showAPIKeyModal() {
+        // Create or get the modal instance
+        if (!window.apiKeyModal) {
+            window.apiKeyModal = new APIKeyModal();
+        }
+
+        window.apiKeyModal.show({
+            onSuccess: (result) => {
+                this.showSuccess(`API key saved successfully using ${result.method}`);
+
+                // Force refresh the status after API key is saved
+                setTimeout(() => {
+                    if (typeof this.forceRefreshStatus === 'function') {
+                        this.forceRefreshStatus();
+                    }
+                }, 500);
+            },
+            onCancel: () => {
+                // User cancelled - no additional action needed
+            }
+        });
     }
 
     /**
@@ -580,7 +709,7 @@ class BioinformaticsChatApp {
     async cleanup() {
         if (this.sessionId) {
             try {
-                await window.httpClient.delete(`${this.config.serverUrl}/api/sessions/${this.sessionId}`);
+                await window.httpClient.delete(`${this.config.serverUrl}/sessions/${this.sessionId}`);
                 this.log('Session cleaned up successfully');
             } catch (error) {
                 this.error('Failed to cleanup session:', error);
@@ -610,10 +739,22 @@ class BioinformaticsChatApp {
             console.error('[BioChatApp]', ...args);
         }
     }
+
 }
 
 // Initialize the application
 const app = new BioinformaticsChatApp();
+
+// Expose app globally for debugging and emergency cleanup
+window.app = app;
+
+// Global function to clear error banners (accessible via console)
+window.clearErrorBanners = () => {
+    if (window.toastManager) {
+        window.toastManager.clearAll();
+    }
+    console.log('🧹 Cleared all error banners');
+};
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {
@@ -632,10 +773,8 @@ window.addEventListener('focus', async () => {
     }
 });
 
-// Export app instance for debugging
-if (window.electronAPI?.isDevelopment) {
-    window.app = app;
-}
+// Export app instance globally for access by other components
+window.app = app;
 
 // Global error handler (only log, don't show toasts unless critical)
 window.addEventListener('error', (event) => {
