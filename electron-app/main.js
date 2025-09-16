@@ -2,14 +2,15 @@ const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 const { existsSync } = require('fs');
+const { SERVER_CONFIG } = require('./config/constants');
 
 class ElectronApp {
     constructor() {
         this.pythonProcess = null;
         this.mainWindow = null;
-        this.serverPort = 8080;
-        this.serverHost = '127.0.0.1';
-        this.baseServerUrl = `http://${this.serverHost}:${this.serverPort}`;
+        this.serverPort = SERVER_CONFIG.PORT;
+        this.serverHost = SERVER_CONFIG.HOST;
+        this.baseServerUrl = SERVER_CONFIG.URL;
         this.isQuitting = false;
         this.isDevelopment = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
     }

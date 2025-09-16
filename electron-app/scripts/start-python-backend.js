@@ -54,7 +54,8 @@ function startPythonBackend() {
     };
     
     // Command arguments
-    const args = ['-m', 'drug_discovery_agent.chat_server', '--port', '8080'];
+    const { DEFAULT_PORT } = require('../config/constants');
+    const args = ['-m', 'drug_discovery_agent.chat_server', '--port', DEFAULT_PORT.toString()];
     
     log('Starting Python backend server...');
     log(`Command: ${pythonPath} ${args.join(' ')}`);

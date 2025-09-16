@@ -29,7 +29,7 @@ class APIKeySettingsHandler:
     async def store_api_key(self, request: Request) -> JSONResponse:
         """Store an API key with validation.
 
-        POST /api_key/api_key-key
+        POST /api/key
         """
         try:
             body = await request.json()

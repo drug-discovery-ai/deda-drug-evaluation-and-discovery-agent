@@ -8,10 +8,11 @@ from typing import Any
 class APIKeyValidator:
     """Validates  key formats. Currently, only OpenAI keys are supported."""
 
+    KEY_MIN_LENGTH = 5
+
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
-        self.pattern = re.compile(r"^sk-[a-zA-Z0-9_-]{20,}$")
-        self.min_length = 23
+        self.pattern = re.compile(rf"^sk-[a-zA-Z0-9_-]{{{self.KEY_MIN_LENGTH - 3},}}$")
 
     def is_valid_format(self, api_key: Any) -> bool:
         """Check if API key has a valid format.
@@ -31,7 +32,7 @@ class APIKeyValidator:
             return False
 
         # Check minimum length
-        if len(api_key) < self.min_length:
+        if len(api_key) < self.KEY_MIN_LENGTH:
             return False
 
         # Check OpenAI pattern match
@@ -54,8 +55,11 @@ class APIKeyValidator:
         if len(api_key) == 0:
             return False, "API key cannot be empty"
 
-        if len(api_key) < self.min_length:
-            return False, f"API key is too short (minimum {self.min_length} characters)"
+        if len(api_key) < self.KEY_MIN_LENGTH:
+            return (
+                False,
+                f"API key is too short (minimum {self.KEY_MIN_LENGTH} characters)",
+            )
 
         # Check for common issues
         if api_key.startswith(" ") or api_key.endswith(" "):

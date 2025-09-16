@@ -288,7 +288,7 @@ class APIKeyModal {
             const requestId = Date.now();
             this.currentRequestId = requestId;
 
-            const response = await window.httpClient.post('http://127.0.0.1:8080/api/key/validate', {
+            const response = await window.httpClient.post(SERVER_CONFIG.ENDPOINTS.API_KEY_VALIDATE, {
                 api_key: apiKey
             });
 
@@ -361,8 +361,7 @@ class APIKeyModal {
     }
 
     showRecommendations(recommendations) {
-        // Could show recommendations in a tooltip or info section
-        console.info('API Key Recommendations:', recommendations);
+        // TODO: show the recommendations in the UI
     }
 
     togglePasswordVisibility() {
@@ -406,7 +405,7 @@ class APIKeyModal {
 
             // Use PUT for updates, POST for new keys
             const method = this.isUpdating ? 'put' : 'post';
-            const response = await window.httpClient[method]('http://127.0.0.1:8080/api/key', requestData);
+            const response = await window.httpClient[method](SERVER_CONFIG.ENDPOINTS.API_KEY_MANAGE, requestData);
 
             if (response.success) {
                 // Success - hide modal and call success callback
