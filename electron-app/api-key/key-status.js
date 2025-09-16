@@ -153,7 +153,7 @@ class APIKeyStatus {
 
     async refresh() {
         try {
-            const response = await window.httpClient.get('http://127.0.0.1:8080/api/key/status');
+            const response = await window.httpClient.get(SERVER_CONFIG.ENDPOINTS.API_KEY_STATUS);
             this.statusData = response;
 
             // Clear any error timeout since we succeeded
@@ -330,7 +330,7 @@ class APIKeyStatus {
 
             // Test by making a simple request to the backend
             // The backend will use the stored key to make a test request
-            const response = await window.httpClient.get('http://127.0.0.1:8080/health');
+            const response = await window.httpClient.get(SERVER_CONFIG.ENDPOINTS.HEALTH);
 
             if (response) {
                 this.showSuccessMessage('API key test successful');
@@ -363,7 +363,7 @@ class APIKeyStatus {
         try {
             this.showInfoMessage('Deleting API key...');
 
-            const response = await window.httpClient.delete('http://127.0.0.1:8080/api/key');
+            const response = await window.httpClient.delete(SERVER_CONFIG.ENDPOINTS.API_KEY_MANAGE);
 
             if (response.success) {
                 this.showSuccessMessage('API key deleted successfully');

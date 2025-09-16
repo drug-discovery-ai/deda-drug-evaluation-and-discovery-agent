@@ -275,11 +275,15 @@ def check_api_key_availability() -> tuple[bool, str, StorageMethod]:
 def main() -> None:
     """Main entry point for the chat server."""
     load_env_for_bundle()
+    from ..config import BACKEND_HOST, BACKEND_PORT
+
     parser = argparse.ArgumentParser(
         description="Stateful Bioinformatics Chat Server - HTTP API for Electron frontend"
     )
-    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8080, help="Port to listen on")
+    parser.add_argument("--host", default=BACKEND_HOST, help="Host to bind to")
+    parser.add_argument(
+        "--port", type=int, default=BACKEND_PORT, help="Port to listen on"
+    )
     parser.add_argument(
         "--verbose",
         action="store_true",

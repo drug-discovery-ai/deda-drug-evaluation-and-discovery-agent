@@ -101,7 +101,7 @@ class SettingsPanel {
             this.elements.statusText.textContent = 'Checking...';
             this.elements.sourceDiv.style.display = 'none';
 
-            const response = await window.httpClient.get('http://127.0.0.1:8080/api/key/status');
+            const response = await window.httpClient.get(SERVER_CONFIG.ENDPOINTS.API_KEY_STATUS);
             this.updateStatus(response);
         } catch (error) {
             this.showError();
@@ -190,7 +190,7 @@ class SettingsPanel {
                 window.showToast('Deleting API key...', 'info');
             }
 
-            const response = await window.httpClient.delete('http://127.0.0.1:8080/api/key');
+            const response = await window.httpClient.delete(SERVER_CONFIG.ENDPOINTS.API_KEY_MANAGE);
 
             if (response.success) {
                 if (window.showToast) {

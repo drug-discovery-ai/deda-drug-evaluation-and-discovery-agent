@@ -67,8 +67,8 @@ class StartupFlow {
 
     async checkStartupAPIKey() {
         try {
-        // TODO: remove all usage of direct url
-            const response = await window.httpClient.get('http://127.0.0.1:8080/api/key/status');
+        // Use dynamic URL construction based on server configuration
+            const response = await window.httpClient.get(SERVER_CONFIG.ENDPOINTS.API_KEY_STATUS);
 
             if (response.has_key) {
                 this.handleAPIKeyFound(response);

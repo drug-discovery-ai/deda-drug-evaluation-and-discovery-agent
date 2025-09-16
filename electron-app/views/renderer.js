@@ -7,7 +7,7 @@ class BioinformaticsChatApp {
     constructor() {
         // Configuration
         this.config = {
-            serverUrl: 'http://127.0.0.1:8080',
+            serverUrl: SERVER_CONFIG.URL,
             maxRetries: 3,
             retryDelay: 1000,
             typingDelay: 100,
