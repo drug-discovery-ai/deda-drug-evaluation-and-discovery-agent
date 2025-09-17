@@ -8,30 +8,21 @@ Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluatio
 
 ## Overview
 
-Agentic AI lets people control system components using plain language. It’s flexible enough that experts from different
-fields can connect it to their own tools—helping reduce hallucinations by ensuring the AI talks to real systems, not
-just guessing. On that ground, we built this project for bioinformatics researchers who want to explore drug discovery,
-analyze protein structures, prototype ideas quickly, and more—all through natural language commands. No need to learn
-every tool’s syntax or API.
+Agentic AI allows people to control system components using plain language. It is flexible enough that experts from different fields can connect it to their own tools—reducing hallucinations by ensuring the AI interacts with real systems rather than guessing.
 
-For example, instead of writing code to fetch a protein or run a molecule generation tool, you can simply ask:
+We built this project on that foundation, targeting bioinformatics researchers who want to explore drug discovery, analyze protein structures, prototype ideas quickly, and more—all through natural language commands. For example, instead of writing code to fetch a protein or run a molecule generation tool, you can simply ask:
 
 ```bash
-Generate 5 small molecules that bind to the spike protein of SARS-CoV-2.
+Show known binding pockets for the SARS-CoV-2 virus.
 ```
-
-Behind the scenes, the AI (i.e. LLM) connects to real tools like Boltz, Pocket2Mol, or ESMFold to get the job
-done—accurately and reproducibly.
-
-Currently, we are focusing only integrating LLM to explore the vast capability of the `boltz` tool. **Contributions**
-are welcome to help expand integration with popular tools like `Pocket2Mol`, `DeepChem`, and `RDKit` —with the goal of
-supporting a broader range of bioinformatics workflows.
-
-We leverage Model Control Protocol (mcp) to develop the bio-informatics AI agent.
 
 <p align="center">
   <img src="electron-app/demo.gif" style="width:100%; max-width:100%;"/>
 </p>
+
+
+Behind the scenes, the AI can connect to trusted data sources such as UniProt, ChEMBL, and OpenTargets to ground its responses in reliable biological and chemical knowledge. It is also designed to integrate with specialized tools like Boltz, Pocket2Mol, and ESMFold, tapping into their rich features and APIs to eventually deliver accurate and reproducible results. These integrations are not yet fully implemented—community contributions are welcome to help bring them to life.
+
 
 ## Quick Start
 
