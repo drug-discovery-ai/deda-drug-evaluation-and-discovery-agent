@@ -10,7 +10,7 @@ Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluatio
 
 Agentic AI allows people to control system components using plain language. It is flexible enough that experts from different fields can connect it to their own tools—reducing hallucinations by ensuring the AI interacts with real systems rather than guessing.
 
-We built this project on that foundation, targeting bioinformatics researchers who want to explore drug discovery, analyze protein structures, prototype ideas quickly, and more—all through natural language commands. For example, instead of writing code to fetch a protein or run a molecule generation tool, you can simply ask:
+We built this project on that foundation, focusing on bioinformatics researchers who want to explore drug discovery, analyze protein structures, prototype ideas quickly, and more—all through natural language commands. For example, instead of writing code to fetch a protein or run a molecule generation tool, you can simply ask:
 
 ```bash
 Show known binding pockets for the SARS-CoV-2 virus.
@@ -21,7 +21,7 @@ Show known binding pockets for the SARS-CoV-2 virus.
 </p>
 
 
-Behind the scenes, the AI can connect to trusted data sources such as UniProt, ChEMBL, and OpenTargets to ground its responses in reliable biological and chemical knowledge. It is also designed to integrate with specialized tools like Boltz, Pocket2Mol, and ESMFold, tapping into their rich features and APIs to eventually deliver accurate and reproducible results. These integrations are not yet fully implemented—community contributions are welcome to help bring them to life.
+Behind the scenes, the AI can connect to trusted data sources such as **UniProt**, **AlphaFold**, and **OpenTargets**, grounding its responses in real biological and chemical knowledge and reducing the risk of _hallucination_. This approach makes complex bioinformatics workflows more accessible, accurate, and reproducible—empowering researchers to focus on discovery rather than tooling.
 
 
 ## Quick Start
