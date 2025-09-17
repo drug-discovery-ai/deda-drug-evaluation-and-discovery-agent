@@ -30,7 +30,7 @@ supporting a broader range of bioinformatics workflows.
 We leverage Model Control Protocol (mcp) to develop the bio-informatics AI agent.
 
 <p align="center">
-  <video src="electron-app/demo.mp4" style="width:100%; max-width:100%;" controls></video>
+  <img src="electron-app/demo.gif" style="width:100%; max-width:100%;"/>
 </p>
 
 ## Quick Start
