@@ -1,6 +1,6 @@
 """Stateful chat server package for bioinformatics queries."""
 
-from .models import (
+from drug_discovery_agent.chat_server.models import (
     ChatRequest,
     ChatResponse,
     CreateSessionRequest,
@@ -8,8 +8,8 @@ from .models import (
     HealthResponse,
     SessionInfoResponse,
 )
-from .server import ChatServer, main
-from .session_manager import ChatSession, SessionManager
+from drug_discovery_agent.chat_server.server import ChatServer, main
+from drug_discovery_agent.chat_server.session_manager import ChatSession, SessionManager
 
 __all__ = [
     # Server

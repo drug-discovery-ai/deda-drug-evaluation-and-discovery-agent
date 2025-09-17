@@ -1,6 +1,5 @@
 Bio==1.8.0
 biopython==1.85
-datasets==4.0.0
 fastmcp>=2.0.0
 httpx==0.28.1
 langchain==0.3.27
@@ -9,8 +8,6 @@ mcp>=1.13.1
 openai==1.102.0
 python-dotenv==1.1.1
 starlette==0.47.3
-torch==2.8.0
-transformers==4.55.4
 uvicorn==0.35.0
 aiofiles==24.1.0
 types-aiofiles==24.1.0.20250822

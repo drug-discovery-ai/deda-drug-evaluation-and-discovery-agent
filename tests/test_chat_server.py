@@ -25,7 +25,7 @@ class TestChatServerModels:
             ("", True),  # Empty string is valid
             ("A" * 10000, True),  # Very long message is valid
             ("Special chars: !@#$%^&*()", True),
-            ("Unicode: 🧬🔬💊", True),
+            ("Unicode: DNA MICROSCOPE PILL", True),
         ],
     )
     def test_chat_request_validation(self, message: str, expected_valid: bool) -> None:

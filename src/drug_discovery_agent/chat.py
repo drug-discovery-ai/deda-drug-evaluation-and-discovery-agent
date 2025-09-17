@@ -4,7 +4,6 @@ import argparse
 import asyncio
 import os
 
-from dotenv import load_dotenv
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, trim_messages
@@ -17,8 +16,7 @@ from drug_discovery_agent.core.uniprot import UniProtClient
 
 # Local imports
 from drug_discovery_agent.interfaces.langchain.tools import create_bioinformatics_tools
-
-load_dotenv()  # Load environment variables from .env
+from drug_discovery_agent.utils.env import load_env_for_bundle
 
 
 class BioinformaticsChatClient:
@@ -162,7 +160,7 @@ Be helpful, accurate, and thorough in your responses. Always use tools when spec
         """Display comprehensive help information."""
         print(
             """
-🧬 Bioinformatics Assistant - Help
+Bioinformatics Assistant - Help
 
 CHAT EXAMPLES:
   Basic Queries:
@@ -205,9 +203,9 @@ TIPS:
 
     async def chat_loop(self) -> None:
         """Run interactive langchain loop with proper error handling."""
-        print("🧬 Bioinformatics Assistant")
-        print("💡 Type '/help' for examples and commands, or '/quit' to exit")
-        print("🔬 Ready to help with protein analysis and molecular data!\n")
+        print("Bioinformatics Assistant")
+        print("💡 Type '/help' for tools and commands, or '/quit' to exit")
+        print("Ready to help with protein analysis and molecular data!\n")
 
         while True:
             try:
@@ -230,7 +228,7 @@ TIPS:
                 # Process langchain query with loading indicator
                 print("🤔 Analyzing...", end="", flush=True)
                 response = await self.chat(user_input)
-                print(f"\r🧬 Assistant: {response}\n")
+                print(f"\rAssistant: {response}\n")
 
             except KeyboardInterrupt:
                 print("\n\n👋 Goodbye! Happy researching!")
@@ -240,7 +238,7 @@ TIPS:
                 break
             except Exception as e:
                 print(f"\n⚠️  Unexpected error: {str(e)}")
-                print("💡 Try '/help' for usage examples or '/quit' to exit\n")
+                print("💡 Try '/help' for usage tools or '/quit' to exit\n")
 
 
 async def async_main(verbose: bool = False) -> None:
@@ -269,6 +267,7 @@ async def async_main(verbose: bool = False) -> None:
 
 def main() -> None:
     """Synchronous entry point that runs the async main function."""
+    load_env_for_bundle()
     parser = argparse.ArgumentParser(
         description="Bioinformatics Assistant - Interactive chat interface for protein analysis"
     )
