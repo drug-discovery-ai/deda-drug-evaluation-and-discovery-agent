@@ -23,10 +23,26 @@ class TestAPIKeyManager:
         if APIKeyManager.ENV_VAR_API_KEY in os.environ:
             del os.environ[APIKeyManager.ENV_VAR_API_KEY]
 
+        # Use test-specific service name to avoid conflicts
+        self.test_service_name = "drug_discovery_agent_test"
+        self.test_account_name = "openai_api_key_test"
+
         # Patch the user data directory to use temp directory
-        with patch.object(APIKeyManager, "_get_user_data_dir") as mock_get_dir:
-            mock_get_dir.return_value = Path(self.temp_dir)
-            self.manager = APIKeyManager()
+        self.patch_user_data_dir = patch.object(APIKeyManager, "_get_user_data_dir")
+        mock_get_dir = self.patch_user_data_dir.start()
+        mock_get_dir.return_value = Path(self.temp_dir)
+
+        # Patch the service and account names for tests
+        self.patch_service_name = patch.object(
+            APIKeyManager, "SERVICE_NAME", self.test_service_name
+        )
+        self.patch_account_name = patch.object(
+            APIKeyManager, "ACCOUNT_NAME", self.test_account_name
+        )
+        self.patch_service_name.start()
+        self.patch_account_name.start()
+
+        self.manager = APIKeyManager()
 
         # Ensure encrypted storage starts clean
         try:
@@ -38,6 +54,11 @@ class TestAPIKeyManager:
 
     def teardown_method(self) -> None:
         """Clean up test fixtures."""
+        # Stop all patches
+        self.patch_user_data_dir.stop()
+        self.patch_service_name.stop()
+        self.patch_account_name.stop()
+
         # Clean up environment variables
         if APIKeyManager.ENV_VAR_API_KEY in os.environ:
             del os.environ[APIKeyManager.ENV_VAR_API_KEY]
@@ -54,28 +75,36 @@ class TestAPIKeyManager:
 
     def test_user_data_dir_platform_specific(self) -> None:
         """Test platform-specific user data directory selection."""
-        manager = APIKeyManager()
+        # Temporarily stop our patches to test the real behavior
+        self.patch_user_data_dir.stop()
 
-        with patch("platform.system") as mock_system:
-            # Test macOS
-            mock_system.return_value = "Darwin"
-            with patch("pathlib.Path.home") as mock_home:
-                mock_home.return_value = Path("/Users/test")
-                data_dir = manager._get_user_data_dir()
-                assert "Library/Application Support" in str(data_dir)
+        try:
+            with patch("platform.system") as mock_system:
+                # Test macOS
+                mock_system.return_value = "Darwin"
+                with patch("pathlib.Path.home") as mock_home:
+                    mock_home.return_value = Path("/Users/test")
+                    manager = APIKeyManager()
+                    data_dir = manager._get_user_data_dir()
+                    assert "Library/Application Support" in str(data_dir)
 
-            # Test Windows
-            mock_system.return_value = "Windows"
-            with patch.dict(os.environ, {"APPDATA": "/Users/test/AppData/Roaming"}):
-                data_dir = manager._get_user_data_dir()
-                assert "AppData" in str(data_dir)
+                # Test Windows
+                mock_system.return_value = "Windows"
+                with patch.dict(os.environ, {"APPDATA": "/Users/test/AppData/Roaming"}):
+                    manager = APIKeyManager()
+                    data_dir = manager._get_user_data_dir()
+                    assert "AppData" in str(data_dir)
 
-            # Test Linux
-            mock_system.return_value = "Linux"
-            with patch("pathlib.Path.home") as mock_home:
-                mock_home.return_value = Path("/home/test")
-                data_dir = manager._get_user_data_dir()
-                assert ".config" in str(data_dir)
+                # Test Linux
+                mock_system.return_value = "Linux"
+                with patch("pathlib.Path.home") as mock_home:
+                    mock_home.return_value = Path("/home/test")
+                    manager = APIKeyManager()
+                    data_dir = manager._get_user_data_dir()
+                    assert ".config" in str(data_dir)
+        finally:
+            # Restart our patch
+            self.patch_user_data_dir.start()
 
     def test_get_api_key_from_environment(self) -> None:
         """Test retrieving API key from environment variable."""
@@ -107,7 +136,7 @@ class TestAPIKeyManager:
 
         # Verify keyring was called correctly
         mock_get_password.assert_called_once_with(
-            APIKeyManager.SERVICE_NAME, APIKeyManager.ACCOUNT_NAME
+            self.test_service_name, self.test_account_name
         )
 
     @patch("keyring.get_password")
@@ -172,7 +201,7 @@ class TestAPIKeyManager:
         assert error is None
 
         mock_set_password.assert_called_once_with(
-            APIKeyManager.SERVICE_NAME, APIKeyManager.ACCOUNT_NAME, self.test_api_key
+            self.test_service_name, self.test_account_name, self.test_api_key
         )
 
     @patch("keyring.set_password")
