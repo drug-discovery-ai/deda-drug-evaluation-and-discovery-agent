@@ -47,7 +47,15 @@ class APIKeyManager:
         return self._encrypted_storage
 
     def _get_user_data_dir(self) -> Path:
-        """Get platform-appropriate user data directory."""
+        """Get platform-appropriate user data directory.
+
+        Can be overridden with DRUG_DISCOVERY_AGENT_DATA_DIR environment variable.
+        """
+        # Allow override via environment variable (useful for testing)
+        env_override = os.environ.get("DRUG_DISCOVERY_AGENT_DATA_DIR")
+        if env_override:
+            return Path(env_override)
+
         system = platform.system()
 
         if system == "Darwin":  # macOS
@@ -175,10 +183,17 @@ class APIKeyManager:
                 results.append("Deleted from keychain")
                 self.logger.info("API key deleted from OS keychain")
             except KeyringError as e:
-                if "not found" not in str(e).lower():
+                # Ignore "not found" and "backend unavailable" errors (expected in CI)
+                error_str = str(e).lower()
+                if (
+                    "not found" not in error_str
+                    and "no recommended backend" not in error_str
+                ):
                     results.append(f"Keychain deletion error: {e}")
             except Exception as e:
-                results.append(f"Keychain deletion error: {e}")
+                error_str = str(e).lower()
+                if "no recommended backend" not in error_str:
+                    results.append(f"Keychain deletion error: {e}")
 
         if method is None or method == StorageMethod.ENCRYPTED_FILE:
             try:
