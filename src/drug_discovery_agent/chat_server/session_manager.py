@@ -5,7 +5,9 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
-from drug_discovery_agent.chat import BioinformaticsChatClient
+from drug_discovery_agent.interfaces.langchain.chat_client import (
+    BioinformaticsChatClient,
+)
 
 
 class ChatSession:

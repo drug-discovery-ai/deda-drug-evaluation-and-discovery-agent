@@ -108,7 +108,7 @@ class TestChatServerSessionManagement:
     @pytest.mark.unit
     def test_create_session(self, test_client: TestClient) -> None:
         """Test session creation endpoint."""
-        response = test_client.post("/api/sessions", json={"verbose": False})
+        response = test_client.post("/sessions", json={"verbose": False})
 
         assert response.status_code == 200
         data = response.json()
@@ -119,7 +119,7 @@ class TestChatServerSessionManagement:
     @pytest.mark.unit
     def test_create_session_verbose(self, test_client: TestClient) -> None:
         """Test session creation with verbose mode."""
-        response = test_client.post("/api/sessions", json={"verbose": True})
+        response = test_client.post("/sessions", json={"verbose": True})
 
         assert response.status_code == 200
         data = response.json()
@@ -129,11 +129,11 @@ class TestChatServerSessionManagement:
     def test_delete_session(self, test_client: TestClient) -> None:
         """Test session deletion endpoint."""
         # Create a session first
-        create_response = test_client.post("/api/sessions", json={"verbose": False})
+        create_response = test_client.post("/sessions", json={"verbose": False})
         session_id = create_response.json()["session_id"]
 
         # Delete the session
-        delete_response = test_client.delete(f"/api/sessions/{session_id}")
+        delete_response = test_client.delete(f"/sessions/{session_id}")
 
         assert delete_response.status_code == 200
         data = delete_response.json()
@@ -143,7 +143,7 @@ class TestChatServerSessionManagement:
     @pytest.mark.unit
     def test_delete_nonexistent_session(self, test_client: TestClient) -> None:
         """Test deleting a non-existent session."""
-        response = test_client.delete("/api/sessions/nonexistent-session")
+        response = test_client.delete("/sessions/nonexistent-session")
 
         assert response.status_code == 404
         data = response.json()
@@ -153,11 +153,11 @@ class TestChatServerSessionManagement:
     def test_get_session_info(self, test_client: TestClient) -> None:
         """Test getting session information."""
         # Create a session first
-        create_response = test_client.post("/api/sessions", json={"verbose": False})
+        create_response = test_client.post("/sessions", json={"verbose": False})
         session_id = create_response.json()["session_id"]
 
         # Get session info
-        info_response = test_client.get(f"/api/sessions/{session_id}/info")
+        info_response = test_client.get(f"/sessions/{session_id}/info")
 
         assert info_response.status_code == 200
         data = info_response.json()
@@ -171,7 +171,7 @@ class TestChatServerSessionManagement:
     @pytest.mark.unit
     def test_get_nonexistent_session_info(self, test_client: TestClient) -> None:
         """Test getting info for non-existent session."""
-        response = test_client.get("/api/sessions/nonexistent-session/info")
+        response = test_client.get("/sessions/nonexistent-session/info")
 
         assert response.status_code == 404
         data = response.json()
@@ -181,11 +181,11 @@ class TestChatServerSessionManagement:
     def test_clear_session_conversation(self, test_client: TestClient) -> None:
         """Test clearing session conversation history."""
         # Create a session first
-        create_response = test_client.post("/api/sessions", json={"verbose": False})
+        create_response = test_client.post("/sessions", json={"verbose": False})
         session_id = create_response.json()["session_id"]
 
         # Clear the conversation
-        clear_response = test_client.post(f"/api/sessions/{session_id}/clear")
+        clear_response = test_client.post(f"/sessions/{session_id}/clear")
 
         assert clear_response.status_code == 200
         data = clear_response.json()
@@ -197,7 +197,7 @@ class TestChatServerSessionManagement:
         self, test_client: TestClient
     ) -> None:
         """Test clearing conversation for non-existent session."""
-        response = test_client.post("/api/sessions/nonexistent-session/clear")
+        response = test_client.post("/sessions/nonexistent-session/clear")
 
         assert response.status_code == 404
         data = response.json()
@@ -246,13 +246,13 @@ class TestChatServerEndpoints:
         mock_client_class.return_value = mock_client
 
         # Create a session first
-        session_response = test_client.post("/api/sessions", json={"verbose": False})
+        session_response = test_client.post("/sessions", json={"verbose": False})
         assert session_response.status_code == 200
         session_id = session_response.json()["session_id"]
 
         # Make chat request with session_id
         response = test_client.post(
-            "/api/chat",
+            "/chat",
             json={"session_id": session_id, "message": "Hello, test message"},
         )
 
@@ -270,7 +270,7 @@ class TestChatServerEndpoints:
     def test_chat_endpoint_invalid_json(self, test_client: TestClient) -> None:
         """Test chat endpoint with invalid JSON."""
         response = test_client.post(
-            "/api/chat",
+            "/chat",
             content="invalid json",
             headers={"Content-Type": "application/json"},
         )
@@ -282,7 +282,7 @@ class TestChatServerEndpoints:
     @pytest.mark.unit
     def test_chat_endpoint_missing_session_id(self, test_client: TestClient) -> None:
         """Test chat endpoint with missing session_id field."""
-        response = test_client.post("/api/chat", json={"message": "test"})
+        response = test_client.post("/chat", json={"message": "test"})
 
         assert response.status_code == 400
         data = response.json()
@@ -291,7 +291,7 @@ class TestChatServerEndpoints:
     @pytest.mark.unit
     def test_chat_endpoint_missing_message_field(self, test_client: TestClient) -> None:
         """Test chat endpoint with missing message field."""
-        response = test_client.post("/api/chat", json={"session_id": "test-session"})
+        response = test_client.post("/chat", json={"session_id": "test-session"})
 
         assert response.status_code == 400
         data = response.json()
@@ -309,11 +309,11 @@ class TestChatServerEndpoints:
         mock_client_class.return_value = mock_client
 
         # Create a session first
-        session_response = test_client.post("/api/sessions", json={"verbose": False})
+        session_response = test_client.post("/sessions", json={"verbose": False})
         session_id = session_response.json()["session_id"]
 
         response = test_client.post(
-            "/api/chat", json={"session_id": session_id, "message": "Test message"}
+            "/chat", json={"session_id": session_id, "message": "Test message"}
         )
 
         assert response.status_code == 400
@@ -325,7 +325,7 @@ class TestChatServerEndpoints:
     def test_chat_endpoint_invalid_session(self, test_client: TestClient) -> None:
         """Test chat endpoint with invalid session_id."""
         response = test_client.post(
-            "/api/chat",
+            "/chat",
             json={"session_id": "invalid-session", "message": "Test message"},
         )
 
@@ -366,13 +366,13 @@ class TestChatServerStreaming:
         mock_client_class.return_value = mock_client
 
         # Create a session first
-        session_response = test_client.post("/api/sessions", json={"verbose": False})
+        session_response = test_client.post("/sessions", json={"verbose": False})
         assert session_response.status_code == 200
         session_id = session_response.json()["session_id"]
 
         # Make streaming request
         response = test_client.post(
-            "/api/chat/stream",
+            "/chat/stream",
             json={"session_id": session_id, "message": "Test streaming message"},
         )
 
@@ -402,7 +402,7 @@ class TestChatServerStreaming:
     def test_chat_stream_endpoint_invalid_json(self, test_client: TestClient) -> None:
         """Test streaming chat endpoint with invalid JSON."""
         response = test_client.post(
-            "/api/chat/stream",
+            "/chat/stream",
             content="invalid json",
             headers={"Content-Type": "application/json"},
         )
@@ -421,7 +421,7 @@ class TestChatServerStreaming:
         mock_client_class.side_effect = Exception("Stream setup failed")
 
         response = test_client.post(
-            "/api/chat/stream",
+            "/chat/stream",
             json={"session_id": "test-session", "message": "Test message"},
         )
 
@@ -486,7 +486,7 @@ class TestChatServerCORS:
     def test_cors_preflight_request(self, test_client: TestClient) -> None:
         """Test CORS preflight request handling."""
         response = test_client.options(
-            "/api/chat",
+            "/chat",
             headers={
                 "Origin": "http://localhost:3000",
                 "Access-Control-Request-Method": "POST",
@@ -532,13 +532,13 @@ class TestChatServerIntegration:
         assert health_response.status_code == 200
 
         # Test chat endpoint (should fail validation but not 404)
-        chat_response = test_client.post("/api/chat", json={})
+        chat_response = test_client.post("/chat", json={})
         assert (
             chat_response.status_code != 404
         )  # Should be validation error, not not found
 
         # Test streaming endpoint (should fail validation but not 404)
-        stream_response = test_client.post("/api/chat/stream", json={})
+        stream_response = test_client.post("/chat/stream", json={})
         assert (
             stream_response.status_code != 404
         )  # Should be validation error, not not found
@@ -555,12 +555,12 @@ class TestChatServerIntegration:
         mock_client_class.return_value = mock_client
 
         # Create a session with verbose=True
-        session_response = test_client.post("/api/sessions", json={"verbose": True})
+        session_response = test_client.post("/sessions", json={"verbose": True})
         session_id = session_response.json()["session_id"]
 
         # Make request
         response = test_client.post(
-            "/api/chat", json={"session_id": session_id, "message": "test"}
+            "/chat", json={"session_id": session_id, "message": "test"}
         )
 
         # Verify client was created with verbose=True
@@ -599,18 +599,18 @@ class TestChatServerStateful:
         mock_client_class.return_value = mock_client
 
         # Create a session
-        session_response = test_client.post("/api/sessions", json={"verbose": False})
+        session_response = test_client.post("/sessions", json={"verbose": False})
         session_id = session_response.json()["session_id"]
 
         # Make multiple requests with the same session
         test_client.post(
-            "/api/chat", json={"session_id": session_id, "message": "First request"}
+            "/chat", json={"session_id": session_id, "message": "First request"}
         )
         test_client.post(
-            "/api/chat", json={"session_id": session_id, "message": "Second request"}
+            "/chat", json={"session_id": session_id, "message": "Second request"}
         )
         test_client.post(
-            "/api/chat", json={"session_id": session_id, "message": "Third request"}
+            "/chat", json={"session_id": session_id, "message": "Third request"}
         )
 
         # Verify only one client created for the session
@@ -629,18 +629,18 @@ class TestChatServerStateful:
         mock_client_class.return_value = mock_client
 
         # Create two different sessions
-        session1_response = test_client.post("/api/sessions", json={"verbose": False})
+        session1_response = test_client.post("/sessions", json={"verbose": False})
         session1_id = session1_response.json()["session_id"]
 
-        session2_response = test_client.post("/api/sessions", json={"verbose": False})
+        session2_response = test_client.post("/sessions", json={"verbose": False})
         session2_id = session2_response.json()["session_id"]
 
         # Make streaming requests to different sessions
         test_client.post(
-            "/api/chat/stream", json={"session_id": session1_id, "message": "Stream 1"}
+            "/chat/stream", json={"session_id": session1_id, "message": "Stream 1"}
         )
         test_client.post(
-            "/api/chat/stream", json={"session_id": session2_id, "message": "Stream 2"}
+            "/chat/stream", json={"session_id": session2_id, "message": "Stream 2"}
         )
 
         # Verify one client created per session

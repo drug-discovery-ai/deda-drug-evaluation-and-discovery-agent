@@ -1,15 +1,84 @@
-.idea
-fine-tuned-model
-base-model
-.DS_Store
-__pycache__
-.env
-venv/
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+
+# Testing
 .coverage
 .testmondata
-build/
-dist/
+.tox/
+.pytest_cache/
+htmlcov/
 
 # PyInstaller auto-generated spec files
 *.spec
+
+# Machine learning models
+fine-tuned-model/
+base-model/
+
+# Node.js/Electron specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tgz
+*.tar.gz
+pids/
+*.pid
+*.seed
+*.pid.lock
+coverage/
+
+# Electron build output
+out/
+release/
+app/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log

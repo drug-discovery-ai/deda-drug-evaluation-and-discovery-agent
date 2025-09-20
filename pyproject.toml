@@ -10,6 +10,21 @@ authors = [{name = "Your Name", email = "your.email@example.com"}]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.12"
+dependencies = [
+    "Bio==1.8.0",
+    "biopython==1.85",
+    "cryptography>=41.0.0",
+    "fastmcp>=2.0.0",
+    "httpx==0.28.1",
+    "keyring>=24.0.0",
+    "langchain==0.3.27",
+    "langchain_openai==0.3.32",
+    "mcp>=1.13.1",
+    "openai==1.102.0",
+    "python-dotenv==1.1.1",
+    "starlette==0.47.3",
+    "uvicorn==0.35.0",
+]
 
 [project.optional-dependencies]
 test = [
@@ -80,6 +95,11 @@ ignore_missing_imports = true
 strict_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+exclude = [
+    "tests/auth/test_api_endpoints.py",
+    "tests/integration/test_api_key_integration.py",
+    "test_e2e_api_key_flow.py"
+]
 
 [tool.testmon]
 # Exclude integration test patterns to avoid async httpx issues

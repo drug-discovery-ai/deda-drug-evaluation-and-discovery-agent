@@ -1,5 +1,13 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+// Simple UUID v4 generator (compatible with CommonJS)
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 try {
     // Expose protected methods that allow the renderer process to use
     // the ipcRenderer without exposing the entire object
@@ -12,14 +20,21 @@ try {
         
         // Backend management
         restartBackend: () => ipcRenderer.invoke('restart-backend'),
-        
+
+        // API Key management
+        checkAPIKeyStatus: () => ipcRenderer.invoke('check-api-key-status'),
+
+        // Listen for error notifications from main process
+        onErrorNotification: (callback) => {
+            ipcRenderer.on('show-error-notification', (event, data) => callback(data));
+        },
+
         // Platform information
         platform: process.platform,
         
         // Environment info (always ensure boolean)  
         isDevelopment: process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath)
     });
-    console.log('electronAPI exposed successfully');
 } catch (error) {
     console.error('Failed to expose electronAPI:', error);
 }
@@ -86,14 +101,39 @@ try {
         },
 
         async put(url, data, options = {}) {
-            return this.request(url, { 
-                ...options, 
-                method: 'PUT', 
-                body: data 
+            return this.request(url, {
+                ...options,
+                method: 'PUT',
+                body: data
             });
+        },
+
+        async checkApiKeyMissing(error) {
+            // Check if error indicates missing API key
+            if (error.message && (
+                error.message.includes('API key') ||
+                error.message.includes('unauthorized') ||
+                error.message.includes('401')
+            )) {
+                return true;
+            }
+            return false;
+        },
+
+        async handleAPIKeyError(error, retryCallback) {
+            // Handle API key related errors with user-friendly prompts
+            const isAPIKeyError = await this.checkApiKeyMissing(error);
+
+            if (isAPIKeyError) {
+                // Notify the renderer about API key requirement
+                if (window.onAPIKeyRequired) {
+                    return window.onAPIKeyRequired(error, retryCallback);
+                }
+            }
+
+            throw error;
         }
     });
-    console.log('httpClient exposed successfully');
 } catch (error) {
     console.error('Failed to expose httpClient:', error);
 }
@@ -103,11 +143,7 @@ try {
     contextBridge.exposeInMainWorld('utils', {
     // Generate UUID for session IDs (client-side backup)
     generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+        return generateUUID();
     },
 
     // Format timestamp for display
@@ -171,7 +207,6 @@ try {
             .replace(/\n/g, '<br>');
     }
     });
-    console.log('utils exposed successfully');
 } catch (error) {
     console.error('Failed to expose utils:', error);
 }
@@ -197,9 +232,4 @@ window.eval = function() {
 window.Function = function() {
     throw new Error('Function constructor is disabled for security reasons');
 };
-
-// Log successful preload
-console.log('Preload script loaded successfully');
-console.log('httpClient exposed:', typeof window.httpClient);
-console.log('electronAPI exposed:', typeof window.electronAPI);
 
