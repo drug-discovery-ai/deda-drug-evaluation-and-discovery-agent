@@ -264,7 +264,7 @@ class TestAPIKeyEndpoints:
             mock_validator.validate_for_storage.return_value = (
                 False,
                 [],
-                ["API key is too short (minimum 23 characters)"],
+                ["API key is not in valid OpenAI format (must start with 'sk-')"],
             )
 
             response = client.post("/api/key/validate", json={"api_key": "invalid"})
@@ -273,7 +273,10 @@ class TestAPIKeyEndpoints:
         data = response.json()
         assert data["valid"] is False
         assert data["format_type"] == "unknown"
-        assert data["error_message"] == "API key is too short (minimum 23 characters)"
+        assert (
+            data["error_message"]
+            == "API key is not in valid OpenAI format (must start with 'sk-')"
+        )
 
     def test_update_api_key_success(
         self, client: TestClient, mock_key_manager: Mock
