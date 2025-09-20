@@ -50,8 +50,26 @@ class ElectronApp {
         // DevTools can be opened manually with Ctrl+Shift+I or Cmd+Option+I
 
         // Handle window closed
-        this.mainWindow.on('closed', () => {
+        this.mainWindow.on('closed', async () => {
             this.mainWindow = null;
+
+            // Stop the Python backend when the window is closed
+            // This ensures cleanup even on macOS where the app doesn't quit automatically
+            if (!this.isQuitting) {
+                this.isQuitting = true;
+                console.log('Window closed, shutting down Python backend...');
+                try {
+                    await this.stopPythonBackend();
+                    console.log('Python backend stopped successfully');
+                } catch (error) {
+                    console.error('Error stopping Python backend:', error);
+                }
+
+                // On macOS, also quit the app when window is closed
+                if (process.platform === 'darwin') {
+                    app.quit();
+                }
+            }
         });
 
         // Handle external links

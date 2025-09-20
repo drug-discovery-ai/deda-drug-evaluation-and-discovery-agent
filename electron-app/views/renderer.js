@@ -183,7 +183,7 @@ class BioinformaticsChatApp {
                 await this.createSession();
             } catch (error) {
                 // Session creation failed (likely no API key), but backend is still connected
-                this.warn('Session creation failed:', error.message);
+                this.log('Session creation failed:', error.message);
                 // Don't throw - let the app continue with just backend connection
             }
             
@@ -568,6 +568,77 @@ class BioinformaticsChatApp {
     async forceRefreshStatus() {
         if (this.isConnected) {
             await this.updateOverallStatus();
+        }
+    }
+
+    /**
+     * Update UI elements based on API key status (for settings panel integration)
+     */
+    updateUIForAPIKey(hasKey, statusData = null) {
+        // Update various UI elements based on API key status
+
+        // Update message input placeholder
+        const messageInput = document.getElementById('message-input');
+        if (messageInput) {
+            if (hasKey) {
+                messageInput.placeholder = 'Ask about proteins, sequences, molecular structures, or any bioinformatics question...';
+                messageInput.disabled = false;
+            } else {
+                messageInput.placeholder = 'Configure your API key to start asking questions...';
+                messageInput.disabled = true;
+            }
+        }
+
+        // Update send button
+        const sendButton = document.getElementById('send-button');
+        if (sendButton) {
+            sendButton.disabled = !hasKey || !messageInput?.value?.trim();
+        }
+
+        // Update welcome screen if visible
+        this.updateWelcomeScreen(hasKey, statusData);
+    }
+
+    /**
+     * Update welcome screen based on API key status
+     */
+    updateWelcomeScreen(hasKey = false, statusData = null) {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        if (!welcomeScreen) return;
+
+        if (!hasKey) {
+            // Add API key setup prompt to welcome screen if not present
+            let apiKeyPrompt = welcomeScreen.querySelector('.api-key-prompt');
+            if (!apiKeyPrompt) {
+                apiKeyPrompt = document.createElement('div');
+                apiKeyPrompt.className = 'api-key-prompt';
+                apiKeyPrompt.innerHTML = `
+                    <div class="prompt-content">
+                        <div class="prompt-icon">🔑</div>
+                        <h3>Get Started</h3>
+                        <p>Configure your OpenAI API key to unlock the full power of this bioinformatics assistant.</p>
+                        <button class="button button-primary setup-api-key-btn">
+                            <span class="button-icon">⚙️</span>
+                            <span class="button-text">Setup API Key</span>
+                        </button>
+                    </div>
+                `;
+
+                const welcomeContent = welcomeScreen.querySelector('.welcome-content');
+                if (welcomeContent) {
+                    welcomeContent.appendChild(apiKeyPrompt);
+                }
+
+                // Bind click event to show API key modal
+                const setupBtn = apiKeyPrompt.querySelector('.setup-api-key-btn');
+                setupBtn?.addEventListener('click', () => this.showAPIKeyModal());
+            }
+        } else {
+            // Remove API key prompt if it exists (API key is now available)
+            const apiKeyPrompt = welcomeScreen.querySelector('.api-key-prompt');
+            if (apiKeyPrompt) {
+                apiKeyPrompt.remove();
+            }
         }
     }
 

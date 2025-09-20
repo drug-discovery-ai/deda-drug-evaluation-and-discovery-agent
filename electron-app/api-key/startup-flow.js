@@ -171,8 +171,13 @@ class StartupFlow {
                     window.toastManager.showAPIKeySuccess(result.method);
                 }
 
-                // Update UI
+                // Update UI immediately
                 this.updateUIForAPIKey(true);
+
+                // Also update main app UI if available
+                if (window.app && typeof window.app.updateUIForAPIKey === 'function') {
+                    window.app.updateUIForAPIKey(true);
+                }
 
                 // Re-check status to update all components and initialize main app
                 setTimeout(() => {
@@ -306,7 +311,9 @@ class StartupFlow {
 
                 // Bind click event
                 const setupBtn = apiKeyPrompt.querySelector('.setup-api-key-btn');
-                setupBtn?.addEventListener('click', () => this.showAPIKeyModal());
+                setupBtn?.addEventListener('click', () => {
+                    this.showAPIKeyModal();
+                });
             }
         } else {
             // Remove API key prompt if it exists

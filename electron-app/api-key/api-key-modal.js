@@ -282,11 +282,11 @@ class APIKeyModal {
         }
 
         // Advanced validation via backend
+        const requestId = Date.now();
+        this.currentRequestId = requestId;
+
         try {
             this.showValidation('loading', 'Validating API key format...');
-
-            const requestId = Date.now();
-            this.currentRequestId = requestId;
 
             const response = await window.httpClient.post(SERVER_CONFIG.ENDPOINTS.API_KEY_VALIDATE, {
                 api_key: apiKey
