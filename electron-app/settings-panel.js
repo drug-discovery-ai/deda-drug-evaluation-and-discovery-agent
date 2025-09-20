@@ -159,7 +159,69 @@ class SettingsPanel {
                 if (window.showToast) {
                     window.showToast(`API key ${action} successfully`, 'success');
                 }
+
+                // Refresh settings panel status
                 this.refreshStatus();
+
+                // Comprehensive refresh logic similar to startup-flow.js
+                // Update main app UI components
+                if (window.app) {
+                    // Update UI for API key presence
+                    window.app.updateUIForAPIKey(true);
+
+                    // Create session if app exists and has createSession method
+                    if (typeof window.app.createSession === 'function') {
+                        window.app.createSession().then(() => {
+                            window.app.updateConnectionStatus(true);
+                            // Force refresh status to check API key
+                            if (typeof window.app.forceRefreshStatus === 'function') {
+                                window.app.forceRefreshStatus();
+                            }
+                        }).catch(error => {
+                            console.error('Failed to create session after API key setup:', error);
+                            // Even if session creation fails, try to update connection status
+                            if (typeof window.app.updateConnectionStatus === 'function') {
+                                window.app.updateConnectionStatus(true);
+                            }
+                            // Force refresh status to check API key
+                            if (typeof window.app.forceRefreshStatus === 'function') {
+                                window.app.forceRefreshStatus();
+                            }
+                        });
+                    } else {
+                        // If createSession is not available, just update connection
+                        if (typeof window.app.updateConnectionStatus === 'function') {
+                            window.app.updateConnectionStatus(true);
+                        }
+                        // Force refresh status to check API key
+                        if (typeof window.app.forceRefreshStatus === 'function') {
+                            window.app.forceRefreshStatus();
+                        }
+                    }
+                }
+
+                // Update startup flow components if they exist
+                if (window.startupFlow && typeof window.startupFlow.updateUIForAPIKey === 'function') {
+                    window.startupFlow.updateUIForAPIKey(true);
+                    // Also trigger a check to refresh startup flow status
+                    setTimeout(() => {
+                        if (typeof window.startupFlow.checkStartupAPIKey === 'function') {
+                            window.startupFlow.checkStartupAPIKey();
+                        }
+                    }, 1000);
+                }
+
+                // Update API key status components if they exist
+                if (window.apiKeyStatus && typeof window.apiKeyStatus.forceRefresh === 'function') {
+                    setTimeout(() => {
+                        window.apiKeyStatus.forceRefresh();
+                    }, 500);
+                }
+
+                // Additional immediate refresh
+                if (window.app && typeof window.app.forceRefreshStatus === 'function') {
+                    setTimeout(() => window.app.forceRefreshStatus(), 1000);
+                }
             },
             onCancel: () => {
                 // User cancelled
