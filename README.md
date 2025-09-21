@@ -10,7 +10,7 @@ Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluatio
 
 Agentic AI lets you control complex systems just by using plain English. Instead of the AI guessing, it connects directly to real tools—so answers are grounded and reliable.
 
-We built DEDA on that idea, with bioinformatics researchers in mind. It helps them do things like explore drug discovery, analyze proteins, and quickly test new ideas—all by typing natural language commands. For example, instead of writing code to pull protein data or run a molecule generator, you can just ask:
+We built DEDA on that idea, with bioinformatics researchers in mind. It’s designed as a lightweight, low-overhead tool that integrates easily into existing workflows—helping them explore drug discovery, analyze proteins, and quickly test new ideas, all through natural language commands. For example, instead of writing code to pull protein data or run a molecule generator, you can simply ask:
 
 ```bash
 Show known binding pockets for the SARS-CoV-2 virus.
@@ -23,9 +23,9 @@ Show known binding pockets for the SARS-CoV-2 virus.
 
 Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations. The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
-**Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions must come from domain experts.
+**Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions **must** come from domain experts.
 
-_Collaboration Call_: Contributions are needed to integrate advanced biological simulation components—such as **Boltz-2**—so the platform can deliver even more accurate protein data directly from our tool.
+_Collaboration Call_: Contributions are needed to integrate advanced ML modeling components—such as Boltz-1—so the platform can generate and refine accurate protein data directly within our tool.
 
 ## Quick Start
 
