@@ -21,9 +21,11 @@ Show known binding pockets for the SARS-CoV-2 virus.
 </p>
 
 
-Behind the scenes, the AI connects to trusted sources like UniProt, AlphaFold, and OpenTargets. This grounds its answers in real biological and chemical data, cutting down on hallucinations. The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
+Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations. The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
 **Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions must come from domain experts.
+
+_Collaboration Call_: Contributions are needed to integrate advanced biological simulation components—such as **Boltz-2**—so the platform can deliver even more accurate protein data directly from our tool.
 
 ## Quick Start
 
