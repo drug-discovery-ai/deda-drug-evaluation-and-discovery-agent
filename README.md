@@ -8,30 +8,20 @@ Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluatio
 
 ## Overview
 
-Agentic AI lets people control system components using plain language. It’s flexible enough that experts from different
-fields can connect it to their own tools—helping reduce hallucinations by ensuring the AI talks to real systems, not
-just guessing. On that ground, we built this project for bioinformatics researchers who want to explore drug discovery,
-analyze protein structures, prototype ideas quickly, and more—all through natural language commands. No need to learn
-every tool’s syntax or API.
+Agentic AI lets you control complex systems just by using plain English. Instead of the AI guessing, it connects directly to real tools—so answers are grounded and reliable.
 
-For example, instead of writing code to fetch a protein or run a molecule generation tool, you can simply ask:
+We built DEDA on that idea, with bioinformatics researchers in mind. It helps them do things like explore drug discovery, analyze proteins, and quickly test new ideas—all by typing natural language commands. For example, instead of writing code to pull protein data or run a molecule generator, you can just ask:
 
 ```bash
-Generate 5 small molecules that bind to the spike protein of SARS-CoV-2.
+Show known binding pockets for the SARS-CoV-2 virus.
 ```
-
-Behind the scenes, the AI (i.e. LLM) connects to real tools like Boltz, Pocket2Mol, or ESMFold to get the job
-done—accurately and reproducibly.
-
-Currently, we are focusing only integrating LLM to explore the vast capability of the `boltz` tool. **Contributions**
-are welcome to help expand integration with popular tools like `Pocket2Mol`, `DeepChem`, and `RDKit` —with the goal of
-supporting a broader range of bioinformatics workflows.
-
-We leverage Model Control Protocol (mcp) to develop the bio-informatics AI agent.
 
 <p align="center">
   <img src="electron-app/demo.gif" style="width:100%; max-width:100%;"/>
 </p>
+
+
+Behind the scenes, the AI connects to trusted sources like UniProt, AlphaFold, and OpenTargets. This grounds its answers in real biological and chemical data, cutting down on hallucinations. The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
 ## Quick Start
 
