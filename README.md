@@ -21,7 +21,7 @@ Show known binding pockets for the SARS-CoV-2 virus.
 </p>
 
 
-Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio%E2%80%90informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
+Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio-informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
 **Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions **must** come from domain experts.
 
@@ -165,71 +165,8 @@ npm run build:mac    # or build:win, build:linux
 Supports creating native installers for Windows (.exe), macOS (.dmg), and Linux (.AppImage) with automatic environment
 configuration and backend bundling.
 
-# Development
 
-## Code Quality
-
-This project uses `ruff` for linting and formatting, and `mypy` for type checking.
-
-### Development Setup
-
-Install development dependencies:
-
-```bash
-pip install -e ".[dev]"
-pre-commit install
-```
-
-The `pre-commit install` sets up Git hooks to automatically run `ruff`, `mypy`, and `pytest` before each commit,
-preventing broken code from reaching the repository.
-
-Run linting:
-
-```bash
-ruff check .          # Check for linting issues
-ruff check . --fix    # Auto-fix linting issues
-ruff format .         # Auto-format code
-```
-
-Run type checking:
-
-```bash
-mypy .                # Run type checking on all files
-```
-
-## Testing
-
-The project includes a unified snapshot testing system for reliable, fast API testing:
-
-### Run Tests
-
-```bash
-# Run all tests (uses snapshots by default - fast, no network calls)
-pytest
-
-# Run only unit tests (uses mocks)
-pytest -k "unit"
-
-# Run only integration tests (uses snapshots)  
-pytest -k "integration"
-
-# Update snapshots from live APIs (when APIs change)
-pytest --update-snapshots
-
-# Validate existing snapshots against live APIs
-pytest --validate-snapshots
-```
-
-### Test Architecture
-
-- **Unit tests**: Use `@patch` decorators for fast, isolated testing
-- **Integration tests**: Use `@pytest.mark.integration` with automatic snapshot/recording
-- **Snapshots**: Real API responses captured for realistic testing without network calls
-- **HTTP Interception**: Transparent to application code - no changes needed to API clients
-
-See `snapshots/README.md` for detailed information about the snapshot testing system.
-
-# Run the AI assistant using Docker
+### 4. Run the AI assistant using Docker
 
 **Pre-requisite** Make sure your `docker` runs in `rootless` mode. If you can run
 
@@ -239,7 +176,7 @@ docker run hello-world
 
 without `sudo`, you are good to go.
 
-### Change API Key Before Proceeding
+#### Change API Key Before Proceeding
 
 Inside `Dockerfile`, replace the `OPENAI_API_KEY`, with your openAI api key.
 
