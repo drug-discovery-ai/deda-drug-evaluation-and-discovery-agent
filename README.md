@@ -25,7 +25,7 @@ Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaF
 
 **Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions **must** come from domain experts.
 
-_Collaboration Call_: Contributions are needed to integrate advanced ML modeling components—such as Boltz-1—so the platform can generate and refine accurate protein data directly within our tool.
+_Collaboration Call_: Contributions are needed to integrate advanced ML modeling components—such as Boltz-2—so the platform can generate and refine accurate protein data directly within our tool.
 
 ## Quick Start
 
