@@ -27,7 +27,7 @@ The underlying Agentic AI does not do any guesswork. Instead it connects directl
 </p>
 
 
-The AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio-informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
+The AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio%E2%80%90informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
 **Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions **must** come from domain experts.
 
