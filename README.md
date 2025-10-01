@@ -8,20 +8,26 @@ Follow our [wiki pages](https://github.com/drug-discovery-ai/deda-drug-evaluatio
 
 ## Overview
 
-Agentic AI lets you control complex systems just by using plain English. Instead of the AI guessing, it connects directly to real tools—so answers are grounded and reliable.
+DEDA - think of ChatGPT for bioinformatics researchers. 
 
-We built DEDA on that idea, with bioinformatics researchers in mind. It’s designed as a lightweight, low-overhead tool that integrates easily into existing workflows—helping them explore drug discovery, analyze proteins, and quickly test new ideas, all through natural language commands. For example, instead of writing code to pull protein data or run a molecule generator, you can simply ask:
+It's designed as a lightweight, low-overhead tool that you can install in your laptop. 
+
+DEDA focuses on integrating workflows, helping researchers explore drug discovery, analyze proteins, and quickly test new ideas - all through simple commands in English. 
+
+For example, instead of writing code to pull protein data or run a molecule generator, you can ask:
 
 ```bash
 Show known binding pockets for the SARS-CoV-2 virus.
 ```
+
+The underlying Agentic AI does not do any guesswork. Instead it connects directly to real tools and data source, so answers are reliable and grounded.
 
 <p align="center">
   <img src="electron-app/demo.gif" style="width:100%; max-width:100%;"/>
 </p>
 
 
-Behind the scenes, the AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio-informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
+The AI connects to trusted sources like **UniProt**, **AlphaFold**, **OpenTargets** and others. This grounds its answers in real biological and chemical data, cutting down on hallucinations (more details [here](https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent/wiki/Bio-informatics-AI-agent-for-Drug-discovery-Research)). The result: bioinformatics workflows that are easier, more accurate, and repeatable—so researchers can focus on discovery instead of wrestling with tools.
 
 **Disclaimer**: This tool helps portray and organize data, but it is not an inventor. Final insights and decisions **must** come from domain experts.
 
