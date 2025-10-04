@@ -4,6 +4,10 @@ import argparse
 import asyncio
 import getpass
 
+from drug_discovery_agent.interfaces.langchain.agent_mode_chat_client import (
+    AgentModeChatClient,
+)
+from drug_discovery_agent.interfaces.langchain.agent_state import Plan
 from drug_discovery_agent.interfaces.langchain.chat_client import (
     BioinformaticsChatClient,
 )
@@ -11,7 +15,7 @@ from drug_discovery_agent.key_storage.key_manager import APIKeyManager
 from drug_discovery_agent.utils.env import load_env_for_bundle
 
 
-async def async_main(verbose: bool = False) -> None:
+async def async_main(verbose: bool = False, agent_mode: bool = False) -> None:
     """Async entry point for running the langchain interface."""
     key_manager = APIKeyManager()
     existing_key, source = key_manager.get_api_key()
@@ -41,7 +45,78 @@ async def async_main(verbose: bool = False) -> None:
     print("✅ Chat client configured successfully!")
 
     try:
-        await client.chat_loop()
+        if agent_mode:
+            agent_client = AgentModeChatClient(verbose=verbose)
+            print("🤖 Agent Mode enabled")
+            print("Enter your research question (or 'exit' to quit):\n")
+
+            while True:
+                query = input("> ").strip()
+                if query.lower() in ["exit", "quit"]:
+                    break
+
+                print("\n🤖 Agent Mode: Planning...\n")
+                try:
+                    plan = await agent_client.create_plan(query)
+
+                    # Display plan
+                    print("📋 Proposed Plan:")
+                    print("━" * 50)
+                    for i, (step, tool) in enumerate(
+                        zip(plan.steps, plan.tool_calls, strict=False), 1
+                    ):
+                        print(f"Step {i}: {step}")
+                        print(f"  Tool: {tool}")
+                        print()
+                    print("━" * 50)
+
+                    # Get approval
+                    while True:
+                        approval = input("\nApprove? (y/n/modify): ").strip().lower()
+
+                        if approval == "y":
+                            print("\n✓ Approved - Starting execution...\n")
+                            result = await agent_client.approve_and_execute(
+                                approved=True
+                            )
+                            print("\n" + "━" * 50)
+                            print("✓ Plan completed!")
+                            print("━" * 50)
+                            print(result)
+                            break
+
+                        elif approval == "n":
+                            print("❌ Plan rejected. Let's try a different approach.")
+                            break
+
+                        elif approval == "modify":
+                            modifications = input("Enter modifications: ").strip()
+                            print("\n🤖 Replanning with your modifications...\n")
+                            result = await agent_client.approve_and_execute(
+                                False, modifications
+                            )
+                            if isinstance(result, Plan):
+                                plan = result
+                                print("📋 Proposed Plan:")
+                                print("━" * 50)
+                                for i, (step, tool) in enumerate(
+                                    zip(plan.steps, plan.tool_calls, strict=False), 1
+                                ):
+                                    print(f"Step {i}: {step}")
+                                    print(f"  Tool: {tool}")
+                                    print()
+                                print("━" * 50)
+                            else:
+                                print("❌ Replanning failed")
+                                break
+
+                        else:
+                            print("Invalid input. Use y/n/modify")
+
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+        else:
+            await client.chat_loop()
     except Exception as e:
         print(f"❌ Failed to start langchain client: {e}")
         print("💡 Check your configuration and try again")
@@ -61,11 +136,16 @@ def main() -> None:
     parser.add_argument(
         "--debug", action="store_true", help="Enable debug mode (same as --verbose)"
     )
+    parser.add_argument(
+        "--agent-mode",
+        action="store_true",
+        help="Enable agent mode with plan-approve-execute workflow",
+    )
 
     args = parser.parse_args()
     verbose = args.verbose or args.debug
 
-    asyncio.run(async_main(verbose=verbose))
+    asyncio.run(async_main(verbose=verbose, agent_mode=args.agent_mode))
 
 
 def prompt_for_api_key(key_manager: APIKeyManager) -> str | None:
