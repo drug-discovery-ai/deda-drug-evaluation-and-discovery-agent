@@ -1,9 +1,7 @@
-import asyncio
 from typing import Any
 
 from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
 )
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
@@ -26,7 +24,21 @@ from drug_discovery_agent.interfaces.langchain.models import (
 
 
 class BioinformaticsToolBase(BaseTool):
-    """Base class for bioinformatics tools with injectable client instances."""
+    """Base class for bioinformatics tools with injectable client instances.
+
+    All bioinformatics tools are async-only and do not support synchronous execution.
+    """
+
+    def _run(self, *args: Any, **kwargs: Any) -> Any:
+        """Synchronous execution is not supported for bioinformatics tools.
+
+        Raises:
+            NotImplementedError: Always raised as these tools require async execution
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} only supports async execution. "
+            "Use _arun() or ensure the agent executor is running in async mode."
+        )
 
     def __init__(
         self,
@@ -106,12 +118,6 @@ class GetDiseaseListTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, disease_name: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> list[dict[str, Any]]:
-        """Retrieve possible diseases from the disease input synchronously"""
-        return asyncio.run(self.ebi_client.fetch_all_ontology_ids(disease_name))
-
     async def _arun(
         self,
         disease_name: str,
@@ -140,14 +146,6 @@ class GetDiseaseTargetTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, ontology_id: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> dict[str, Any]:
-        """Retrieve disease associated target synchronously."""
-        return asyncio.run(
-            self.opentarget_client.disease_target_knowndrug_pipeline(ontology_id)
-        )
-
     async def _arun(
         self,
         ontology_id: str,
@@ -170,19 +168,18 @@ class GetProteinFastaTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> str:
-        """Retrieve FASTA sequence synchronously."""
-        return asyncio.run(self.uniprot_client.get_fasta_sequence(uniprot_code))
-
     async def _arun(
         self,
         uniprot_code: str,
         run_manager: AsyncCallbackManagerForToolRun | None = None,
     ) -> str:
         """Retrieve FASTA sequence asynchronously."""
-        return await self.uniprot_client.get_fasta_sequence(uniprot_code)
+        result = await self.uniprot_client.get_fasta_sequence(uniprot_code.strip())
+
+        if not result:
+            return ""
+
+        return result
 
 
 class GetProteinDetailsTool(BioinformaticsToolBase):
@@ -195,12 +192,6 @@ class GetProteinDetailsTool(BioinformaticsToolBase):
     # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> dict[str, Any]:
-        """Retrieve protein details synchronously."""
-        return asyncio.run(self.uniprot_client.get_details(uniprot_code))
 
     async def _arun(
         self,
@@ -222,12 +213,6 @@ class AnalyzeSequencePropertiesTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> dict[str, Any]:
-        """Analyze sequence properties synchronously."""
-        return asyncio.run(self.sequence_analyzer.analyze_from_uniprot(uniprot_code))
-
     async def _arun(
         self,
         uniprot_code: str,
@@ -248,12 +233,6 @@ class AnalyzeRawSequenceTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, sequence: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> dict[str, Any]:
-        """Analyze raw sequence properties synchronously."""
-        return self.sequence_analyzer.analyze_raw_sequence(sequence)
-
     async def _arun(
         self,
         sequence: str,
@@ -273,15 +252,6 @@ class CompareProteinVariantTool(BioinformaticsToolBase):
     # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-
-    def _run(
-        self,
-        uniprot_id: str,
-        mutation: str,
-        run_manager: CallbackManagerForToolRun | None = None,
-    ) -> dict[str, Any]:
-        """Compare protein variant synchronously."""
-        return asyncio.run(self.sequence_analyzer.compare_variant(uniprot_id, mutation))
 
     async def _arun(
         self,
@@ -307,12 +277,6 @@ class GetTopPDBIdsTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> list[str]:
-        """Get PDB IDs synchronously."""
-        return asyncio.run(self.uniprot_client.get_pdb_ids(uniprot_code))
-
     async def _arun(
         self,
         uniprot_code: str,
@@ -333,12 +297,6 @@ class GetStructureDetailsTool(BioinformaticsToolBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def _run(
-        self, pdb_id: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> dict[str, Any]:
-        """Get structure details synchronously."""
-        return asyncio.run(self.pdb_client.get_structure_details(pdb_id))
-
     async def _arun(
         self, pdb_id: str, run_manager: AsyncCallbackManagerForToolRun | None = None
     ) -> dict[str, Any]:
@@ -356,12 +314,6 @@ class GetLigandSmilesTool(BioinformaticsToolBase):
     # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> list[dict[str, Any]]:
-        """Get ligand SMILES synchronously."""
-        return asyncio.run(self.pdb_client.get_ligands_for_uniprot(uniprot_code))
 
     async def _arun(
         self,
@@ -388,14 +340,6 @@ class GetAlphaFoldPredictionTool(BioinformaticsToolBase):
     # Explicit __init__ needed for mypy to recognize inherited constructor from BaseTool
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-
-    def _run(
-        self, uniprot_code: str, run_manager: CallbackManagerForToolRun | None = None
-    ) -> list[dict[str, Any]]:
-        """Get protein structure prediction synchronously."""
-        return asyncio.run(
-            self.alphafold_client.fetch_alphafold_prediction(uniprot_code)
-        )
 
     async def _arun(
         self,
