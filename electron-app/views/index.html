@@ -17,6 +17,18 @@
                     <span class="app-subtitle">AI-Powered Research Companion</span>
                 </div>
                 <div class="header-controls">
+                    <div class="mode-selector">
+                        <label class="mode-option">
+                            <input type="radio" name="mode" value="chat" checked>
+                            <span class="mode-icon">💬</span>
+                            <span class="mode-label">Chat</span>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="mode" value="agent">
+                            <span class="mode-icon">🤖</span>
+                            <span class="mode-label">Agent</span>
+                        </label>
+                    </div>
                     <div class="connection-status" id="connection-status">
                         <span class="status-indicator" id="status-indicator"></span>
                     </div>
@@ -147,6 +159,19 @@
             </div>
         </div>
 
+        <!-- Modification Modal -->
+        <div class="modal" id="modify-modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Modify Plan</h3>
+                <p>Describe how you'd like to change the plan:</p>
+                <textarea id="modification-input" rows="4" placeholder="e.g., Add step to check drug interactions"></textarea>
+                <div class="modal-actions">
+                    <button id="submit-modifications">Submit</button>
+                    <button id="cancel-modifications">Cancel</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay">
             <div class="loading-content">
@@ -168,5 +193,6 @@
     <script src="../api-key/startup-flow.js"></script>
 
     <script src="renderer.js"></script>
+    <script src="agent-mode.js"></script>
 </body>
 </html>

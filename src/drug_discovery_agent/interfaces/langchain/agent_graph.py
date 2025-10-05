@@ -127,9 +127,13 @@ Provide the final answer:""",
         )
 
         chain = prompt | llm
-        response = await chain.ainvoke(
-            {"task": state["input"], "steps": "\n".join(steps_context)}
-        )
+        try:
+            response = await chain.ainvoke(
+                {"task": state["input"], "steps": "\n".join(steps_context)}
+            )
+        except Exception as e:
+            print(f"❌ Error generating final response: {e}")
+            return {**state, "final_response": f"Error generating final response: {e}"}
 
         # Extract string content from response
         content = response.content
@@ -139,7 +143,7 @@ Provide the final answer:""",
         else:
             final_text = str(content)
 
-        return {**state, "final_response": final_text}
+        return {**state, "final_response": final_text, "needs_approval": False}
 
     # --- Routing Functions ---
 

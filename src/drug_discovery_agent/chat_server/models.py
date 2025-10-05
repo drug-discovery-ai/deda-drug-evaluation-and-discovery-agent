@@ -1,5 +1,7 @@
 """Pydantic models for chat server requests and responses."""
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -46,3 +48,57 @@ class HealthResponse(BaseModel):
     service: str
     version: str
     active_sessions: int = 0
+
+
+# Agent Mode Models
+
+
+class AgentChatRequest(BaseModel):
+    """Request to create a plan in agent mode."""
+
+    session_id: str
+    message: str
+    agent_mode: bool = True  # Always true for agent endpoints
+
+
+class PlanResponse(BaseModel):
+    """Plan returned for user approval."""
+
+    plan_id: str
+    session_id: str
+    steps: list[str]
+    tool_calls: list[str]
+    requires_approval: bool = True
+    created_at: str
+
+
+class ApprovalRequest(BaseModel):
+    """User's response to plan approval."""
+
+    session_id: str
+    plan_id: str
+    approved: bool
+    modifications: str | None = None
+
+
+class ExecutionStatus(BaseModel):
+    """Current execution state."""
+
+    plan_id: str
+    session_id: str
+    current_step: int
+    total_steps: int
+    completed: list[dict]  # [{step, result, success, duration}, ...]
+    status: Literal["planning", "awaiting_approval", "executing", "completed", "failed"]
+    error: str | None = None
+    final_response: str | None = None
+
+
+class StreamEvent(BaseModel):
+    """Event streamed during execution."""
+
+    type: Literal["step_start", "tool_call", "tool_result", "step_complete", "error"]
+    plan_id: str
+    step_index: int
+    data: dict
+    timestamp: str

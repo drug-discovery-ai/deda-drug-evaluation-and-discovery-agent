@@ -15,14 +15,19 @@ from starlette.responses import JSONResponse, StreamingResponse
 from starlette.routing import Route
 
 from drug_discovery_agent.chat_server.models import (
+    AgentChatRequest,
+    ApprovalRequest,
     ChatRequest,
     ChatResponse,
     CreateSessionRequest,
     CreateSessionResponse,
+    ExecutionStatus,
     HealthResponse,
+    PlanResponse,
     SessionInfoResponse,
 )
 from drug_discovery_agent.chat_server.session_manager import SessionManager
+from drug_discovery_agent.interfaces.langchain.agent_state import Plan
 from drug_discovery_agent.key_storage.key_manager import APIKeyManager, StorageMethod
 from drug_discovery_agent.settings.api_key.settings import create_api_key_routes
 
@@ -180,6 +185,148 @@ class ChatServer:
         )
         return JSONResponse(response.model_dump())
 
+    # Agent Mode endpoints
+
+    async def create_agent_plan_endpoint(self, request: Request) -> JSONResponse:
+        """Create execution plan for user task.
+
+        Plan requires approval before execution.
+        """
+        try:
+            body = await request.json()
+            agent_request = AgentChatRequest(**body)
+
+            plan = await self.session_manager.create_agent_plan(
+                agent_request.session_id, agent_request.message
+            )
+
+            response = PlanResponse(
+                plan_id=plan.id,
+                session_id=agent_request.session_id,
+                steps=plan.steps,
+                tool_calls=plan.tool_calls,
+                created_at=plan.created_at,
+            )
+
+            return JSONResponse(response.model_dump())
+
+        except ValueError as e:
+            return JSONResponse({"error": str(e)}, status_code=404)
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    async def approve_plan_endpoint(self, request: Request) -> JSONResponse:
+        """Approve or reject plan.
+
+        If approved: starts execution
+        If rejected with modifications: creates new plan
+        """
+        try:
+            body = await request.json()
+            approval_request = ApprovalRequest(**body)
+
+            result = await self.session_manager.approve_plan(
+                approval_request.session_id,
+                approval_request.plan_id,
+                approval_request.approved,
+                approval_request.modifications,
+            )
+
+            if not approval_request.approved and isinstance(result, Plan):
+                # Return new plan for approval
+                response = PlanResponse(
+                    plan_id=result.id,
+                    session_id=approval_request.session_id,
+                    steps=result.steps,
+                    tool_calls=result.tool_calls,
+                    created_at=result.created_at,
+                )
+                return JSONResponse(response.model_dump())
+
+            return JSONResponse({"status": "approved", "message": "Execution started"})
+
+        except ValueError as e:
+            return JSONResponse({"error": str(e)}, status_code=404)
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    async def get_plan_endpoint(self, request: Request) -> JSONResponse:
+        """Retrieve plan details by ID."""
+        try:
+            plan_id = request.path_params["plan_id"]
+            session_id = request.query_params.get("session_id")
+
+            if not session_id:
+                return JSONResponse(
+                    {"error": "session_id query parameter required"}, status_code=400
+                )
+
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return JSONResponse({"error": "Session not found"}, status_code=404)
+
+            if (
+                not session.current_plan or session.current_plan.id != plan_id  # type: ignore
+            ):
+                return JSONResponse({"error": "Plan not found"}, status_code=404)
+
+            plan = session.current_plan
+            response = PlanResponse(
+                plan_id=plan.id,  # type: ignore
+                session_id=session_id,
+                steps=plan.steps,  # type: ignore
+                tool_calls=plan.tool_calls,  # type: ignore
+                created_at=plan.created_at,  # type: ignore
+            )
+
+            return JSONResponse(response.model_dump())
+
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    async def get_execution_status_endpoint(self, request: Request) -> JSONResponse:
+        """Get current execution status."""
+        try:
+            plan_id = request.path_params["plan_id"]
+            session_id = request.query_params.get("session_id")
+
+            if not session_id:
+                return JSONResponse(
+                    {"error": "session_id query parameter required"}, status_code=400
+                )
+
+            status = await self.session_manager.get_execution_status(
+                session_id, plan_id
+            )
+            response = ExecutionStatus(**status)
+
+            return JSONResponse(response.model_dump())
+
+        except ValueError as e:
+            return JSONResponse({"error": str(e)}, status_code=404)
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    async def cancel_execution_endpoint(self, request: Request) -> JSONResponse:
+        """Cancel ongoing execution."""
+        try:
+            body = await request.json()
+            session_id = body.get("session_id")
+            plan_id = body.get("plan_id")
+
+            if not session_id or not plan_id:
+                return JSONResponse(
+                    {"error": "session_id and plan_id required"}, status_code=400
+                )
+
+            await self.session_manager.cancel_agent_execution(session_id, plan_id)
+            return JSONResponse({"status": "cancelled"})
+
+        except ValueError as e:
+            return JSONResponse({"error": str(e)}, status_code=404)
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
     def create_app(self) -> Starlette:
         """Create the Starlette application with routes and middleware."""
 
@@ -205,6 +352,22 @@ class ChatServer:
             # Chat endpoints
             Route("/chat", self.chat_endpoint, methods=["POST"]),
             Route("/chat/stream", self.chat_stream_endpoint, methods=["POST"]),
+            # Agent mode endpoints
+            Route("/chat/agent", self.create_agent_plan_endpoint, methods=["POST"]),
+            Route("/chat/agent/approve", self.approve_plan_endpoint, methods=["POST"]),
+            Route(
+                "/chat/agent/plan/{plan_id}",
+                self.get_plan_endpoint,
+                methods=["GET"],
+            ),
+            Route(
+                "/chat/agent/status/{plan_id}",
+                self.get_execution_status_endpoint,
+                methods=["GET"],
+            ),
+            Route(
+                "/chat/agent/cancel", self.cancel_execution_endpoint, methods=["POST"]
+            ),
             # Health check
             Route("/health", self.health_check, methods=["GET"]),
         ]

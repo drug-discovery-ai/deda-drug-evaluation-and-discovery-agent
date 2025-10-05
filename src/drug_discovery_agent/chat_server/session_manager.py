@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
+from drug_discovery_agent.interfaces.langchain.agent_mode_chat_client import (
+    AgentModeChatClient,
+)
+from drug_discovery_agent.interfaces.langchain.agent_state import Plan
 from drug_discovery_agent.interfaces.langchain.chat_client import (
     BioinformaticsChatClient,
 )
@@ -19,6 +23,11 @@ class ChatSession:
         self.created_at = datetime.now()
         self.last_accessed = datetime.now()
         self.message_count = 0
+        # Agent mode fields
+        self.agent_mode: bool = False
+        self.agent_client: AgentModeChatClient | None = None
+        self.current_plan: Plan | None = None
+        self.thread_id: str | None = None
 
     def update_access(self) -> None:
         """Update the last accessed timestamp."""
@@ -154,3 +163,125 @@ class SessionManager:
                 pass
 
         self.sessions.clear()
+
+    # Agent Mode Methods
+
+    async def create_agent_plan(self, session_id: str, task: str) -> Plan:
+        """Create execution plan using agent client."""
+        session = self.get_session(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+
+        # Initialize agent client if needed
+        if not session.agent_client:
+            session.agent_client = AgentModeChatClient()
+            session.agent_mode = True
+
+        # Create plan (will interrupt for approval)
+        plan = await session.agent_client.create_plan(task)
+        session.current_plan = plan
+        session.thread_id = session.agent_client.thread_id
+
+        return plan
+
+    async def approve_plan(
+        self,
+        session_id: str,
+        plan_id: str,
+        approved: bool,
+        modifications: str | None = None,
+    ) -> Plan | str:
+        """Handle plan approval or rejection.
+
+        Returns new Plan if rejected with modifications, or execution result string if approved.
+        """
+        session = self.get_session(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+
+        if not session.agent_client:
+            raise ValueError("No active agent session")
+
+        if session.current_plan and session.current_plan.id != plan_id:
+            raise ValueError("Plan ID mismatch")
+
+        if approved:
+            # Start execution in background (non-blocking)
+            async def run_execution() -> None:
+                try:
+                    await session.agent_client.approve_and_execute(approved=True)  # type: ignore
+                except Exception as e:
+                    print(f"❌ Agent execution failed: {e}")
+
+            asyncio.create_task(run_execution())
+            return "Execution started"
+        else:
+            # Request replanning
+            result = await session.agent_client.approve_and_execute(
+                approved=False, modifications=modifications
+            )
+            if isinstance(result, Plan):
+                session.current_plan = result
+                return result
+            else:
+                raise ValueError("Expected Plan but got string response")
+
+    async def get_execution_status(
+        self, session_id: str, plan_id: str
+    ) -> dict[str, Any]:
+        """Get current execution state."""
+        session = self.get_session(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+
+        if not session.agent_client:
+            raise ValueError("No active agent session")
+
+        state = session.agent_client.get_state()
+        plan = state.get("plan")
+
+        # Convert state to dict for _determine_status
+        state_dict: dict[str, Any] = dict(state)
+
+        return {
+            "plan_id": plan_id,
+            "session_id": session_id,
+            "current_step": state.get("current_step_index", 0),
+            "total_steps": len(plan.steps) if plan else 0,
+            "completed": [
+                {
+                    "step": r.step,
+                    "result": r.result,
+                    "success": r.success,
+                    "duration": r.duration,
+                }
+                for r in state.get("past_steps", [])
+            ],
+            "status": self._determine_status(state_dict),
+            "error": state.get("error"),
+            "final_response": state.get("final_response"),
+        }
+
+    def _determine_status(self, state: dict[str, Any]) -> str:
+        """Determine execution status from graph state."""
+        if state.get("error"):
+            return "failed"
+        if state.get("final_response"):
+            return "completed"
+        if state.get("needs_approval"):
+            return "awaiting_approval"
+        if state.get("current_step_index", 0) > 0:
+            return "executing"
+        return "planning"
+
+    async def cancel_agent_execution(self, session_id: str, plan_id: str) -> None:
+        """Cancel ongoing execution."""
+        session = self.get_session(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+
+        if session.agent_client:
+            # Set cancellation flag
+            await session.agent_client.graph.aupdate_state(
+                session.agent_client.config, {"error": "Cancelled by user"}
+            )

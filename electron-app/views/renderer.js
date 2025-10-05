@@ -453,6 +453,12 @@ class BioinformaticsChatApp {
      * Format message content with basic markdown support
      */
     formatMessageContent(content) {
+        // Check if content contains HTML (plan messages)
+        if (content.includes('<div') || content.includes('<span')) {
+            // Return HTML as-is for plan messages
+            return content;
+        }
+        // Otherwise escape and parse markdown for regular messages
         return window.utils.parseMarkdown(window.utils.escapeHtml(content));
     }
 

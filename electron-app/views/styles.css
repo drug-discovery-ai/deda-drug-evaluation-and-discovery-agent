@@ -1725,3 +1725,411 @@ body {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
+
+/* ============================================
+   Agent Mode Styles
+   ============================================ */
+
+/* Mode Selector (Radio Buttons) */
+.mode-selector {
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 4px;
+    gap: 4px;
+    -webkit-app-region: no-drag;
+}
+
+.mode-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    position: relative;
+}
+
+.mode-option:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mode-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mode-option input[type="radio"]:checked + .mode-icon {
+    transform: scale(1.1);
+}
+
+.mode-option input[type="radio"]:checked ~ .mode-label {
+    color: white;
+    font-weight: 600;
+}
+
+.mode-option:has(input[type="radio"]:checked) {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.mode-icon {
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.mode-label {
+    transition: all 0.2s ease;
+}
+
+/* In-Chat Plan Message */
+.plan-message {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 8px;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.plan-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.plan-steps-count {
+    font-size: 14px;
+    color: #6c757d;
+    background: #e0e0e0;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* Progress */
+.plan-progress {
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+progress {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: none;
+}
+
+progress::-webkit-progress-bar {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+progress::-webkit-progress-value {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+progress::-moz-progress-bar {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+/* Steps List */
+.plan-steps-list {
+    margin-bottom: 16px;
+}
+
+.plan-step {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.plan-step[data-status="in-progress"] {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.plan-step[data-status="completed"] {
+    border-color: #28a745;
+    background: #f0fff4;
+}
+
+.plan-step[data-status="failed"] {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+
+.step-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.step-number {
+    font-weight: bold;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.step-duration {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.step-text {
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.step-tool {
+    font-size: 12px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.step-details {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 12px;
+}
+
+.tool-calls, .step-result {
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+.plan-step-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #6c757d;
+    align-self: flex-start;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.plan-step-toggle:hover {
+    color: #333;
+}
+
+/* Plan Actions */
+.plan-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.plan-approve-btn,
+.plan-reject-btn,
+.plan-modify-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.plan-approve-btn {
+    background: #28a745;
+    color: white;
+}
+
+.plan-approve-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.plan-reject-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.plan-reject-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.plan-modify-btn {
+    background: #667eea;
+    color: white;
+}
+
+.plan-modify-btn:hover {
+    background: #5568d3;
+    transform: translateY(-1px);
+}
+
+.plan-rejected {
+    color: #dc3545;
+    text-align: center;
+    padding: 8px;
+    font-weight: 600;
+}
+
+/* Plan Progress (shown during execution) */
+.plan-progress {
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: none;
+}
+
+.progress-bar::-webkit-progress-bar {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+.progress-bar::-webkit-progress-value {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.progress-bar::-moz-progress-bar {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+/* Modify Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal .modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal .modal-content h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.modal .modal-content p {
+    color: #6c757d;
+    margin-bottom: 12px;
+}
+
+.modal .modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: inherit;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.modal .modal-content textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.modal-actions button:first-child {
+    background: #667eea;
+    color: white;
+}
+
+.modal-actions button:first-child:hover {
+    background: #5568d3;
+}
+
+.modal-actions button:last-child {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-actions button:last-child:hover {
+    background: #5a6268;
+}
