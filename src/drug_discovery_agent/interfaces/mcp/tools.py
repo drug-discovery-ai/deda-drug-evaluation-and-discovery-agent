@@ -21,7 +21,7 @@ class BioinformaticsToolBase:
         self.open_target_client = OpenTargetsClient()
 
         # Shared MCP interface
-        self.mcp:FastMCP = FastMCP("DEDA")
+        self.mcp: FastMCP = FastMCP("DEDA")
 
         # Register tools
         self._register_tools()
@@ -61,7 +61,7 @@ class BioinformaticsToolBase:
             ),
             annotations=None,
         )
-        async def get_disease_targets(ontology_id: str) ->  dict[str, Any]:
+        async def get_disease_targets(ontology_id: str) -> dict[str, Any]:
             """Retrieve disease-associated target proteins and related data from OpenTargets."""
             return await self.open_target_client.disease_target_knowndrug_pipeline(
                 ontology_id=ontology_id

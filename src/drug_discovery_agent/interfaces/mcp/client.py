@@ -140,7 +140,9 @@ class MCPClient:
                 for tool_call in choice.message.tool_calls or []:
                     tool_name: str = tool_call.function.name
                     tool_args: dict[str, Any] = json.loads(tool_call.function.arguments)
-                    assert self.session is not None, "Client session is not initialized."
+                    assert self.session is not None, (
+                        "Client session is not initialized."
+                    )
                     print(f" Calling tool '{tool_name}' with args: {tool_args}")
                     result = await self.session.call_tool(tool_name, tool_args)
 

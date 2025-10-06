@@ -14,6 +14,7 @@ from .tools import bio_tools, mcp
 
 # ========= REST ENDPOINTS =========
 
+
 async def rest_get_details_protein(request: Request) -> JSONResponse:
     try:
         uniprot_code = request.query_params["uniprot_code"]
