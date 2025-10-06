@@ -12,7 +12,6 @@ from starlette.routing import Mount, Route
 # Import new class-based tool container
 from .tools import bio_tools, mcp
 
-
 # ========= REST ENDPOINTS =========
 
 async def rest_get_details_protein(request: Request) -> JSONResponse:

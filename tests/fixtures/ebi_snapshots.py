@@ -140,8 +140,9 @@ def create_ebi_snapshot_from_mock() -> Any:
             snapshot_manager: Optional snapshot manager instance
         """
         if not snapshot_manager:
-            from drug_discovery_agent.utils.constants import EBI_ENDPOINT
             from snapshots.pytest_plugin import create_snapshot_from_mock
+
+            from drug_discovery_agent.utils.constants import EBI_ENDPOINT
 
             params = {"q": disease_name, "ontology": "efo"}
             return create_snapshot_from_mock(  # type: ignore[no-any-return]
