@@ -1,15 +1,33 @@
+"""
+NOTE: This `client.py` is a simplified Docker client implementation
+intended primarily for local development and testing.
+
+It demonstrates how to interact with the MCP/Starlette backend
+within a containerized setup — suitable for debugging, demos,
+or minimal client-side validation.
+
+CAUTION: Do not use this file directly in production.
+
+For production environments:
+    - Implement your own robust `client.py` with proper error handling,
+      logging, retries, authentication, and secure connection management.
+    - Ensure it aligns with your deployment’s Docker, network,
+      and security policies.
+
+In short → treat this as a reference or starting point, not as a ready-to-deploy client.
+"""
+
 import asyncio
 import json
 import os
-from typing import Optional, List, Dict, Any
 from contextlib import AsyncExitStack
+from typing import Any
 
+from dotenv import load_dotenv
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
-from dotenv import load_dotenv
-
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -19,11 +37,11 @@ class MCPClient:
 
     def __init__(self) -> None:
         """Initialize the MCP client with session management and OpenAI setup."""
-        self.session: Optional[ClientSession] = None
+        self.session: ClientSession | None = None
         self.exit_stack: AsyncExitStack = AsyncExitStack()
         self.openai: OpenAI = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.available_tools: List[Dict[str, Any]] = []
-        self.messages: List[Dict[str, Any]] = []
+        self.available_tools: list[dict[str, Any]] = []
+        self.messages: list[dict[str, Any]] = []
 
     async def connect_to_sse_server(self, server_url: str) -> None:
         """
@@ -60,12 +78,9 @@ class MCPClient:
             raise RuntimeError("Session not initialized.")
         prompt = await self.session.get_prompt("get_initial_prompts")
 
-        messages: List[Dict[str, str]] = []
+        messages: list[dict[str, str]] = []
         for message in prompt.messages:
-            messages.append({
-                "role": message.role,
-                "content": message.content.text
-            })
+            messages.append({"role": message.role, "content": message.content.text})
         self.messages = messages
 
     async def get_available_tools(self) -> None:
@@ -75,7 +90,10 @@ class MCPClient:
 
         print("Fetching available server tools...")
         response = await self.session.list_tools()
-        print("Connected to MCP server with tools:", [tool.name for tool in response.tools])
+        print(
+            "Connected to MCP server with tools:",
+            [tool.name for tool in response.tools],
+        )
 
         self.available_tools = [
             {
@@ -98,10 +116,10 @@ class MCPClient:
             ChatCompletion: The OpenAI response object.
         """
         return self.openai.chat.completions.create(
-            model="gpt-4.1-nano",
+            model="gpt-4o-mini",
             max_tokens=1000,
             messages=self.messages,
-            tools=self.available_tools
+            tools=self.available_tools,
         )
 
     async def process_openai_response(self, response: ChatCompletion) -> str:
@@ -121,16 +139,18 @@ class MCPClient:
 
                 for tool_call in choice.message.tool_calls or []:
                     tool_name: str = tool_call.function.name
-                    tool_args: Dict[str, Any] = json.loads(tool_call.function.arguments)
-
+                    tool_args: dict[str, Any] = json.loads(tool_call.function.arguments)
+                    assert self.session is not None, "Client session is not initialized."
                     print(f" Calling tool '{tool_name}' with args: {tool_args}")
                     result = await self.session.call_tool(tool_name, tool_args)
 
-                    self.messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": result.content,
-                    })
+                    self.messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": result.content,
+                        }
+                    )
 
                 # Recursively process next step
                 next_response = await self.call_openai()
@@ -153,10 +173,7 @@ class MCPClient:
         Returns:
             str: The final assistant output after any tool interactions.
         """
-        self.messages.append({
-            "role": "user",
-            "content": query
-        })
+        self.messages.append({"role": "user", "content": query})
 
         response = await self.call_openai()
         return await self.process_openai_response(response)

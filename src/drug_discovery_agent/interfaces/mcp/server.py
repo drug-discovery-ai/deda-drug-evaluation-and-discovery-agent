@@ -1,4 +1,4 @@
-from typing import Any
+# server.py
 import uvicorn
 from fastmcp.prompts.prompt import Message
 from mcp.server import Server
@@ -9,31 +9,16 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
-from .tools import (
-    mcp,
-    get_fasta_protein,
-    get_virus_protein_details,
-    analyze_protein_sequence_properties,
-    get_top_pdb_ids_for_uniprot,
-    get_experimental_structure_details,
-    get_ligand_smiles_from_uniprot,
-)
+# Import new class-based tool container
+from .tools import bio_tools, mcp
 
 
-# REST-style endpoints that wrap MCP tools
-async def rest_get_fasta_protein(request: Request) -> JSONResponse:
-    try:
-        state = request.query_params["uniprot_code"]
-        result = await get_fasta_protein.fn(state)
-        return JSONResponse({"result": result})
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=400)
-
+# ========= REST ENDPOINTS =========
 
 async def rest_get_details_protein(request: Request) -> JSONResponse:
     try:
-        state = request.query_params["uniprot_code"]
-        result = await get_virus_protein_details.fn(state)
+        uniprot_code = request.query_params["uniprot_code"]
+        result = await bio_tools.get_virus_protein_details.fn(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -41,17 +26,8 @@ async def rest_get_details_protein(request: Request) -> JSONResponse:
 
 async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
     try:
-        state = request.query_params["uniprot_code"]
-        result = await analyze_protein_sequence_properties.fn(state)
-        return JSONResponse({"result": result})
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=400)
-
-
-async def rest_get_top_pdb_ids_for_uniprot(request: Request) -> JSONResponse:
-    try:
-        state = request.query_params["uniprot_code"]
-        result = await get_top_pdb_ids_for_uniprot.fn(state)
+        uniprot_code = request.query_params["uniprot_code"]
+        result = await bio_tools.analyze_protein_sequence_properties.fn(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -59,8 +35,8 @@ async def rest_get_top_pdb_ids_for_uniprot(request: Request) -> JSONResponse:
 
 async def rest_get_experimental_structure_details(request: Request) -> JSONResponse:
     try:
-        state = request.query_params["pdb_id"]
-        result = await get_experimental_structure_details.fn(state)
+        pdb_id = request.query_params["pdb_id"]
+        result = await bio_tools.get_experimental_structure_details.fn(pdb_id)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -68,30 +44,35 @@ async def rest_get_experimental_structure_details(request: Request) -> JSONRespo
 
 async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
     try:
-        state = request.query_params["uniprot_code"]
-        result = await get_ligand_smiles_from_uniprot.fn(state)
+        uniprot_code = request.query_params["uniprot_code"]
+        result = await bio_tools.get_ligand_smiles_from_uniprot.fn(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
+# ========= INITIAL PROMPTS =========
 @mcp.prompt()
 def get_initial_prompts() -> list[PromptMessage]:
     return [
         Message(
             "You are a knowledgeable bioinformatics assistant. "
-            "You help users prepare molecular inputs for docking and drug discovery workflows, particularly for the Boltz system. "
-            "You can fetch protein information from UniProt, download FASTA or PDB data, explain virus protein structures, and guide users on formatting inputs. "
-            "When needed, you call the appropriate tools to fetch sequence data, provide metadata, or guide formatting. "
-            "Always ask clarifying questions if input is ambiguous. "
+            "You help users explore disease-associated targets, analyze protein sequences, and retrieve relevant biological or structural data. "
+            "You can fetch protein information from UniProt, retrieve target-disease relationships from OpenTargets, "
+            "and explore related structural or ligand data from RCSB PDB. "
+            "When a user asks about small molecules, binding partners, inhibitors, or ligands for a known protein, "
+            "use `get_ligand_smiles_from_uniprot`. For 3D structural metadata, use `get_experimental_structure_details`. "
+            "Always call the most relevant tool only when sufficient input (e.g., UniProt ID or ontology ID) is available. "
+            "If no matching data is found, respond clearly with 'No data found' — do not invent or assume information. "
             "Keep your responses concise, scientific, and user-friendly.",
             role="user",
         )
     ]
 
 
+# ========= STARLETTE APP CREATION =========
 def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
-    """Create a Starlette application that can server the provied mcp server with SSE."""
+    """Create a Starlette application that can serve the provided MCP server with SSE."""
     sse = SseServerTransport("/messages/")
 
     async def handle_sse(request: Request) -> None:
@@ -110,7 +91,6 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         debug=debug,
         routes=[
             Route("/sse", endpoint=handle_sse),
-            Route("/rest/get_fasta", endpoint=rest_get_fasta_protein, methods=["GET"]),
             Route(
                 "/rest/get_protein_details",
                 endpoint=rest_get_details_protein,
@@ -119,11 +99,6 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
             Route(
                 "/rest/analyze_sequence_properties",
                 endpoint=rest_analyze_sequence_properties,
-                methods=["GET"],
-            ),
-            Route(
-                "/rest/top_pdb_ids",
-                endpoint=rest_get_top_pdb_ids_for_uniprot,
                 methods=["GET"],
             ),
             Route(
@@ -141,6 +116,7 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
     )
 
 
+# ========= MAIN ENTRY POINT =========
 def main() -> None:
     """Main entry point for the MCP server."""
     mcp_server = mcp._mcp_server
@@ -156,9 +132,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Bind SSE request handling to MCP server
     starlette_app = create_starlette_app(mcp_server, debug=True)
-
     uvicorn.run(starlette_app, host=args.host, port=args.port)
 
 
