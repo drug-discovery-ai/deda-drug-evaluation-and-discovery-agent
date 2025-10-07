@@ -80,7 +80,7 @@ class MCPClient:
 
         messages: list[dict[str, str]] = []
         for message in prompt.messages:
-            messages.append({"role": message.role, "content": message.content.text})
+            messages.append({"role": message.role, "content": message.content.text})  # type: ignore[union-attr]
         self.messages = messages
 
     async def get_available_tools(self) -> None:
@@ -118,8 +118,8 @@ class MCPClient:
         return self.openai.chat.completions.create(
             model="gpt-4.1-mini",
             max_tokens=1000,
-            messages=self.messages,
-            tools=self.available_tools,
+            messages=self.messages,  # type: ignore[arg-type]
+            tools=self.available_tools,  # type: ignore[arg-type]
         )
 
     async def process_openai_response(self, response: ChatCompletion) -> str:
@@ -135,14 +135,14 @@ class MCPClient:
         for choice in response.choices:
             if choice.finish_reason == "tool_calls":
                 # Save assistant message before tool invocation
-                self.messages.append(choice.message)
+                self.messages.append(choice.message)  # type: ignore[arg-type]
 
                 for tool_call in choice.message.tool_calls or []:
-                    tool_name: str = tool_call.function.name
-                    tool_args: dict[str, Any] = json.loads(tool_call.function.arguments)
+                    tool_name: str = tool_call.function.name  # type: ignore[union-attr]
+                    tool_args: dict[str, Any] = json.loads(tool_call.function.arguments)  # type: ignore[union-attr]
 
                     print(f" Calling tool '{tool_name}' with args: {tool_args}")
-                    result = await self.session.call_tool(tool_name, tool_args)
+                    result = await self.session.call_tool(tool_name, tool_args)  # type: ignore[union-attr]
 
                     self.messages.append(
                         {
