@@ -18,10 +18,7 @@ COPY . .
 # Make entrypoint executable
 RUN chmod +x /app/entrypoint.sh
 
-# ✅ Fix: point PYTHONPATH to src
+# point PYTHONPATH to src
 ENV PYTHONPATH=/app/src
-
-# Other envs
-ENV MCP_SSE_URL=http://localhost:8080/sse
 
 ENTRYPOINT ["/app/entrypoint.sh"]
