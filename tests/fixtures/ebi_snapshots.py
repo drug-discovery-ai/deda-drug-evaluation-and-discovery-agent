@@ -5,6 +5,7 @@ from typing import Any
 import pytest
 
 from drug_discovery_agent.core.ebi import EBIClient
+from drug_discovery_agent.utils.constants import EBI_ENDPOINT
 
 
 @pytest.fixture
@@ -140,7 +141,6 @@ def create_ebi_snapshot_from_mock() -> Any:
             snapshot_manager: Optional snapshot manager instance
         """
         if not snapshot_manager:
-            from drug_discovery_agent.utils.constants import EBI_ENDPOINT
             from snapshots.pytest_plugin import create_snapshot_from_mock
 
             params = {"q": disease_name, "ontology": "efo"}
@@ -149,7 +149,6 @@ def create_ebi_snapshot_from_mock() -> Any:
             )
 
         # Use provided snapshot manager
-        from drug_discovery_agent.utils.constants import EBI_ENDPOINT
 
         params = {"q": disease_name, "ontology": "efo"}
         key = snapshot_manager.generate_key(EBI_ENDPOINT, "GET", params)

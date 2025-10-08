@@ -107,7 +107,7 @@ class PDBClient:
 
                         ligands.append(ligand_data)
 
-            return ligands[:10]  # return top 10 ligands total
+            return ligands
 
         except Exception as e:
             return [{"error": str(e)}]

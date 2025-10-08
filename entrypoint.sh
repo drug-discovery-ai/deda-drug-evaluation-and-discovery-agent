@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
-ls
-# Start the server in background
+
+# Set the API key here
+export OPENAI_API_KEY="sk-proj-XXXX"
+
+# Set the MCP SSE Communication Endpint
+export MCP_SSE_URL=http://localhost:8080/sse
+
+# RUN MCP Server
 echo "Starting MCP server..."
-python mcp/boltz/server.py &
-
-# Wait for the server to start
-echo "Waiting for MCP server to start..."
-sleep 3
-
-# Run the MCP client
-echo "Starting MCP client..."
-python mcp/boltz/client.py
-
+python -m drug_discovery_agent.interfaces.mcp.server

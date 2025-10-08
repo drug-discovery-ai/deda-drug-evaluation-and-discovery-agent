@@ -96,6 +96,11 @@ python -m drug_discovery_agent.interfaces.mcp.server --port 8081
 
 The server will start on `localhost:8080` by default and can be connected to by MCP-compatible clients.
 
+Start the MCP Client:
+```bash
+python -m drug_discovery_agent.interfaces.mcp.client
+```
+
 ### 2. Running Chat on CLI
 
 For quick terminal-based interactions with the AI agent:
