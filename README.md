@@ -188,7 +188,7 @@ without `sudo`, you are good to go.
 
 #### Change API Key Before Proceeding
 
-Inside `Dockerfile`, replace the `OPENAI_API_KEY`, with your openAI api key.
+Inside `entrypoint.sh`, replace the `OPENAI_API_KEY`, with your openAI api key.
 
 ```
 ENV OPENAI_API_KEY=sk-proj-XXXX
