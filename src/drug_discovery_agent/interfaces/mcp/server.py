@@ -101,7 +101,7 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         routes=[
             Route("/sse", endpoint=handle_sse),
             Route(
-                "/healthz",
+                "/health",
                 endpoint=rest_server_health,
                 methods=["GET"],
             ),
