@@ -14,7 +14,11 @@ from .tools import bio_tools, mcp
 
 # ========= REST ENDPOINTS =========
 
+# Server Health Check
+async def rest_server_health(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "ok"}, status_code=200)
 
+# Rest Services to tools
 async def rest_get_details_protein(request: Request) -> JSONResponse:
     try:
         uniprot_code = request.query_params["uniprot_code"]
@@ -94,6 +98,11 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
         debug=debug,
         routes=[
             Route("/sse", endpoint=handle_sse),
+            Route(
+                "/healthz",
+                endpoint=rest_server_health,
+                methods=["GET"],
+            ),
             Route(
                 "/rest/get_protein_details",
                 endpoint=rest_get_details_protein,
