@@ -14,9 +14,11 @@ from .tools import bio_tools, mcp
 
 # ========= REST ENDPOINTS =========
 
+
 # Server Health Check
 async def rest_server_health(request: Request) -> JSONResponse:
     return JSONResponse({"status": "ok"}, status_code=200)
+
 
 # Rest Services to tools
 async def rest_get_details_protein(request: Request) -> JSONResponse:
