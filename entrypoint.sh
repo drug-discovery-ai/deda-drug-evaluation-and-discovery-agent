@@ -2,7 +2,7 @@
 set -e
 
 # ---- Environment ----
-export OPENAI_API_KEY="sk-proj-XXXX"
+export OPENAI_API_KEY=sk-proj-XXXX
 export MCP_SSE_URL=http://localhost:8080/sse
 
 # ---- Start MCP Server ----
