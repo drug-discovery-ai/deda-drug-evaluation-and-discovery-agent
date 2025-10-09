@@ -291,3 +291,70 @@ def http_backend_info(pytestconfig: Any) -> dict[str, str]:
         return {"type": "validate", "description": "Validating snapshots"}
     else:
         return {"type": "snapshots", "description": "Using saved snapshots (default)"}
+
+
+# Agent Mode Testing Fixtures
+
+
+@pytest.fixture
+def sample_agent_plan() -> Any:
+    """Sample plan for agent mode testing."""
+    from drug_discovery_agent.interfaces.langchain.agent_state import Plan
+
+    return Plan(
+        id="test-plan-123",
+        steps=[
+            "Search for Alzheimer's disease in the ontology",
+            "For disease ID EFO_0000249, retrieve therapeutic targets",
+            "Get protein details for top target UniProt ID P12345",
+        ],
+        tool_calls=["get_disease_list", "get_disease_targets", "get_protein_details"],
+        created_at="2024-10-04T12:00:00",
+    )
+
+
+@pytest.fixture
+def sample_step_result() -> Any:
+    """Sample step result for agent mode testing."""
+    from drug_discovery_agent.interfaces.langchain.agent_state import StepResult
+
+    return StepResult(
+        step="Test step",
+        result="Test result",
+        success=True,
+        duration=1.5,
+        tool_calls=["test_tool"],
+    )
+
+
+@pytest.fixture
+def sample_agent_state() -> dict[str, Any]:
+    """Sample agent state for testing."""
+    from drug_discovery_agent.interfaces.langchain.agent_state import Plan, StepResult
+
+    plan = Plan(
+        id="state-test-plan",
+        steps=["Step 1", "Step 2"],
+        tool_calls=["tool1", "tool2"],
+        created_at="2024-10-04T12:00:00",
+    )
+
+    step_result = StepResult(
+        step="Step 1",
+        result="Result 1",
+        success=True,
+        duration=1.0,
+        tool_calls=["tool1"],
+    )
+
+    return {
+        "input": "Test query",
+        "plan": plan,
+        "current_step_index": 1,
+        "past_steps": [step_result],
+        "final_response": "",
+        "approved": True,
+        "needs_approval": False,
+        "error": None,
+        "modification_request": None,
+    }
