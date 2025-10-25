@@ -339,7 +339,7 @@ To support multiple Linux formats, update the `build` section:
 ```json
 {
   "build": {
-    "appId": "com.drugdiscovery.biochat",
+    "appId": "deda.drug-evaluation-and-discovery-agent",
     "productName": "Bioinformatics Chat Assistant",
     "directories": {
       "output": "dist",

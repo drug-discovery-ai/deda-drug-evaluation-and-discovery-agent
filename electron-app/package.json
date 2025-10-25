@@ -57,7 +57,7 @@
     "uuid": "^13.0.0"
   },
   "build": {
-    "appId": "com.drugdiscovery.biochat",
+    "appId": "deda.drug-evaluation-and-discovery-agent",
     "productName": "DEDA - Drug Evaluation and Discovery Agent",
     "directories": {
       "output": "dist",
