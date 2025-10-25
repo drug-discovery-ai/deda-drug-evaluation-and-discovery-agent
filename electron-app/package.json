@@ -58,7 +58,7 @@
   },
   "build": {
     "appId": "com.drugdiscovery.biochat",
-    "productName": "Drug Evaluation and Discovery Agent",
+    "productName": "DEDA - Drug Evaluation and Discovery Agent",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -89,6 +89,8 @@
       }
     ],
     "mac": {
+      "identity": "Md Reaz Murshed Masud (NYGMS3PEWS)",
+      "provisioningProfile": "macappdistribution.provisionprofile",
       "category": "public.app-category.education",
       "icon": "../assets/icon.icns",
       "target": [
@@ -102,7 +104,7 @@
       ]
     },
     "dmg": {
-      "title": "Drug Evaluation and Discovery Agent Installer",
+      "title": "DEDA - Drug Evaluation and Discovery Agent Installer",
       "window": {
         "width": 520,
         "height": 450
