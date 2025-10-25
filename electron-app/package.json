@@ -17,6 +17,8 @@
     "build:mac:universal": "electron-builder --mac universal",
     "build:linux": "electron-builder --linux",
     "build:all": "electron-builder --mac --win --linux",
+    "build:mas:x64": "electron-builder --mac mas --x64",
+    "build:mas:arm64": "electron-builder --mac mas --arm64",
     "package": "npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",

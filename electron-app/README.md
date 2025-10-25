@@ -228,6 +228,10 @@ npm run build:mac:arm64
 
 # Build for both architectures
 npm run build:mac:universal
+
+# Build for apple store
+npm run build:mas:x64
+npm run build:mas:arm64
 ```
 
 #### Build for All Platforms
