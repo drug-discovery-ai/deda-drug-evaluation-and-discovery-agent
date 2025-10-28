@@ -12,6 +12,10 @@ python -m drug_discovery_agent.interfaces.mcp.server &
 # ---- Give the server a few seconds, need to be replace with "http://localhost:8080/health" api later, Retry until http://localhost:8080/health returns 200 ----
 sleep 5
 
-# ---- Start MCP Client ----
-echo "Starting MCP client..."
-python -m drug_discovery_agent.interfaces.mcp.client
+# ---- Optionally Start MCP Client ----
+if [ -n "$RUN_CLIENT" ]; then
+  echo "RUN_CLIENT is set — starting MCP client..."
+  python -m drug_discovery_agent.interfaces.mcp.client
+else
+  wait 
+fi
