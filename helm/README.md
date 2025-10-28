@@ -1,6 +1,7 @@
 # 🧠 Helm Installation Guideline — DEDA: Drug Evaluation & Discovery Agent
 
-This guide explains how to install and run **DEDA** using Helm, both locally and in a KIND (Kubernetes-in-Docker) cluster.
+This guide explains how to install and run DEDA as a Kubernetes Pod using Helm.
+Feel free to change the Helm template as necessary.
 
 ---
 
@@ -14,7 +15,7 @@ Make sure you have the following installed:
 
 ## 🧱 2. Run DEDA locally (recommended)
 
-Inside `entrypoint.sh` set your OPENAI_API_KEY. 
+Inside `entrypoint.sh` set your `OPENAI_API_KEY`. 
 
 Navigate to the Helm directory inside the project:
 ```bash
@@ -39,7 +40,8 @@ docker images
 > docker build -t <your-registry>/deda:latest .
 > docker push <your-registry>/deda:latest
 > ```
-> Please contact us for assistance if you’d like to set up private image hosting.
+> And then update the `values.yaml` accordingly.
+
 
 ---
 
@@ -69,13 +71,3 @@ You can verify the deployment:
 ```bash
 kubectl get pods
 ```
-
----
-
-## ✅ 4. Summary
-
-| Mode | Command | Notes |
-|------|----------|-------|
-| **Local Docker (recommended)** | `helm install deda ./deda` | Keeps API key private |
-| **KIND cluster** | `kind load docker-image deda:latest` → `helm install deda ./deda` | For Kubernetes testing |
-| **Private registry** | `docker push <your-registry>/deda:latest` | Contact us for setup help |
