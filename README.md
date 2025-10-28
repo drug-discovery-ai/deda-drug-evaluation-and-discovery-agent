@@ -197,13 +197,13 @@ ENV OPENAI_API_KEY=sk-proj-XXXX
 Run the following command to build the docker image
 
 ```
-docker build --no-cache -t mcp_app .
+docker build --no-cache -t deda .
 ```
 
 To test
 
 ```
-docker run -it mcp_app
+docker run -it -e RUN_CLIENT=true deda
 ```
 
 Enjoy chatting!
