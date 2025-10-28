@@ -40,9 +40,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron.git"
+    "url": "https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent.git"
   },
-  "homepage": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron#readme",
+  "homepage": "https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent.git#readme",
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "concurrently": "^8.2.2",

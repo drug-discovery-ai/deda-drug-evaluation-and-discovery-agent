@@ -23,7 +23,7 @@
 
 ```bash
 git clone <repository-url>
-cd train-a-model
+cd deda-drug-evaluation-and-discovery-agent
 ```
 
 ### 2. Backend Setup
