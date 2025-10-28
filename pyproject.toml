@@ -19,10 +19,12 @@ dependencies = [
     "keyring>=24.0.0",
     "langchain==0.3.27",
     "langchain_openai==0.3.32",
+    "langgraph>=0.2.0",
     "mcp>=1.13.1",
     "openai==1.102.0",
     "python-dotenv==1.1.1",
     "starlette==0.47.3",
+    "tenacity>=8.0.0",
     "uvicorn==0.35.0",
 ]
 
