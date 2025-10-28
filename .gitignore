@@ -84,3 +84,4 @@ logs/
 *.log
 
 entrypoint.sh
+electron-app/macappdistribution.provisionprofile

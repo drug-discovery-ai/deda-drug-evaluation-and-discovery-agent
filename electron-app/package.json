@@ -12,8 +12,13 @@
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
+    "build:mac:arm64": "electron-builder --mac --arm64",
+    "build:mac:x64": "electron-builder --mac --x64",
+    "build:mac:universal": "electron-builder --mac universal",
     "build:linux": "electron-builder --linux",
     "build:all": "electron-builder --mac --win --linux",
+    "build:mas:x64": "electron-builder --mac mas --x64",
+    "build:mas:arm64": "electron-builder --mac mas --arm64",
     "package": "npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -35,13 +40,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron.git"
+    "url": "https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent.git"
   },
-  "homepage": "https://github.com/drug-discovery-ai/train-a-model-shahad.electron#readme",
+  "homepage": "https://github.com/drug-discovery-ai/deda-drug-evaluation-and-discovery-agent.git#readme",
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "concurrently": "^8.2.2",
-    "electron": "^27.0.0",
+    "electron": "^38.4.0",
     "electron-builder": "^24.6.4",
     "eslint": "^8.50.0",
     "jest": "^29.7.0"
@@ -52,8 +57,8 @@
     "uuid": "^13.0.0"
   },
   "build": {
-    "appId": "com.drugdiscovery.biochat",
-    "productName": "Drug Evaluation and Discovery Agent",
+    "appId": "deda.drug-evaluation-and-discovery-agent",
+    "productName": "DEDA - Drug Evaluation and Discovery Agent",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -84,6 +89,8 @@
       }
     ],
     "mac": {
+      "identity": "Md Reaz Murshed Masud (NYGMS3PEWS)",
+      "provisioningProfile": "macappdistribution.provisionprofile",
       "category": "public.app-category.education",
       "icon": "../assets/icon.icns",
       "target": [
@@ -97,7 +104,7 @@
       ]
     },
     "dmg": {
-      "title": "Drug Evaluation and Discovery Agent Installer",
+      "title": "DEDA - Drug Evaluation and Discovery Agent Installer",
       "window": {
         "width": 520,
         "height": 450
