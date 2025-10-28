@@ -26,7 +26,7 @@ The Python backend must be built on each target platform to ensure compatibility
 
 1. **Create Python environment:**
    ```bash
-   cd /path/to/train-a-model
+   cd /path/to/deda-drug-evaluation-and-discovery-agent
    python3 -m venv venv
    source venv/bin/activate
    ```
@@ -79,7 +79,7 @@ The Python backend must be built on each target platform to ensure compatibility
 
 1. **Create Python environment:**
    ```cmd
-   cd C:\path\to\train-a-model
+   cd C:\path\to\deda-drug-evaluation-and-discovery-agent
    python -m venv venv
    venv\Scripts\activate
    ```
@@ -107,7 +107,7 @@ The Python backend must be built on each target platform to ensure compatibility
 
 1. **Create Python environment:**
    ```bash
-   cd /path/to/train-a-model
+   cd /path/to/deda-drug-evaluation-and-discovery-agent
    python3 -m venv venv
    source venv/bin/activate
    ```

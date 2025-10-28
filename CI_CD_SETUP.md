@@ -339,7 +339,7 @@ To support multiple Linux formats, update the `build` section:
 ```json
 {
   "build": {
-    "appId": "com.drugdiscovery.biochat",
+    "appId": "deda.drug-evaluation-and-discovery-agent",
     "productName": "Bioinformatics Chat Assistant",
     "directories": {
       "output": "dist",
@@ -637,7 +637,7 @@ jobs:
 Add build status badges to your README.md:
 
 ```markdown
-[![Build Desktop Applications](https://github.com/your-username/train-a-model/actions/workflows/build-desktop-apps.yml/badge.svg)](https://github.com/your-username/train-a-model/actions/workflows/build-desktop-apps.yml)
+[![Build Desktop Applications](https://github.com/your-username/deda-drug-evaluation-and-discovery-agent/actions/workflows/build-desktop-apps.yml/badge.svg)](https://github.com/your-username/train-a-model/actions/workflows/build-desktop-apps.yml)
 ```
 
 ### Slack/Discord Notifications
