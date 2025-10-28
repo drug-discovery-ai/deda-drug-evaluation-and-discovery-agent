@@ -30,7 +30,7 @@ Then verify that the Docker images is built successfully:
 ```bash
 docker images
 
-
+```
 > ⚠️ **Important:**  
 > We **do not recommend embedding your OpenAI API key inside the Docker image**.  
 > Always run the container locally where you can safely manage environment variables.  
