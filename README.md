@@ -210,4 +210,4 @@ Enjoy chatting!
 
 
 ### 4. Run DEDA in Kubernetes Cluster:
-For deployment on a Kubernetes cluster, follow the [Helm deployment guide](./helm/README,md).
+For deployment on a Kubernetes cluster, follow the [Helm deployment guide](./helm/README.md).
