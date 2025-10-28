@@ -3,27 +3,31 @@
 ## 📋 Prerequisites
 
 ### Development Environment
+
 - **Node.js**: Version 18.0 or higher
 - **Python**: Version 3.12 or higher
 - **Git**: For version control
 - **Platform-specific build tools**:
-  - Windows: Visual Studio Build Tools
-  - macOS: Xcode Command Line Tools  
-  - Linux: build-essential package
+    - Windows: Visual Studio Build Tools
+    - macOS: Xcode Command Line Tools
+    - Linux: build-essential package
 
 ### API Configuration
+
 - **OpenAI API Key**: Required for AI functionality
 - Create `.env` file in project root with: `OPENAI_API_KEY=your_key_here`
 
 ## 🚀 Quick Start
 
 ### 1. Clone and Setup
+
 ```bash
 git clone <repository-url>
-cd train-a-model
+cd deda-drug-evaluation-and-discovery-agent
 ```
 
 ### 2. Backend Setup
+
 ```bash
 # Create Python virtual environment
 python -m venv venv
@@ -39,6 +43,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Frontend Setup
+
 ```bash
 # Navigate to Electron app
 cd electron-app
@@ -48,6 +53,7 @@ npm install
 ```
 
 ### 4. Development Mode
+
 ```bash
 # From electron-app directory
 npm run dev
@@ -63,20 +69,20 @@ The Electron app communicates with a Python backend server running on `localhost
 
 ### Session Flow
 
-1. **App Startup**: 
-   - Electron launches Python backend server
-   - Frontend creates new session via `POST /sessions`
-   - Session ID stored for all subsequent requests
+1. **App Startup**:
+    - Electron launches Python backend server
+    - Frontend creates new session via `POST /sessions`
+    - Session ID stored for all subsequent requests
 
 2. **Chat Interaction**:
-   - User types message and clicks send
-   - Frontend sends to `POST /api/chat` with session_id
-   - Backend maintains conversation context automatically
-   - AI response displayed in chat interface
+    - User types message and clicks send
+    - Frontend sends to `POST /api/chat` with session_id
+    - Backend maintains conversation context automatically
+    - AI response displayed in chat interface
 
 3. **App Shutdown**:
-   - Session cleanup via `DELETE /sessions/{id}`
-   - Python backend server terminated gracefully
+    - Session cleanup via `DELETE /sessions/{id}`
+    - Python backend server terminated gracefully
 
 ## 🛠️ Development Guide
 
@@ -113,12 +119,14 @@ npm test
 ### Debugging
 
 #### Frontend Debugging
+
 - **DevTools**: Full Chrome DevTools available
 - **Console Logging**: Use `console.log()` in renderer.js
 - **Network Tab**: Monitor HTTP requests to backend
 - **Sources Tab**: Set breakpoints in JavaScript code
 
 #### Backend Debugging
+
 - **Terminal Output**: Python server logs appear in terminal
 - **Health Endpoint**: Check `localhost:8080/health` in browser
 - **Session Status**: Monitor active sessions in health response
@@ -127,11 +135,13 @@ npm test
 ## 🏭 Build & Packaging
 
 ### Development Build
+
 ```bash
 npm run build
 ```
 
 ### Platform-Specific Builds
+
 ```bash
 # Windows installer
 npm run build:win
@@ -149,6 +159,7 @@ npm run build:all
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 # .env file in project root
 OPENAI_API_KEY=your_openai_api_key_here
@@ -157,12 +168,15 @@ ELECTRON_DEV_MODE=true
 ```
 
 ### Application Settings
+
 Settings are stored in platform-specific locations:
+
 - **Windows**: `%APPDATA%/bioinformatics-chat`
-- **macOS**: `~/Library/Preferences/bioinformatics-chat`  
+- **macOS**: `~/Library/Preferences/bioinformatics-chat`
 - **Linux**: `~/.config/bioinformatics-chat`
 
 ### Customization
+
 - **UI Themes**: Modify `src/styles.css`
 - **Backend Port**: Change in `main.js` and backend startup
 - **Window Size**: Configure in `main.js` window options
@@ -188,10 +202,12 @@ npm run build:python
 ```
 
 This runs PyInstaller with the correct configuration and creates:
+
 - `../dist/__main__` - The Python backend executable (in the project root dist folder)
 - `../dist/__main__.app` - macOS app bundle (on macOS)
 
 **Note**: The npm script automatically handles:
+
 - Detecting the correct target architecture automatically
 - Including necessary hidden imports (Bio, langchain, uvicorn, etc.)
 - Excluding unnecessary modules (tkinter, matplotlib)
@@ -207,6 +223,7 @@ npm install
 ```
 
 #### Build for Current Platform
+
 ```bash
 # Build DMG installer for macOS (current architecture)
 npm run build:mac
@@ -219,6 +236,7 @@ npm run build:linux
 ```
 
 #### Build for Specific Architectures
+
 ```bash
 # Build for Intel Macs (x64)
 npm run build:mac:x64
@@ -228,9 +246,15 @@ npm run build:mac:arm64
 
 # Build for both architectures
 npm run build:mac:universal
+
+# Build for apple store
+# Put macappdistribution.provisionprofile file in the electron-app folder for signing
+npm run build:mas:x64
+npm run build:mas:arm64
 ```
 
 #### Build for All Platforms
+
 ```bash
 # Create installers for all supported platforms
 npm run build:all
@@ -247,7 +271,9 @@ Installers are created in `electron-app/dist/`:
 ### Important Notes
 
 #### Environment Variables
-The `.env` file containing your OpenAI API key is automatically included in the installer build process. The application uses enhanced path resolution to find environment variables in these locations:
+
+The `.env` file containing your OpenAI API key is automatically included in the installer build process. The application
+uses enhanced path resolution to find environment variables in these locations:
 
 1. **Development**: `.env` file in project root
 2. **Production**: Bundled within the application package at `Contents/Resources/.env`
@@ -256,11 +282,13 @@ The `.env` file containing your OpenAI API key is automatically included in the 
 #### Troubleshooting
 
 **Environment Variable Issues:**
+
 - If you see "api_key client option must be set" errors, ensure your `.env` file contains `OPENAI_API_KEY=your_key_here`
 - The app includes debug logging that shows which `.env` file was loaded (check console output)
 - For production apps, the environment file is bundled automatically during the build process
 
 **Import Errors:**
+
 - If you encounter relative import errors, ensure you're using the latest build with fixed absolute imports
 - The `npm run build:python` command now handles import resolution automatically
 
