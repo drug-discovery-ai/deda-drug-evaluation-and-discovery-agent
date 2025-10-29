@@ -1,8 +1,3 @@
-from typing import Any
-
-from drug_discovery_agent.core.uniprot import UniProtClient
-
-import yaml # type: ignore
 import asyncio
 
 # Sample epitope.json
@@ -29,17 +24,17 @@ import asyncio
 
 
 class PreprocessorClient:
-    def __init__(self,denovo_tool_name:str="") -> None:
+    def __init__(self, denovo_tool_name: str = "") -> None:
         self.denovo_tool_name = denovo_tool_name
         pass
 
     def get_yaml(
-    self,
-    target_uniprot: str,
-    is_foreign: bool,
-    epitope_region: list[tuple[int, int]] | None,
-    antibody_framework: str|None,
-    CDR: list[str]
+        self,
+        target_uniprot: str,
+        is_foreign: bool,
+        epitope_region: list[tuple[int, int]] | None,
+        antibody_framework: str | None,
+        CDR: list[str],
     ) -> str | None:
         """
         Build and return a de novo antibody-design YAML specification.
@@ -68,14 +63,16 @@ class PreprocessorClient:
             or None if YAML generation fails.
         """
         if not epitope_region:
-            epitope_generation:str|Exception = self.generate_antigen_epitope(uniprot_code=target_uniprot)
+            epitope_generation: str | Exception = self.generate_antigen_epitope(
+                uniprot_code=target_uniprot
+            )
             if not epitope_generation:
                 return None
         if not antibody_framework:
             asyncio.run(self.generate_denovo_antibody_framework())
 
         return "success"
-    
+
     def generate_antigen_epitope(self, uniprot_code: str) -> str | Exception:
         """
         Use PyMOL to fetch the AlphaFold structure for the given UniProt code
@@ -105,7 +102,6 @@ class PreprocessorClient:
         """
         print("Antigen UniProt:", uniprot_code)
         return "success"
-
 
     async def generate_denovo_antibody_framework(self) -> str | Exception:
         """
@@ -140,6 +136,3 @@ class PreprocessorClient:
             or an Exception object if framework generation fails.
         """
         return "success"
-
-
-
