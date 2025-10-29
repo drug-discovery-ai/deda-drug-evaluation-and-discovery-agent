@@ -1,28 +1,5 @@
 import asyncio
 
-# Sample epitope.json
-# {
-#   "source": "RBD_333-527",
-#   "description": "Receptor-binding domain of SARS-CoV-2 Spike protein",
-#   "chain_id": "A",
-#   "residue_range": [333, 527],
-#   "center_of_mass": [12.45, 58.12, 43.87],
-#   "surface_patch": [
-#     333, 334, 335, 336, 338, 341, 344,
-#     348, 351, 354, 356, 358, 360, 366,
-#     368, 369, 373, 375, 376, 379, 382,
-#     383, 384, 385, 389, 392, 395, 396,
-#     400, 401, 403, 405, 408, 409, 412,
-#     414, 417, 421, 425, 426, 430, 435,
-#     438, 440, 444, 446, 449, 450, 453,
-#     456, 458, 462, 464, 467, 470, 472,
-#     475, 478, 480, 482, 485, 489, 491,
-#     493, 495, 496, 499, 501, 503, 505,
-#     507, 509, 511, 515, 518, 522, 526, 527
-#   ]
-# }
-
-
 class PreprocessorClient:
     def __init__(self, denovo_tool_name: str = "") -> None:
         self.denovo_tool_name = denovo_tool_name
