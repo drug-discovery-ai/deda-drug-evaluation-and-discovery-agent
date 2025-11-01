@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import httpx
@@ -85,7 +85,7 @@ class EBIClient:
 
     async def fetch_antigen_region_to_pdb_protein_data(
         self, antigen_uniprot_code: str
-    ) -> list[PDBMapping] | None:
+    ) -> list[dict[str, Any]] | None | None:
         """
         Fetch PDB mappings for a given UniProt antigen code.
 
@@ -127,4 +127,4 @@ class EBIClient:
                     )
                 )
 
-        return results
+        return [asdict(entry) for entry in results]
