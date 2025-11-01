@@ -1,8 +1,25 @@
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import httpx
 
-from drug_discovery_agent.utils.constants import EBI_ENDPOINT
+from drug_discovery_agent.utils.constants import (
+    EBI_ANTIGEN_REGION_DETAILS_TO_PDB,
+    EBI_ENDPOINT,
+)
+
+
+@dataclass
+class PDBMapping:
+    pdb_id: str
+    entity_id: int
+    chain_id: str
+    struct_asym_id: str
+    method: str | None = None
+    resolution: float | None = None
+    uniprot_range: list[int] | None = None
+    pdb_range: list[int] | None = None
+    overlap: list[int] | None = None
 
 
 class EBIClient:
@@ -65,3 +82,49 @@ class EBIClient:
         ]
 
         return self.ontology_matches
+
+    async def fetch_antigen_region_to_pdb_protein_data(
+        self, antigen_uniprot_code: str
+    ) -> list[dict[str, Any]] | None | None:
+        """
+        Fetch PDB mappings for a given UniProt antigen code.
+
+        Returns a list of PDBMapping instances with entity, chain, and residue range details.
+        """
+        url = f"{EBI_ANTIGEN_REGION_DETAILS_TO_PDB}/{antigen_uniprot_code}"
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=10, follow_redirects=True)
+                response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            print(
+                f"HTTP error {e.response.status_code} for UniProt: {antigen_uniprot_code}"
+            )
+            return []
+        except Exception as e:
+            print(f"Request failed: {str(e)}")
+            return []
+
+        data: dict[str, Any] = response.json()
+        pdb_data = data.get(antigen_uniprot_code, {}).get("PDB", {})
+        results: list[PDBMapping] = []
+
+        # PDBe returns a flat list of mappings per PDB ID
+        for pdb_id, mappings in pdb_data.items():
+            for seg in mappings:
+                results.append(
+                    PDBMapping(
+                        pdb_id=pdb_id,
+                        entity_id=seg.get("entity_id", 0),
+                        chain_id=seg.get("chain_id", ""),
+                        struct_asym_id=seg.get("struct_asym_id", ""),
+                        uniprot_range=[seg.get("unp_start"), seg.get("unp_end")],
+                        pdb_range=[
+                            seg.get("start", {}).get("residue_number"),
+                            seg.get("end", {}).get("residue_number"),
+                        ],
+                    )
+                )
+
+        return [asdict(entry) for entry in results]
