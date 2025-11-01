@@ -6,6 +6,7 @@ RCSB_DB_ENDPOINT = "https://data.rcsb.org/rest/v1/core/entry"
 EBI_ENDPOINT = "https://www.ebi.ac.uk/ols/api/search"
 OPENTARGET_ENDPOINT = "https://api.platform.opentargets.org/api/v4/graphql"
 ALPHAFOLD_ENDPOINT = "https://alphafold.ebi.ac.uk/api/prediction"
+EBI_ANTIGEN_REGION_DETAILS_TO_PDB = "https://www.ebi.ac.uk/pdbe/api/mappings"
 
 # HTTP configuration
 USER_AGENT = "FASTA-app/1.0"

@@ -1,12 +1,17 @@
 import asyncio
 
+from drug_discovery_agent.core.ebi import EBIClient
+from drug_discovery_agent.core.uniprot import UniProtClient
+
 
 class PreprocessorClient:
     def __init__(self, denovo_tool_name: str = "") -> None:
         self.denovo_tool_name = denovo_tool_name
+        self.uniprot_client = UniProtClient()
+        self.ebi_client = EBIClient()
         pass
 
-    def get_yaml(
+    async def get_yaml(
         self,
         target_uniprot: str,
         is_foreign: bool,
@@ -41,9 +46,9 @@ class PreprocessorClient:
             or None if YAML generation fails.
         """
         if not epitope_region:
-            epitope_generation: str | Exception = self.generate_antigen_epitope(
-                uniprot_code=target_uniprot
-            )
+            epitope_generation: list[
+                dict[str, str | list[int] | list[dict[str, str]]]
+            ] = await self.generate_antigen_epitope(uniprot_code=target_uniprot)
             if not epitope_generation:
                 return None
         if not antibody_framework:
@@ -51,35 +56,37 @@ class PreprocessorClient:
 
         return "success"
 
-    def generate_antigen_epitope(self, uniprot_code: str) -> str | Exception:
+    async def generate_antigen_epitope(
+        self, uniprot_code: str
+    ) -> list[dict[str, str | list[int] | list[dict[str, str]]]]:
         """
-        Use PyMOL to fetch the AlphaFold structure for the given UniProt code
-        and identify surface-exposed residues (potential epitopes) based on
-        solvent accessibility and geometric analysis. Also try to leverage the
-        existing core APIs in `pdb.py` to fetch and read epitopes (if any).
-        The result will be saved as `epitope.json`.
+        Generate and retrieve potential epitope regions for a given UniProt antigen.
 
-        # Sample epitope.json
-        # {
-        #   "source": "RBD_333-527",
-        #   "description": "Receptor-binding domain of SARS-CoV-2 Spike protein",
-        #   "chain_id": "A",
-        #   "residue_ranges": [[333, 527]],
-        #   "center_of_mass": [12.45, 58.12, 43.87],
-        #   "surface_patch": [
-        #     333, 334, 335, 336, 338, 341, 344, 348, 351, 354, 356, 358,
-        #     360, 366, 368, 369, 373, 375, 376, 379, 382, 383, 384, 385,
-        #     389, 392, 395, 396, 400, 401, 403, 405, 408, 409, 412, 414,
-        #     417, 421, 425, 426, 430, 435, 438, 440, 444, 446, 449, 450,
-        #     453, 456, 458, 462, 464, 467, 470, 472, 475, 478, 480, 482,
-        #     485, 489, 491, 493, 495, 496, 499, 501, 503, 505, 507, 509,
-        #     511, 515, 518, 522, 526, 527
-        #   ],
-        #   "method": "pymol_surface"
-        # }
+        This method:
+        - Fetches annotated structural or antigenic regions from UniProt.
+        - Initializes or updates the de novo antibody framework.
+        - Retrieves PDB mappings from the EBI PDBe API to identify
+            experimentally resolved antigen segments.
+        - Optionally integrates surface residue analysis from AlphaFold
+            or PyMOL-based methods.
+
+        Returns:
+            list[dict[str, str | list[int] | list[dict[str, str]]]]:
+                A list of region dictionaries, each containing the type,
+                description, residue range, and optional evidence metadata.
         """
-        print("Antigen UniProt:", uniprot_code)
-        return "success"
+        get_regions_for_epitope_candidate = (
+            await self.uniprot_client.get_antigen_regions_to_target(
+                uniprot_id=uniprot_code, denovo=False
+            )
+        )
+        await self.generate_denovo_antibody_framework()
+        # ebI_PDB_antigen = (
+        #     await self.ebi_client.fetch_antigen_region_to_pdb_protein_data(
+        #         antigen_uniprot_code=uniprot_code
+        #     )
+        # )
+        return get_regions_for_epitope_candidate
 
     async def generate_denovo_antibody_framework(self) -> str | Exception:
         """
