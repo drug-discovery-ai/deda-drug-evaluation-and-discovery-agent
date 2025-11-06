@@ -194,7 +194,7 @@ Before creating installers, ensure you have:
 
 ### Step 1: Build Python Backend
 
-From the electron-app directory:
+From the electron-app directory: `cd electron-app`
 
 ```bash
 # Build the Python backend executable using the npm script
@@ -218,7 +218,6 @@ This runs PyInstaller with the correct configuration and creates:
 Navigate to the electron-app directory and install dependencies:
 
 ```bash
-cd electron-app
 npm install
 ```
 
