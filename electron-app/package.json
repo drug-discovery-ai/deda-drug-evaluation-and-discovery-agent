@@ -1,6 +1,7 @@
 {
   "name": "bioinformatics-chat-assistant",
-  "version": "1.0.0",
+  "productName": "DEDA (bioinformatics chat assistant)",
+  "version": "1.0.1",
   "description": "Desktop application for AI-powered bioinformatics research and analysis",
   "main": "main.js",
   "scripts": {
