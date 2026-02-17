@@ -36,8 +36,6 @@ class BioinformaticsChatClient:
         self.key_manager = APIKeyManager()
         api_key, _ = self.key_manager.get_api_key()
 
-        # Fallback mechanism: allow empty API key during initialization
-        # This prevents startup crashes while maintaining functional security
         if not api_key:
             api_key = os.getenv("OPENAI_API_KEY", "")
 
