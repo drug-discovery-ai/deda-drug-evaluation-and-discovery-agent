@@ -250,6 +250,7 @@ npm run build:mac:universal
 # Put macappdistribution.provisionprofile file in the electron-app folder for signing
 npm run build:mas:x64
 npm run build:mas:arm64
+# After the installers are built inside electron-app/dist/, you can use "Transporter" app to upload to the apple store developer's account. 
 ```
 
 #### Build for All Platforms
