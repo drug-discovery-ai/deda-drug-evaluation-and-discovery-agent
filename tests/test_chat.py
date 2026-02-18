@@ -354,7 +354,7 @@ class TestAsyncMainKeyRetrieval:
         mock_key_manager_class.return_value = mock_key_manager
         mock_key_manager.get_api_key.return_value = (
             "sk-existing123",
-            StorageMethod.KEYCHAIN,
+            StorageMethod.ENVIRONMENT,
         )
 
         mock_client = AsyncMock()
