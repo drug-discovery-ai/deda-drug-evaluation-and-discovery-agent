@@ -125,32 +125,6 @@ class TestAPIKeyManager:
         assert source != StorageMethod.ENVIRONMENT
 
     @patch("keyring.get_password")
-    def test_get_api_key_from_keychain(self, mock_get_password: Any) -> None:
-        """Test retrieving API key from OS keychain."""
-        # Mock keychain to return our test key
-        mock_get_password.return_value = self.test_api_key
-
-        key, source = self.manager.get_api_key()
-        assert key == self.test_api_key
-        assert source == StorageMethod.KEYCHAIN
-
-        # Verify keyring was called correctly
-        mock_get_password.assert_called_once_with(
-            self.test_service_name, self.test_account_name
-        )
-
-    @patch("keyring.get_password")
-    def test_get_api_key_keychain_error(self, mock_get_password: Any) -> None:
-        """Test handling keychain access errors."""
-        from keyring.errors import KeyringError
-
-        mock_get_password.side_effect = KeyringError("Access denied")
-
-        key, source = self.manager.get_api_key()
-        # Should fall back to other methods
-        assert source != StorageMethod.KEYCHAIN
-
-    @patch("keyring.get_password")
     def test_get_api_key_from_encrypted_file(self, mock_get_password: Any) -> None:
         """Test retrieving API key from encrypted file storage."""
         # Mock keyring to return None (no key in keychain)
@@ -190,19 +164,6 @@ class TestAPIKeyManager:
             key, source = self.manager.get_api_key()
             assert key == "sk-envkey1234567890abcdef"
             assert source == StorageMethod.ENVIRONMENT
-
-    @patch("keyring.set_password")
-    def test_store_api_key_keychain(self, mock_set_password: Any) -> None:
-        """Test storing API key in keychain."""
-        success, method, error = self.manager.store_api_key(self.test_api_key)
-
-        assert success
-        assert method == StorageMethod.KEYCHAIN
-        assert error is None
-
-        mock_set_password.assert_called_once_with(
-            self.test_service_name, self.test_account_name, self.test_api_key
-        )
 
     @patch("keyring.set_password")
     def test_store_api_key_keychain_fallback(self, mock_set_password: Any) -> None:
@@ -260,7 +221,7 @@ class TestAPIKeyManager:
     @patch("keyring.delete_password")
     def test_delete_api_key_specific_method(self, mock_delete_password: Any) -> None:
         """Test deleting API key from specific storage method."""
-        success, message = self.manager.delete_api_key(StorageMethod.KEYCHAIN)
+        success, message = self.manager.delete_api_key(StorageMethod.ENCRYPTED_FILE)
 
         # Should only call keyring delete
         mock_delete_password.assert_called_once()

@@ -119,7 +119,7 @@ class TestAPIKeyIntegration:
         api_key, source = self.key_manager.get_api_key()
 
         assert api_key is not None
-        assert source in [StorageMethod.KEYCHAIN, StorageMethod.ENCRYPTED_FILE]
+        assert source in [StorageMethod.ENCRYPTED_FILE]
 
     def test_startup_without_api_key(self) -> None:
         """Test server startup without any API key."""
@@ -210,7 +210,7 @@ class TestAPIKeyIntegration:
         success, method, _ = self.key_manager.store_api_key(stored_key)
         assert success
         # Method could be either keychain or encrypted file depending on system
-        assert method in [StorageMethod.KEYCHAIN, StorageMethod.ENCRYPTED_FILE]
+        assert method in [StorageMethod.ENCRYPTED_FILE]
 
         # Set environment variable (higher priority)
         env_key = "sk-enviro123456789abcdef123456789abcdef"
@@ -227,7 +227,7 @@ class TestAPIKeyIntegration:
         # Get API key again - should return stored key
         retrieved_key, source = self.key_manager.get_api_key()
         assert retrieved_key == stored_key
-        assert source in [StorageMethod.KEYCHAIN, StorageMethod.ENCRYPTED_FILE]
+        assert source in [StorageMethod.ENCRYPTED_FILE]
 
     def test_invalid_api_key_handling(self) -> None:
         """Test handling of invalid API keys."""

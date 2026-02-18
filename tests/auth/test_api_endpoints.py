@@ -51,7 +51,7 @@ class TestAPIKeyEndpoints:
         # Mock successful storage
         mock_key_manager.store_api_key.return_value = (
             True,
-            StorageMethod.KEYCHAIN,
+            StorageMethod.ENCRYPTED_FILE,
             None,
         )
 
@@ -150,7 +150,7 @@ class TestAPIKeyEndpoints:
         """Test getting key status when key exists."""
         mock_key_manager.get_api_key.return_value = (
             "sk-1234567890abcdefghij",
-            StorageMethod.KEYCHAIN,
+            StorageMethod.ENCRYPTED_FILE,
         )
         mock_key_manager.get_storage_status.return_value = {
             "environment": {"available": False, "valid": False},
@@ -284,7 +284,7 @@ class TestAPIKeyEndpoints:
         """Test successful API key update."""
         mock_key_manager.update_api_key.return_value = (
             True,
-            StorageMethod.KEYCHAIN,
+            StorageMethod.ENCRYPTED_FILE,
             None,
         )
 
@@ -387,7 +387,7 @@ class TestAPIKeyEndpoints:
         """Test storing API key that has warnings but is valid."""
         mock_key_manager.store_api_key.return_value = (
             True,
-            StorageMethod.KEYCHAIN,
+            StorageMethod.ENCRYPTED_FILE,
             None,
         )
 

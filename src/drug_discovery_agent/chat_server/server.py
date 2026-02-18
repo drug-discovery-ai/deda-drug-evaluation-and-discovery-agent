@@ -239,8 +239,6 @@ def display_api_key_status() -> None:
         print(f"🔑 {message}")
         if source == StorageMethod.ENVIRONMENT:
             print("   Source: Environment variable")
-        elif source == StorageMethod.KEYCHAIN:
-            print("   Source: OS keychain (secure)")
         elif source == StorageMethod.ENCRYPTED_FILE:
             print("   Source: Encrypted file storage")
     else:
