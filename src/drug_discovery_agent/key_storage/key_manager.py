@@ -7,9 +7,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import keyring
-from keyring.errors import KeyringError
-
 from .storage_fallback import EncryptedFileStorage
 from .validation import APIKeyValidator
 
