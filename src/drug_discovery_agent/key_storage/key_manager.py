@@ -13,6 +13,7 @@ from .validation import APIKeyValidator
 
 class StorageMethod(Enum):
     """Available storage methods in priority order."""
+
     ENVIRONMENT = "environment"
     ENCRYPTED_FILE = "encrypted_file"
     NOT_FOUND = "not_found"
