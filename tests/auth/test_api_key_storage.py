@@ -182,7 +182,9 @@ class TestAPIKeyManager:
         assert error is None
 
     @patch("keyring.delete_password")
-    def test_delete_api_key_encrypted_file_only(self, mock_delete_password: Any) -> None:
+    def test_delete_api_key_encrypted_file_only(
+        self, mock_delete_password: Any
+    ) -> None:
         """Test deleting API key from encrypted file storage only."""
         # Store key in encrypted file
         self.manager.encrypted_storage.store_api_key(self.test_api_key)
