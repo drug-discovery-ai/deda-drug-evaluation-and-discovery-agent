@@ -199,12 +199,12 @@ class TestAPIKeyManager:
         """Test deleting API key from specific encrypted file storage method."""
         # Store key in encrypted file first
         self.manager.encrypted_storage.store_api_key(self.test_api_key)
-        
+
         success, message = self.manager.delete_api_key(StorageMethod.ENCRYPTED_FILE)
 
         assert success
         assert "Deleted from" in message
-        
+
         # Verify encrypted file was deleted
         assert self.manager.encrypted_storage.get_api_key() is None
 
