@@ -70,7 +70,7 @@ class TestAPIKeyEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
-        assert data["method_used"] == "keychain"
+        assert data["method_used"] == "encrypted_file"
 
     def test_store_api_key_invalid_format(
         self, client: TestClient, mock_key_manager: Mock
@@ -154,9 +154,8 @@ class TestAPIKeyEndpoints:
         )
         mock_key_manager.get_storage_status.return_value = {
             "environment": {"available": False, "valid": False},
-            "keychain": {"available": True, "valid": True},
-            "encrypted_file": {"available": False, "valid": False},
-            "current_source": "keychain",
+            "encrypted_file": {"available": True, "valid": True},
+            "current_source": "encrypted_file",
         }
 
         with patch(
@@ -171,7 +170,7 @@ class TestAPIKeyEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["has_key"] is True
-        assert data["source"] == "keychain"
+        assert data["source"] == "encrypted_file"
         assert data["masked_key"] == "sk-1***************ghij"
 
     def test_get_key_status_no_key(
@@ -181,7 +180,6 @@ class TestAPIKeyEndpoints:
         mock_key_manager.get_api_key.return_value = (None, StorageMethod.NOT_FOUND)
         mock_key_manager.get_storage_status.return_value = {
             "environment": {"available": False, "valid": False},
-            "keychain": {"available": False, "valid": False},
             "encrypted_file": {"available": False, "valid": False},
             "current_source": "not_found",
         }
@@ -302,7 +300,7 @@ class TestAPIKeyEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
-        assert data["method_used"] == "keychain"
+        assert data["method_used"] == "encrypted_file"
 
     def test_update_api_key_failure(
         self, client: TestClient, mock_key_manager: Mock
