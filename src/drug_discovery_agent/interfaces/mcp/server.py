@@ -75,8 +75,8 @@ def get_initial_prompts() -> list[PromptMessage]:
                 "Always choose tools based on available identifiers (disease name, ontology ID, UniProt ID, or PDB ID) and inferred context — never guess. "
                 "If input is ambiguous, ask clarifying questions. "
                 "If no valid data is found, respond with 'No data found' and do not fabricate results. "
-                "Keep responses concise, factual, and scientifically clear, emphasizing how diseases, targets, drugs, and protein structures connect mechanistically."
-            )
+                "Keep responses concise, factual, and scientifically clear, emphasizing how diseases, targets, drugs, and protein structures connect mechanistically.",
+            ),
         )
     ]
 
