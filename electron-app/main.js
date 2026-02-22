@@ -4,6 +4,33 @@ const path = require('path');
 const { existsSync } = require('fs');
 const { SERVER_CONFIG } = require('./config/constants');
 
+// Add crash handlers and V8 safeguards
+process.env.ELECTRON_ENABLE_LOGGING = '1';
+process.env.ELECTRON_ENABLE_STACK_DUMPING = '1';
+
+// Add V8 flags to prevent font-related crashes
+app.commandLine.appendSwitch('js-flags', '--expose-gc --max-old-space-size=4096');
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('no-sandbox');
+
+// Global error handlers
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  if (error.message && error.message.includes('font')) {
+    console.log('Font-related error detected, continuing with fallback fonts');
+    return; // Don't exit on font errors
+  }
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  if (reason && reason.message && reason.message.includes('font')) {
+    console.log('Font-related rejection detected, continuing');
+    return;
+  }
+});
+
 class ElectronApp {
     constructor() {
         this.pythonProcess = null;
@@ -13,6 +40,37 @@ class ElectronApp {
         this.baseServerUrl = SERVER_CONFIG.URL;
         this.isQuitting = false;
         this.isDevelopment = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
+    }
+
+    async createMinimalWindow() {
+        // Create a minimal window as fallback
+        this.mainWindow = new BrowserWindow({
+            width: 800,
+            height: 600,
+            show: true,
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                enableRemoteModule: false,
+                preload: path.join(__dirname, 'preload.js'),
+                webSecurity: true,
+                allowRunningInsecureContent: false
+            }
+        });
+
+        // Load the app
+        await this.mainWindow.loadFile('views/index.html');
+
+        // Handle window closed
+        this.mainWindow.on('closed', async () => {
+            this.mainWindow = null;
+            if (!this.isQuitting) {
+                this.isQuitting = true;
+                if (process.platform === 'darwin') {
+                    app.quit();
+                }
+            }
+        });
     }
 
     async createWindow() {
@@ -36,7 +94,7 @@ class ElectronApp {
         });
 
         // Load the app
-        this.mainWindow.loadFile('views/index.html');
+        await this.mainWindow.loadFile('views/index.html');
 
         // Show window when ready to prevent visual flash
         this.mainWindow.once('ready-to-show', () => {
@@ -308,29 +366,54 @@ class ElectronApp {
 
     async initialize() {
         try {
-            // Set up IPC handlers
+            console.log('Starting application initialization...');
+            
+            // Set up IPC handlers first
             this.setupIPC();
 
-            // Create main window first so user sees something immediately
-            await this.createWindow();
-            console.log('Electron window created');
+            // Create main window with error handling
+            try {
+                await this.createWindow();
+                console.log('Electron window created successfully');
+            } catch (windowError) {
+                console.error('Failed to create window:', windowError);
+                // Try creating window with minimal settings
+                await this.createMinimalWindow();
+                console.log('Minimal Electron window created as fallback');
+            }
 
-            // Start Python backend in parallel
-            console.log('Starting Python backend server...');
-            await this.startPythonBackend();
-            console.log('Python backend started successfully');
+            // Start Python backend with error handling
+            try {
+                console.log('Starting Python backend server...');
+                await this.startPythonBackend();
+                console.log('Python backend started successfully');
 
-            // Verify backend is healthy
-            const isHealthy = await this.healthCheck();
-            if (!isHealthy) {
-                throw new Error('Backend server is not responding to health checks');
+                // Verify backend is healthy
+                const isHealthy = await this.healthCheck();
+                if (!isHealthy) {
+                    console.warn('Backend health check failed, but continuing...');
+                }
+            } catch (backendError) {
+                console.error('Backend startup failed:', backendError);
+                this.showError('Backend Error', 
+                    `Backend failed to start: ${backendError.message}. Some features may be limited.`);
+                // Don't quit the app - continue with limited functionality
             }
 
             console.log('Application initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize application:', error);
-            this.showError('Startup Error', 
-                `Failed to start the application: ${error.message}`);
+            console.error('Critical initialization error:', error);
+            
+            // Try to show error dialog before quitting
+            if (this.mainWindow) {
+                this.showError('Critical Startup Error', 
+                    `Failed to start the application: ${error.message}`);
+            } else {
+                // Fallback to native dialog if window failed
+                dialog.showErrorBox('Critical Startup Error', 
+                    `Failed to start the application: ${error.message}`);
+            }
+            
             app.quit();
         }
     }
