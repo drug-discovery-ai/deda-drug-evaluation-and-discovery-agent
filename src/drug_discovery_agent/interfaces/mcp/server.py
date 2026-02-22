@@ -23,7 +23,7 @@ async def rest_server_health(request: Request) -> JSONResponse:
 async def rest_get_details_protein(request: Request) -> JSONResponse:
     try:
         uniprot_code = request.query_params["uniprot_code"]
-        result = await bio_tools.get_virus_protein_details.fn(uniprot_code)
+        result = await bio_tools._get_virus_protein_details_raw(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -32,7 +32,7 @@ async def rest_get_details_protein(request: Request) -> JSONResponse:
 async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
     try:
         uniprot_code = request.query_params["uniprot_code"]
-        result = await bio_tools.analyze_protein_sequence_properties.fn(uniprot_code)
+        result = await bio_tools._analyze_protein_sequence_properties_raw(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -41,7 +41,7 @@ async def rest_analyze_sequence_properties(request: Request) -> JSONResponse:
 async def rest_get_experimental_structure_details(request: Request) -> JSONResponse:
     try:
         pdb_id = request.query_params["pdb_id"]
-        result = await bio_tools.get_experimental_structure_details.fn(pdb_id)
+        result = await bio_tools._get_experimental_structure_details_raw(pdb_id)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
@@ -50,7 +50,7 @@ async def rest_get_experimental_structure_details(request: Request) -> JSONRespo
 async def rest_get_ligand_smiles_from_uniprot(request: Request) -> JSONResponse:
     try:
         uniprot_code = request.query_params["uniprot_code"]
-        result = await bio_tools.get_ligand_smiles_from_uniprot.fn(uniprot_code)
+        result = await bio_tools._get_ligand_smiles_from_uniprot_raw(uniprot_code)
         return JSONResponse({"result": result})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
