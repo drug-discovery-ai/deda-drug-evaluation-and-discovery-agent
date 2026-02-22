@@ -32,16 +32,16 @@ class BioinformaticsToolBase:
         # Create separate undecorated functions for REST access
         async def _get_virus_protein_details_raw(uniprot_code: str) -> dict[str, Any]:
             return await self.uniprot_client.get_details(uniprot_code)
-        
+
         async def _analyze_protein_sequence_properties_raw(uniprot_code: str) -> dict[str, Any]:
             return await self.sequence_analyzer.analyze_from_uniprot(uniprot_code)
-        
+
         async def _get_experimental_structure_details_raw(pdb_id: str) -> dict[str, Any]:
             return await self.pdb_client.get_structure_details(pdb_id)
-        
+
         async def _get_ligand_smiles_from_uniprot_raw(uniprot_id: str) -> list[dict[str, Any]]:
             return await self.pdb_client.get_ligands_for_uniprot(uniprot_id)
-        
+
         # Store these for REST access
         self._get_virus_protein_details_raw = _get_virus_protein_details_raw
         self._analyze_protein_sequence_properties_raw = _analyze_protein_sequence_properties_raw
