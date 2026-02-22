@@ -8,6 +8,8 @@
     "dev": "concurrently \"npm run dev:python\" \"npm run dev:electron\"",
     "dev:python": "node scripts/start-python-backend.js",
     "dev:electron": "node scripts/start-electron-dev.js",
+    "debug": "electron --inspect=5858 --enable-logging --v=1 .",
+    "start": "electron --enable-logging --v=1 .",
     "build": "npm run build:python && npm run build:electron",
     "build:python": "cd .. && pyinstaller --onefile --clean --noconfirm --noconsole --log-level=INFO --hidden-import=langchain --hidden-import=langchain_openai --hidden-import=Bio --hidden-import=uvicorn --hidden-import=starlette --exclude-module=tkinter --exclude-module=matplotlib --exclude-module=numpy.testing --exclude-module=pytest --exclude-module=setuptools --osx-bundle-identifier deda.drug-evaluation-and-discovery-agent src/drug_discovery_agent/chat_server/__main__.py",
     "build:electron": "electron-builder",
@@ -47,7 +49,7 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "concurrently": "^8.2.2",
-    "electron": "^38.4.0",
+    "electron": "^40.6.0",
     "electron-builder": "^24.6.4",
     "eslint": "^8.50.0",
     "jest": "^29.7.0"
