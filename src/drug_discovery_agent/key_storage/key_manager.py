@@ -7,9 +7,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import keyring
-from keyring.errors import KeyringError
-
 from .storage_fallback import EncryptedFileStorage
 from .validation import APIKeyValidator
 
@@ -18,7 +15,6 @@ class StorageMethod(Enum):
     """Available storage methods in priority order."""
 
     ENVIRONMENT = "environment"
-    KEYCHAIN = "keychain"
     ENCRYPTED_FILE = "encrypted_file"
     NOT_FOUND = "not_found"
 
@@ -26,7 +22,7 @@ class StorageMethod(Enum):
 class APIKeyManager:
     """Manages API key storage and retrieval with multiple backend support.
 
-    Priority order: environment variables → OS keychain → encrypted file → user prompt
+    Priority order: environment variables → encrypted file → user prompt
     """
 
     SERVICE_NAME = "drug-discovery-agent"
@@ -70,7 +66,7 @@ class APIKeyManager:
         return base_dir / self.app_name
 
     def get_api_key(self) -> tuple[str | None, StorageMethod]:
-        """Retrieve API key using priority order: env → keychain → encrypted_file.
+        """Retrieve API key using priority order: env → encrypted_file.
 
         Returns:
             Tuple of (api_key, storage_method) where api_key is None if not found.
@@ -85,20 +81,6 @@ class APIKeyManager:
                 self.logger.warning(
                     "Invalid API key format found in environment variable"
                 )
-
-        # 2. Check OS keychain
-        try:
-            keychain_key = keyring.get_password(self.SERVICE_NAME, self.ACCOUNT_NAME)
-            if keychain_key:
-                if self.validator.is_valid_format(keychain_key):
-                    self.logger.info("API key loaded from OS keychain")
-                    return keychain_key, StorageMethod.KEYCHAIN
-                else:
-                    self.logger.warning("Invalid API key format found in OS keychain")
-        except KeyringError as e:
-            self.logger.warning(f"Could not access OS keychain: {e}")
-        except Exception as e:
-            self.logger.error(f"Unexpected error accessing keychain: {e}")
 
         # 3. Check encrypted file storage (fallback)
         try:
@@ -125,22 +107,13 @@ class APIKeyManager:
 
         Args:
             api_key: The API key to store
-            preferred_method: Preferred storage method, defaults to keychain
+            preferred_method: Preferred storage method, defaults to encrypted_file
 
         Returns:
             Tuple of (success, actual_method_used, error_message)
         """
         if not self.validator.is_valid_format(api_key):
             return False, StorageMethod.NOT_FOUND, "Invalid API key format"
-
-        if preferred_method is None:
-            preferred_method = StorageMethod.KEYCHAIN
-
-        if preferred_method == StorageMethod.KEYCHAIN:
-            success, error = self._store_in_keychain(api_key)
-            if success:
-                return True, StorageMethod.KEYCHAIN, None
-            self.logger.warning(f"Keychain storage failed: {error}")
 
         try:
             self.encrypted_storage.store_api_key(api_key)
@@ -150,21 +123,6 @@ class APIKeyManager:
             error_msg = f"Encrypted file storage failed: {e}"
             self.logger.error(error_msg)
             return False, StorageMethod.NOT_FOUND, error_msg
-
-    def _store_in_keychain(self, api_key: str) -> tuple[bool, str | None]:
-        """Store API key in OS keychain.
-
-        Returns:
-            Tuple of (success, error_message)
-        """
-        try:
-            keyring.set_password(self.SERVICE_NAME, self.ACCOUNT_NAME, api_key)
-            self.logger.info("API key stored in OS keychain")
-            return True, None
-        except KeyringError as e:
-            return False, f"Keyring error: {e}"
-        except Exception as e:
-            return False, f"Unexpected error: {e}"
 
     def delete_api_key(self, method: StorageMethod | None = None) -> tuple[bool, str]:
         """Delete API key from storage.
@@ -176,24 +134,6 @@ class APIKeyManager:
             Tuple of (success, message)
         """
         results = []
-
-        if method is None or method == StorageMethod.KEYCHAIN:
-            try:
-                keyring.delete_password(self.SERVICE_NAME, self.ACCOUNT_NAME)
-                results.append("Deleted from keychain")
-                self.logger.info("API key deleted from OS keychain")
-            except KeyringError as e:
-                # Ignore "not found" and "backend unavailable" errors (expected in CI)
-                error_str = str(e).lower()
-                if (
-                    "not found" not in error_str
-                    and "no recommended backend" not in error_str
-                ):
-                    results.append(f"Keychain deletion error: {e}")
-            except Exception as e:
-                error_str = str(e).lower()
-                if "no recommended backend" not in error_str:
-                    results.append(f"Keychain deletion error: {e}")
 
         if method is None or method == StorageMethod.ENCRYPTED_FILE:
             try:
@@ -221,7 +161,6 @@ class APIKeyManager:
                 "available": bool(os.environ.get(self.ENV_VAR_API_KEY)),
                 "valid": False,
             },
-            "keychain": {"available": False, "valid": False, "error": None},
             "encrypted_file": {"available": False, "valid": False, "error": None},
             "current_source": StorageMethod.NOT_FOUND.value,
         }
@@ -232,22 +171,6 @@ class APIKeyManager:
             status["environment"]["valid"] = self.validator.is_valid_format(env_key)
             if status["environment"]["valid"]:
                 status["current_source"] = StorageMethod.ENVIRONMENT.value
-
-        # Check keychain
-        try:
-            keychain_key = keyring.get_password(self.SERVICE_NAME, self.ACCOUNT_NAME)
-            if keychain_key:
-                status["keychain"]["available"] = True
-                status["keychain"]["valid"] = self.validator.is_valid_format(
-                    keychain_key
-                )
-                if (
-                    status["keychain"]["valid"]
-                    and status["current_source"] == StorageMethod.NOT_FOUND.value
-                ):
-                    status["current_source"] = StorageMethod.KEYCHAIN.value
-        except Exception as e:
-            status["keychain"]["error"] = str(e)
 
         # Check encrypted file
         try:

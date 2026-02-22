@@ -37,9 +37,7 @@ class BioinformaticsChatClient:
         api_key, _ = self.key_manager.get_api_key()
 
         if not api_key:
-            raise ValueError(
-                "No API key found. Please configure an OpenAI API key through environment variables, keychain, or the application settings."
-            )
+            api_key = os.getenv("OPENAI_API_KEY", "")
 
         # Initialize LangChain components
         self.llm = self._create_model_integration(api_key)

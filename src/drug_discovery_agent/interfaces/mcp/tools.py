@@ -29,6 +29,35 @@ class BioinformaticsToolBase:
     def _register_tools(self) -> None:
         """Registers all tools under the FastMCP instance."""
 
+        # Create separate undecorated functions for REST access
+        async def _get_virus_protein_details_raw(uniprot_code: str) -> dict[str, Any]:
+            return await self.uniprot_client.get_details(uniprot_code)
+
+        async def _analyze_protein_sequence_properties_raw(
+            uniprot_code: str,
+        ) -> dict[str, Any]:
+            return await self.sequence_analyzer.analyze_from_uniprot(uniprot_code)
+
+        async def _get_experimental_structure_details_raw(
+            pdb_id: str,
+        ) -> dict[str, Any]:
+            return await self.pdb_client.get_structure_details(pdb_id)
+
+        async def _get_ligand_smiles_from_uniprot_raw(
+            uniprot_id: str,
+        ) -> list[dict[str, Any]]:
+            return await self.pdb_client.get_ligands_for_uniprot(uniprot_id)
+
+        # Store these for REST access
+        self._get_virus_protein_details_raw = _get_virus_protein_details_raw
+        self._analyze_protein_sequence_properties_raw = (
+            _analyze_protein_sequence_properties_raw
+        )
+        self._get_experimental_structure_details_raw = (
+            _get_experimental_structure_details_raw
+        )
+        self._get_ligand_smiles_from_uniprot_raw = _get_ligand_smiles_from_uniprot_raw
+
         # Retrieve possible disease ontology matches (Human-in-the-Loop verification)
         @self.mcp.tool(
             name="get_possible_diseases_list",
@@ -83,7 +112,7 @@ class BioinformaticsToolBase:
             """Fetch comprehensive UniProt metadata for a given viral protein accession code."""
             return await self.uniprot_client.get_details(uniprot_code)
 
-        # Retrieve experimental 3D structure details from RCSB PDB
+        # Retrieve experimental 3D structure details
         @self.mcp.tool(
             name="get_experimental_structure_details",
             description=(
@@ -98,7 +127,7 @@ class BioinformaticsToolBase:
             """Retrieve experimental structure metadata from RCSB PDB for a given PDB ID."""
             return await self.pdb_client.get_structure_details(pdb_id)
 
-        # Retrieve co-crystallized ligands associated with a UniProt protein
+        # Retrieve co-crystallized ligands
         @self.mcp.tool(
             name="get_ligand_smiles_from_uniprot",
             description=(
@@ -114,6 +143,7 @@ class BioinformaticsToolBase:
             """Retrieve ligand metadata (SMILES, formula, name) from PDB entries linked to a given UniProt ID."""
             return await self.pdb_client.get_ligands_for_uniprot(uniprot_id)
 
+        # Analyze protein sequence properties
         @self.mcp.tool(
             name="analyze_sequence_properties",
             description="Analyze protein properties by UniProt code (length, molecular weight, pI, composition).",
@@ -123,7 +153,7 @@ class BioinformaticsToolBase:
         ) -> dict[str, Any]:
             return await self.sequence_analyzer.analyze_from_uniprot(uniprot_code)
 
-        # Attach for external access
+        # Attach for external access (decorated versions for MCP)
         self.get_disease_list = get_disease_list
         self.get_disease_targets = get_disease_targets
         self.get_virus_protein_details = get_virus_protein_details
