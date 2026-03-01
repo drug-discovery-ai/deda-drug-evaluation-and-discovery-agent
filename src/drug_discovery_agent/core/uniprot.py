@@ -153,3 +153,80 @@ class UniProtClient:
         ]
 
         return sorted(set(pdb_ids))[:10]
+
+    async def get_antigen_regions_to_target(
+        self, uniprot_id: str, denovo: bool = True
+    ) -> list[dict[str, str | list[int] | list[dict[str, str]]]]:
+        """
+        Fetch antigenic or structural regions from a UniProt entry for the specified antigen.
+
+        Args:
+            denovo (bool, optional):
+                If True, filter and return only regions that are potential candidates
+                for de novo antibody design (e.g., receptor-binding domains, antigenic
+                determinants, epitopes). Disordered, transmembrane, and intracellular
+                regions are excluded. Defaults to True.
+
+            uniprot_id (str):
+                The UniProt accession ID (e.g., "P0DTC2" for SARS-CoV-2 Spike protein).
+        """
+        url = f"{VIRUS_UNIPROT_REST_API_BASE}/{uniprot_id}.json"
+        data = await self._make_request(url, expected_format="json")
+
+        regions_to_target: list[dict[str, str | list[int] | list[dict[str, str]]]] = []
+
+        denovo_keywords: list[str] = [
+            "receptor-binding",
+            "antigenic",
+            "epitope",
+            "surface",
+            "spike",
+            "binding site",
+            "loop",
+            "motif",
+            "n-terminal domain",
+            "s1 subunit",
+        ]
+
+        valid_feature_types = ["Region", "Domain", "Topological domain", "Chain"]
+
+        for feature in data.get("features", []):
+            ftype = feature.get("type", "")
+            if ftype not in valid_feature_types:
+                continue
+
+            desc = feature.get("description", "")
+            location = feature.get("location", {})
+            start = location.get("start", {}).get("value")
+            end = location.get("end", {}).get("value")
+
+            # Skip if coordinates are missing
+            if not (start and end):
+                continue
+
+            # Extract evidences if available
+            evidences = []
+            for ev in feature.get("evidences", []) or []:
+                evidences.append(
+                    {
+                        "evidenceCode": ev.get("evidenceCode", ""),
+                        "source": ev.get("source", ""),
+                        "id": ev.get("id", ""),
+                    }
+                )
+
+            # If denovo mode, only keep antigenically relevant descriptors
+            if denovo and not any(k in desc.lower() for k in denovo_keywords):
+                continue
+
+            entry = {
+                "type": ftype,
+                "description": desc,
+                "residue_range": [start, end],
+            }
+            if evidences:
+                entry["evidence"] = evidences
+
+            regions_to_target.append(entry)
+
+        return regions_to_target
