@@ -82,5 +82,7 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+entrypoint.sh
 electron-app/macappdistribution.provisionprofile
 build-output/
